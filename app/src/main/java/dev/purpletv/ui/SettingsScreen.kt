@@ -46,7 +46,7 @@ fun SettingsScreen(vm: HomeViewModel, onLogin: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         // Reading the counter here makes the screen recompose (and keep focus) after a change.
-        @Suppress("UNUSED_EXPRESSION") version
+        @Suppress("UNUSED_VARIABLE") val observed = version
         run {
             Section("Konto")
             if (name != null) {
