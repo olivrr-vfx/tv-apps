@@ -40,7 +40,15 @@ die Wiedergabe läuft flüssig.
    https://github.com/olivrr-vfx/tv-apps/releases/latest/download/PurpleTV.apk
    ```
 
-4. Installieren und öffnen. Für Updates einfach denselben Link nochmal laden.
+4. Installieren und öffnen.
+
+### Automatische Updates
+
+PurpleTV prüft beim Start selbst, ob es eine neue Version gibt, lädt sie herunter und
+installiert sie. Beim ersten Update fragt Android einmalig, ob PurpleTV Apps installieren darf
+(„Erlauben“ wählen). Ab Android 12 laufen die weiteren Updates danach ohne Nachfrage. Auf
+älteren Geräten musst du die Installation jeweils mit einem Klick bestätigen. Abschalten
+kannst du das unter *Einstellungen → Automatische Updates*.
 
 Alternativ per ADB: `adb connect <TV-IP>` und danach `adb install -r PurpleTV.apk`.
 

@@ -63,6 +63,9 @@ class Settings(context: Context) {
     var thirdPartyEmotes: Boolean
         get() = prefs.getBoolean("third_party_emotes", true)
         set(value) = putBool("third_party_emotes", value)
+    var autoUpdate: Boolean
+        get() = prefs.getBoolean("auto_update", true)
+        set(value) = putBool("auto_update", value)
     var showStats: Boolean
         get() = prefs.getBoolean("show_stats", false)
         set(value) = putBool("show_stats", value)

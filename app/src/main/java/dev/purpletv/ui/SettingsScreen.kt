@@ -22,6 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import dev.purpletv.update.Updater
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +44,8 @@ fun SettingsScreen(vm: HomeViewModel, onLogin: () -> Unit) {
     var version by remember { mutableIntStateOf(0) }
     fun changed() { version++ }
     var clientId by remember { mutableStateOf(s.clientId) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 48.dp, vertical = 12.dp),
@@ -87,6 +93,12 @@ fun SettingsScreen(vm: HomeViewModel, onLogin: () -> Unit) {
                 changed()
             }
             SettingRow("7TV- & BTTV-Emotes", onOff(s.thirdPartyEmotes)) { s.thirdPartyEmotes = !s.thirdPartyEmotes; changed() }
+
+            Section("App")
+            SettingRow("Automatische Updates", onOff(s.autoUpdate)) { s.autoUpdate = !s.autoUpdate; changed() }
+            SettingRow("Version ${BuildConfig.VERSION_NAME}", "", action = "Nach Updates suchen") {
+                scope.launch { Updater.checkAndInstall(context, manual = true) }
+            }
 
             Spacer(Modifier.height(16.dp))
             Text("PurpleTV ${BuildConfig.VERSION_NAME}", color = Colors.TextDim, fontSize = 12.sp)

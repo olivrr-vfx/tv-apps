@@ -14,7 +14,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.purpletv.PurpleApp
+import dev.purpletv.update.UpdateState
+import dev.purpletv.update.Updater
+import kotlinx.coroutines.launch
 import dev.purpletv.twitch.Game
 import dev.purpletv.twitch.StreamInfo
 
@@ -26,6 +31,19 @@ sealed interface Route {
 }
 
 class MainActivity : ComponentActivity() {
+    private var lastUpdateCheck = 0L
+
+    override fun onStart() {
+        super.onStart()
+        if (!(application as PurpleApp).settings.autoUpdate) return
+        val now = System.currentTimeMillis()
+        // Re-check right away when coming back from the permission screen.
+        if (Updater.state.value == UpdateState.NeedsPermission || now - lastUpdateCheck > 30 * 60_000) {
+            lastUpdateCheck = now
+            lifecycleScope.launch { Updater.checkAndInstall(this@MainActivity) }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -82,5 +100,6 @@ private fun App() {
                 onExit = { pop() },
             )
         }
+        UpdateOverlay()
     }
 }
