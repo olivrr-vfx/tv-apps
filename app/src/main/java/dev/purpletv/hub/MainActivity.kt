@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -311,9 +312,10 @@ private val pendingYouTubeSearch = kotlinx.coroutines.flow.MutableStateFlow<Stri
 /** Top-level sections get the navigation rail on the left. */
 @Composable
 private fun HubShell(app: PurpleApp, nav: Navigator, section: Route.Section, content: @Composable () -> Unit) {
+    val enabled by app.enabledAppsState.collectAsState()
     val items = buildList {
         add(RailItem("dashboard", "Start", icon = Icons.Filled.Home))
-        app.enabledApps().forEach { add(RailItem(it.key, it.label, app = it, accent = accentFor(it))) }
+        enabled.forEach { add(RailItem(it.key, it.label, app = it, accent = accentFor(it))) }
         add(RailItem("settings", "Einstellungen", icon = Icons.Filled.Settings))
     }
     Box(Modifier.fillMaxSize()) {

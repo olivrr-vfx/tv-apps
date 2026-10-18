@@ -17,6 +17,8 @@ import dev.purpletv.twitch.api.Helix
 import dev.purpletv.twitch.api.TwitchAuth
 import dev.purpletv.twitch.api.TwitchGql
 import dev.purpletv.youtube.YouTubeRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class PurpleApp : Application(), ImageLoaderFactory {
     lateinit var settings: Settings
@@ -44,14 +46,20 @@ class PurpleApp : Application(), ImageLoaderFactory {
         history = WatchHistory(this)
         twitch = TwitchRepository(settings, auth, helix)
         youtube = YouTubeRepository(this, settings)
+        _enabled.value = enabledApps()
         AppLauncher.sync(this, settings)
         if (settings.remoteEnabled) startRemote()
     }
 
     fun enabledApps(): List<AppId> = AppId.entries.filter { settings.isEnabled(it) }
 
+    private val _enabled = MutableStateFlow<List<AppId>>(emptyList())
+    /** Enabled apps as state, so the navigation and dashboard follow the settings. */
+    val enabledAppsState: StateFlow<List<AppId>> get() = _enabled
+
     fun setAppEnabled(app: AppId, enabled: Boolean) {
         settings.setEnabled(app, enabled)
+        _enabled.value = enabledApps()
         AppLauncher.sync(this, settings)
         if (enabled) onForeground() else when (app) {
             AppId.TWITCH -> twitch.onBackground()

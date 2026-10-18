@@ -224,6 +224,8 @@ fun <T> TopTabs(
                 onClick = { pending = null; onSelect(tab) },
                 icon = icon?.invoke(tab),
                 onFocus = { if (tab != selected) pending = tab },
+                // Opening an app (e.g. from its home screen tile) puts the focus on its tabs.
+                modifier = Modifier.initialFocus(enabled = tab == selected, key = Unit),
             )
         }
     }

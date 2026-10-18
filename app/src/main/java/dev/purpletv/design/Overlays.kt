@@ -20,7 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.focusGroup
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -32,6 +36,7 @@ import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 
 /** Modal card over a dimmed screen. Back closes it. */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TvDialog(
     title: String,
@@ -45,6 +50,9 @@ fun TvDialog(
     Box(Modifier.fillMaxSize().background(Palette.scrim), contentAlignment = Alignment.Center) {
         Column(
             modifier
+                // The D-pad must not wander to the screen behind the dialog.
+                .focusProperties { exit = { FocusRequester.Cancel } }
+                .focusGroup()
                 .width(width)
                 .clip(RoundedCornerShape(Tokens.Radius.xl))
                 .background(Palette.surfaceRaised)

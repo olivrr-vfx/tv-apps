@@ -49,6 +49,7 @@ import dev.purpletv.design.Tokens
 import dev.purpletv.design.TvButton
 import dev.purpletv.design.TvTextField
 import dev.purpletv.design.Type
+import dev.purpletv.design.initialFocus
 import dev.purpletv.remote.RemoteServer
 import dev.purpletv.update.Updater
 import kotlinx.coroutines.launch
@@ -74,7 +75,14 @@ fun SettingsScreen(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(Tokens.Space.sm),
             ) {
                 Category.entries.forEach { c ->
-                    Chip(c.label, selected = c == category, onClick = { category = c }, icon = c.icon, onFocus = { category = c })
+                    Chip(
+                        c.label,
+                        selected = c == category,
+                        onClick = { category = c },
+                        icon = c.icon,
+                        onFocus = { category = c },
+                        modifier = Modifier.initialFocus(enabled = c == category),
+                    )
                 }
             }
             Column(

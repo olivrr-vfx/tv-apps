@@ -69,7 +69,7 @@ private sealed interface ContinueItem {
 
 @Composable
 fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
-    val enabled = remember(app.settings.isEnabled(AppId.TWITCH), app.settings.isEnabled(AppId.YOUTUBE)) { app.enabledApps() }
+    val enabled by app.enabledAppsState.collectAsState()
     val twitchOn = AppId.TWITCH in enabled
     val youtubeOn = AppId.YOUTUBE in enabled
     LaunchedEffect(twitchOn, youtubeOn) {
