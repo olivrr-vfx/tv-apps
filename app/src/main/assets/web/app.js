@@ -8,7 +8,7 @@
 
   var params = new URLSearchParams(location.search);
   // Demo: opened as a file or with ?demo=1 – sample data, no TV needed.
-  var DEMO = params.get("demo") === "1" || location.protocol === "file:" || /claudeusercontent\.com$|github\.io$/.test(location.hostname);
+  var DEMO = window.COUCH_DEMO === true || params.get("demo") === "1" || location.protocol === "file:" || /claudeusercontent\.com$|github\.io$/.test(location.hostname);
   // The code travels in the URL so "Add to Home Screen" keeps it (iOS gives the home screen app
   // its own storage); localStorage is the fallback for plain browser use.
   var code = params.get("code") || safeGet(STORE) || safeGet("purpletv.code") || (DEMO ? "123456" : "");
@@ -246,6 +246,7 @@
       stage.appendChild(el("iframe", {
         src: "https://www.youtube-nocookie.com/embed/" + encodeURIComponent(item.id) + "?autoplay=1&rel=0&playsinline=1" + start,
         allow: "autoplay; encrypted-media; picture-in-picture; fullscreen", allowfullscreen: true,
+        referrerpolicy: "strict-origin-when-cross-origin",
       }));
       $("#player-note").textContent = "Läuft über den YouTube-Player. Manche Videos erlauben das nicht – dann „Auf dem TV“.";
       return;
@@ -816,7 +817,15 @@
 
   function demoApi(method, path) {
     var now = Date.now();
-    var thumb = function (seed) { return "https://picsum.photos/seed/" + seed + "/640/360"; };
+    // Generated placeholder pictures, so the demo works offline.
+    var thumb = function (seed) {
+      var h = 0;
+      for (var i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) % 360;
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0">' +
+        '<stop offset="0" stop-color="hsl(' + h + ',55%,22%)"/><stop offset="1" stop-color="hsl(' + ((h + 50) % 360) + ',70%,48%)"/></linearGradient></defs>' +
+        '<rect width="640" height="360" fill="url(#g)"/><circle cx="470" cy="120" r="140" fill="rgba(255,255,255,.08)"/></svg>';
+      return "data:image/svg+xml," + encodeURIComponent(svg);
+    };
     var DATA = {
       state: {
         version: "2.0.0", screen: "live", app: "twitch", apps: ["twitch", "youtube"], playing: true, paused: false, muted: false, volume: 0.6, https_port: 8766,
