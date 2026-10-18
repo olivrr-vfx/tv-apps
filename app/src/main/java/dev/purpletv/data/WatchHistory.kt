@@ -1,7 +1,7 @@
 package dev.purpletv.data
 
 import android.content.Context
-import dev.purpletv.twitch.VideoInfo
+import dev.purpletv.twitch.api.VideoInfo
 import org.json.JSONObject
 
 /** Remembers how far each VOD was watched, for resuming and the "Weiter schauen" row. */
