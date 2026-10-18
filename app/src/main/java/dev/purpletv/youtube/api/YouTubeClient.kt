@@ -183,7 +183,7 @@ object YouTubeClient {
             videoOnly = info.videoOnlyStreams.orEmpty(),
             audio = info.audioStreams.orEmpty(),
             muxed = info.videoStreams.orEmpty(),
-            description = info.description?.content().orEmpty(),
+            description = info.description?.content.orEmpty(),
             related = info.relatedItems.videos(),
         )
     }
