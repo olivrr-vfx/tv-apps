@@ -8,6 +8,8 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/olivrr-vfx/tv-apps/issues",
   "requirements": [],
-  "version": "1.0.0",
-  "zeroconf": ["_purpletv._tcp.local."]
+  "version": "2.0.0",
+  "zeroconf": [
+    "_purpletv._tcp.local."
+  ]
 }

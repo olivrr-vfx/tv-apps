@@ -2,9 +2,10 @@
 <resources>
     <style name="Theme.PurpleTV" parent="@android:style/Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/background</item>
-        <item name="android:colorAccent">@color/purple</item>
+        <item name="android:colorAccent">@color/accent</item>
         <item name="android:windowFullscreen">true</item>
     </style>
-    <color name="background">#0E0E10</color>
-    <color name="purple">#9147FF</color>
+    <!-- Mirrors color.canvas / color.hub in design/tokens.json. -->
+    <color name="background">#09090E</color>
+    <color name="accent">#7C6CFF</color>
 </resources>

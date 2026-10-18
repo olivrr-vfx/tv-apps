@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="PurpleTV">
+  <meta name="theme-color" content="#09090E">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="apple-touch-icon" href="/icon-180.png">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link id="manifest" rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/tokens.css">
+  <link rel="stylesheet" href="/app.css">
+  <title>PurpleTV</title>
+</head>
+<body>
+  <!-- Pairing: shown until a valid code is known. -->
+  <section id="pair" class="pair" hidden>
+    <img src="/icon.svg" alt="" class="pair-logo">
+    <h1>PurpleTV</h1>
+    <p class="muted">Gib den Code ein, den der TV unter<br><b>Einstellungen → Fernbedienung &amp; Home Assistant</b> zeigt.</p>
+    <form id="pair-form" class="pair-form">
+      <input id="pair-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" aria-label="Code">
+      <button class="btn primary" type="submit">Verbinden</button>
+    </form>
+    <p id="pair-error" class="error" role="alert"></p>
+  </section>
+
+  <div id="app" class="app" hidden>
+    <header class="topbar">
+      <div class="brand"><img src="/icon.svg" alt=""><span>Purple<b>TV</b></span></div>
+      <div id="conn" class="conn"><span class="dot"></span><span id="conn-text">Verbinde…</span></div>
+    </header>
+
+    <!-- What's on -->
+    <section id="now" class="now empty">
+      <div class="now-bg" id="now-bg"></div>
+      <div class="now-body">
+        <div class="now-meta"><span id="now-app" class="tag"></span><span id="now-live" class="live" hidden>LIVE</span></div>
+        <h2 id="now-title">Nichts läuft gerade</h2>
+        <p id="now-sub" class="muted">Starte etwas über Twitch oder YouTube.</p>
+        <div class="progress" id="now-progress" hidden><div id="now-bar"></div></div>
+        <div class="times" id="now-times" hidden><span id="now-pos"></span><span id="now-dur"></span></div>
+      </div>
+    </section>
+
+    <main>
+      <!-- Remote -->
+      <section class="panel" data-panel="remote">
+        <div class="transport">
+          <button class="round" data-cmd="previous" aria-label="Zurück / vorheriger Kanal"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg></button>
+          <button class="round big accent" data-cmd="toggle" aria-label="Play/Pause"><svg id="pp-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <button class="round" data-cmd="next" aria-label="Weiter / nächster Kanal"><svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+        </div>
+
+        <div class="pad-wrap">
+          <div class="dpad" id="dpad">
+            <button data-key="up" class="d up" aria-label="Hoch"><svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg></button>
+            <button data-key="left" class="d left" aria-label="Links"><svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5z"/></svg></button>
+            <button data-key="ok" class="d ok" aria-label="OK">OK</button>
+            <button data-key="right" class="d right" aria-label="Rechts"><svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5z"/></svg></button>
+            <button data-key="down" class="d down" aria-label="Runter"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></button>
+          </div>
+          <div class="swipe" id="swipe" hidden><span>Wischen zum Bewegen · Tippen für OK</span></div>
+        </div>
+
+        <div class="keys">
+          <button class="pill" data-key="back">Zurück</button>
+          <button class="pill" data-cmd="home">Start</button>
+          <button class="pill" data-key="menu">Menü</button>
+          <button class="pill" id="pad-mode">Wischfeld</button>
+        </div>
+
+        <div class="seek" id="seek-row">
+          <button class="pill" data-seek="-30">−30 s</button>
+          <button class="pill" data-seek="-10">−10 s</button>
+          <button class="pill" data-seek="10">+10 s</button>
+          <button class="pill" data-seek="30">+30 s</button>
+        </div>
+
+        <div class="volume">
+          <button class="round small" id="mute" aria-label="Ton aus/an"><svg viewBox="0 0 24 24"><path id="mute-path" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z"/></svg></button>
+          <input type="range" id="volume" min="0" max="100" value="100" aria-label="Lautstärke">
+        </div>
+      </section>
+
+      <!-- Twitch -->
+      <section class="panel" data-panel="twitch" hidden>
+        <form class="search" id="tw-open">
+          <input id="tw-login" placeholder="Twitch-Kanal öffnen, z. B. papaplatte" autocapitalize="off" autocorrect="off">
+          <button class="btn twitch" type="submit">Öffnen</button>
+        </form>
+        <h3 class="section">Live – Gefolgt <span id="tw-count" class="muted"></span></h3>
+        <div id="tw-list" class="list"></div>
+      </section>
+
+      <!-- YouTube -->
+      <section class="panel" data-panel="youtube" hidden>
+        <form class="search" id="yt-search">
+          <input id="yt-query" type="search" placeholder="YouTube durchsuchen" enterkeyhint="search">
+          <button class="btn youtube" type="submit">Suchen</button>
+        </form>
+        <div class="chips">
+          <button class="chip active" data-yt="feed">Abos</button>
+          <button class="chip" data-yt="results">Suche</button>
+          <button class="chip" data-yt="manage">Kanäle verwalten</button>
+        </div>
+        <div id="yt-feed" class="list" data-yt-view="feed"></div>
+        <div id="yt-results" data-yt-view="results" hidden>
+          <button class="btn ghost wide" id="yt-show-tv">Suche auf dem TV anzeigen</button>
+          <div id="yt-channels" class="hscroll"></div>
+          <div id="yt-videos" class="list"></div>
+        </div>
+        <div data-yt-view="manage" hidden>
+          <p class="muted">Ohne Google-Konto: Abos liegen nur auf dem TV. Füge Kanäle per Link, @Name oder Kanal-ID hinzu – eine Zeile pro Kanal.</p>
+          <textarea id="yt-add" rows="4" placeholder="@MrBeast&#10;https://www.youtube.com/@LinusTechTips"></textarea>
+          <button class="btn youtube wide" id="yt-add-btn">Abonnieren</button>
+          <p id="yt-add-status" class="muted"></p>
+          <h3 class="section">Deine Abos <span id="yt-sub-count" class="muted"></span></h3>
+          <div id="yt-subs" class="list"></div>
+        </div>
+      </section>
+
+      <!-- TV -->
+      <section class="panel" data-panel="tv" hidden>
+        <h3 class="section">Apps auf dem TV</h3>
+        <div class="app-grid" id="app-grid">
+          <button class="app-tile hub" data-app="dashboard"><img src="/icon.svg" alt=""><span>Start</span></button>
+          <button class="app-tile twitch" data-app="twitch"><svg viewBox="0 0 48 48"><path fill="#fff" d="M13 11h22a2.5 2.5 0 0 1 2.5 2.5v15a2.5 2.5 0 0 1-2.5 2.5H25l-7 6v-6h-5a2.5 2.5 0 0 1-2.5-2.5v-15A2.5 2.5 0 0 1 13 11z"/><path fill="currentColor" d="M19.5 16.5h3v8h-3zm7 0h3v8h-3z"/></svg><span>Twitch</span></button>
+          <button class="app-tile youtube" data-app="youtube"><svg viewBox="0 0 48 48"><path fill="#fff" d="M19 14.5l15 9.5-15 9.5z"/></svg><span>YouTube</span></button>
+        </div>
+        <h3 class="section">Verbindung</h3>
+        <div class="info">
+          <div><span class="muted">TV</span><span id="info-host"></span></div>
+          <div><span class="muted">Version</span><span id="info-version"></span></div>
+        </div>
+        <p class="muted small">Zum Home-Bildschirm hinzufügen: Safari → Teilen → „Zum Home-Bildschirm“. Funktioniert nur im selben WLAN wie der TV.</p>
+        <div class="row">
+          <a class="btn ghost" href="/design" target="_blank" rel="noopener">Design-System</a>
+          <button class="btn ghost" id="unpair">Abmelden</button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tabbar">
+      <button data-tab="remote" class="active"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 4 3 3H9zm0 12-3-3h6zM6 12l3-3v6zm12 0-3 3V9z"/></svg><span>Fernbedienung</span></button>
+      <button data-tab="twitch"><svg viewBox="0 0 24 24"><path d="M5 3 3 7v12h5v3h3l3-3h4l4-4V3zm15 11-3 3h-4l-3 3v-3H6V5h14zm-5-6h2v5h-2zm-5 0h2v5h-2z"/></svg><span>Twitch</span></button>
+      <button data-tab="youtube"><svg viewBox="0 0 24 24"><path d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 0 0 2.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3z"/></svg><span>YouTube</span></button>
+      <button data-tab="tv"><svg viewBox="0 0 24 24"><path d="M21 3H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5v2h8v-2h5a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 14H3V5h18z"/></svg><span>TV</span></button>
+    </nav>
+  </div>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -6,13 +6,19 @@ import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import dev.purpletv.core.AppId
 import dev.purpletv.data.Http
 import dev.purpletv.data.Settings
 import dev.purpletv.data.WatchHistory
+import dev.purpletv.hub.AppLauncher
 import dev.purpletv.remote.RemoteServer
-import dev.purpletv.twitch.Helix
-import dev.purpletv.twitch.TwitchAuth
-import dev.purpletv.twitch.TwitchGql
+import dev.purpletv.twitch.TwitchRepository
+import dev.purpletv.twitch.api.Helix
+import dev.purpletv.twitch.api.TwitchAuth
+import dev.purpletv.twitch.api.TwitchGql
+import dev.purpletv.youtube.YouTubeRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class PurpleApp : Application(), ImageLoaderFactory {
     lateinit var settings: Settings
@@ -23,7 +29,12 @@ class PurpleApp : Application(), ImageLoaderFactory {
         private set
     lateinit var helix: Helix
         private set
+    /** Twitch VOD progress. */
     lateinit var history: WatchHistory
+        private set
+    lateinit var twitch: TwitchRepository
+        private set
+    lateinit var youtube: YouTubeRepository
         private set
 
     override fun onCreate() {
@@ -33,14 +44,45 @@ class PurpleApp : Application(), ImageLoaderFactory {
         auth = TwitchAuth(settings)
         helix = Helix(settings, auth)
         history = WatchHistory(this)
+        twitch = TwitchRepository(settings, auth, helix)
+        youtube = YouTubeRepository(this, settings)
+        _enabled.value = enabledApps()
+        AppLauncher.sync(this, settings)
         if (settings.remoteEnabled) startRemote()
+    }
+
+    fun enabledApps(): List<AppId> = AppId.entries.filter { settings.isEnabled(it) }
+
+    private val _enabled = MutableStateFlow<List<AppId>>(emptyList())
+    /** Enabled apps as state, so the navigation and dashboard follow the settings. */
+    val enabledAppsState: StateFlow<List<AppId>> get() = _enabled
+
+    fun setAppEnabled(app: AppId, enabled: Boolean) {
+        settings.setEnabled(app, enabled)
+        _enabled.value = enabledApps()
+        AppLauncher.sync(this, settings)
+        if (enabled) onForeground() else when (app) {
+            AppId.TWITCH -> twitch.onBackground()
+            AppId.YOUTUBE -> youtube.onBackground()
+        }
+    }
+
+    /** PurpleTV is visible: keep the data of enabled apps fresh. */
+    fun onForeground() {
+        if (settings.isEnabled(AppId.TWITCH)) twitch.onForeground()
+        if (settings.isEnabled(AppId.YOUTUBE)) youtube.onForeground()
+    }
+
+    fun onBackground() {
+        twitch.onBackground()
+        youtube.onBackground()
     }
 
     private var remote: RemoteServer? = null
 
     fun startRemote() {
         if (remote != null) return
-        remote = RemoteServer(this, settings).also { it.startAll() }
+        remote = RemoteServer(this).also { it.startAll() }
     }
 
     fun stopRemote() {

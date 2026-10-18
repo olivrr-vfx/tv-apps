@@ -2,6 +2,7 @@ package dev.purpletv.data
 
 import android.content.Context
 import dev.purpletv.BuildConfig
+import dev.purpletv.core.AppId
 import java.util.UUID
 
 enum class ChatMode(val label: String) {
@@ -19,6 +20,16 @@ enum class DefaultQuality(val label: String, val maxHeight: Int?) {
     P720("720p", 720),
     P480("480p", 480),
     P360("360p", 360);
+
+    fun next() = entries[(ordinal + 1) % entries.size]
+}
+
+/** What PurpleTV shows when it is opened from its main launcher tile. */
+enum class StartScreen(val label: String) {
+    DASHBOARD("Dashboard"),
+    LAST("Zuletzt genutzte App"),
+    TWITCH("Twitch"),
+    YOUTUBE("YouTube");
 
     fun next() = entries[(ordinal + 1) % entries.size]
 }
@@ -100,7 +111,35 @@ class Settings(context: Context) {
         get() = runCatching { DefaultQuality.valueOf(string("quality")!!) }.getOrDefault(DefaultQuality.AUTO)
         set(value) = put("quality", value.name)
 
-    /** Local control API for Home Assistant. */
+    // --- Hub -----------------------------------------------------------------------------
+
+    fun isEnabled(app: AppId): Boolean = prefs.getBoolean("app_enabled_${app.key}", true)
+    fun setEnabled(app: AppId, enabled: Boolean) = putBool("app_enabled_${app.key}", enabled)
+
+    var startScreen: StartScreen
+        get() = runCatching { StartScreen.valueOf(string("start_screen")!!) }.getOrDefault(StartScreen.DASHBOARD)
+        set(value) = put("start_screen", value.name)
+
+    var lastApp: AppId?
+        get() = AppId.fromKey(string("last_app"))
+        set(value) = put("last_app", value?.key)
+
+    // --- YouTube -------------------------------------------------------------------------
+
+    var youtubeQuality: DefaultQuality
+        get() = runCatching { DefaultQuality.valueOf(string("yt_quality")!!) }.getOrDefault(DefaultQuality.P1080)
+        set(value) = put("yt_quality", value.name)
+    var youtubeAutoplay: Boolean
+        get() = prefs.getBoolean("yt_autoplay", true)
+        set(value) = putBool("yt_autoplay", value)
+    var youtubeHideShorts: Boolean
+        get() = prefs.getBoolean("yt_hide_shorts", true)
+        set(value) = putBool("yt_hide_shorts", value)
+    var youtubeRegion: String
+        get() = string("yt_region") ?: "DE"
+        set(value) = put("yt_region", value.uppercase())
+
+    /** Local control API for Home Assistant and the phone remote. */
     var remoteEnabled: Boolean
         get() = prefs.getBoolean("remote_enabled", true)
         set(value) = putBool("remote_enabled", value)
