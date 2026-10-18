@@ -17,6 +17,8 @@ die Wiedergabe läuft flüssig.
 - **Chat** mit **7TV**- und **BTTV**-Emotes (auch animierte), als Seitenleiste, Overlay oder ausgeblendet.
 - **Kanal-Zapping** mit ▲/▼ durch deine Liste, wie beim Fernsehen.
 - **Statistiken**: Auflösung, Bitrate, Puffer, Latenz, verworfene Frames.
+- **VODs** mit Spulen, Weiterschauen und Kanalseiten.
+- **Home Assistant**: Media-Player, „Schaut Twitch“-Sensor, Live-Sensoren pro Kanal und Deep-Links (siehe unten).
 
 ### Fernbedienung im Player
 
@@ -68,6 +70,94 @@ Für Login und gefolgte Kanäle braucht die App eine eigene Twitch Client-ID. Di
 5. In der App auf **Anmelden** gehen, den QR-Code scannen und den Code bestätigen.
 
 Ohne Login kannst du über die Suche trotzdem jeden Kanal per exaktem Namen öffnen.
+
+## Home Assistant
+
+PurpleTV lässt sich mit Home Assistant steuern und liefert Sensoren.
+
+**Das bekommst du:**
+
+| Entität | Was sie macht |
+|---|---|
+| `media_player.purpletv` | Zeigt Kanal, Titel und Vorschaubild. Kann Pause/Play, Ton aus, Lautstärke, Kanal vor/zurück und einen Kanal oder VOD öffnen. Als Quelle stehen deine gefolgten Live-Kanäle zur Auswahl. |
+| `binary_sensor.purpletv_schaut_twitch` | `an`, solange ein Stream oder VOD läuft |
+| `sensor.purpletv_aktueller_kanal` | Name des laufenden Kanals |
+| `sensor.purpletv_gefolgte_kanale_live` | Anzahl deiner gefolgten Kanäle, die live sind (mit Liste als Attribut) |
+| `binary_sensor.twitch_kanale_<kanal>_live` | Pro gewähltem Kanal (z. B. Papaplatte): live ja/nein, mit Titel, Spiel und Zuschauern. **Funktioniert auch, wenn der TV aus ist.** |
+
+### Installation
+
+1. In HACS: *Benutzerdefinierte Repositories* → `https://github.com/olivrr-vfx/tv-apps`, Typ *Integration* → **PurpleTV** installieren → Home Assistant neu starten.
+2. PurpleTV auf dem TV öffnen. Home Assistant findet den TV automatisch, unter *Einstellungen → Geräte & Dienste* erscheint „PurpleTV gefunden“.
+3. Den **Code** aus PurpleTV (*Einstellungen → Home Assistant*) eingeben. Optional Kanäle für Live-Sensoren angeben, z. B. `papaplatte, zarbex`. Die Liste kannst du später über *Konfigurieren* ändern.
+
+Wird der TV nicht automatisch gefunden: *Integration hinzufügen → PurpleTV* und IP-Adresse und Code von Hand eintragen.
+
+### TV einschalten und direkt Papaplatte starten
+
+Dafür brauchst du zusätzlich die offizielle Integration **Android TV Remote**. Sie kann den TV einschalten und PurpleTV über einen Link öffnen:
+
+```yaml
+script:
+  papaplatte_schauen:
+    alias: Papaplatte schauen
+    icon: mdi:twitch
+    sequence:
+      - action: remote.turn_on
+        target:
+          entity_id: remote.wohnzimmer_tv   # deine Android-TV-Remote-Entität
+      - delay: 3
+      - action: remote.turn_on
+        target:
+          entity_id: remote.wohnzimmer_tv
+        data:
+          activity: purpletv://watch/papaplatte
+```
+
+Verfügbare Links:
+
+| Link | Öffnet |
+|---|---|
+| `purpletv://watch/<kanal>` | Live-Stream |
+| `purpletv://channel/<kanal>` | Kanalseite mit VODs |
+| `purpletv://vod/<id>` | Ein VOD |
+| `purpletv://home` | Startseite |
+
+Läuft PurpleTV schon, geht es auch ohne Android TV Remote:
+
+```yaml
+action: media_player.play_media
+target:
+  entity_id: media_player.purpletv
+data:
+  media_content_type: channel
+  media_content_id: papaplatte    # oder channel:papaplatte, vod:123456, twitch.tv-Link
+```
+
+### Beispiel: Benachrichtigung, wenn Papaplatte live geht
+
+```yaml
+automation:
+  - alias: Papaplatte ist live
+    triggers:
+      - trigger: state
+        entity_id: binary_sensor.twitch_kanale_papaplatte_live
+        to: "on"
+    actions:
+      - action: notify.mobile_app_dein_handy
+        data:
+          title: "Papaplatte ist live!"
+          message: "{{ state_attr('binary_sensor.twitch_kanale_papaplatte_live', 'title') }}"
+          data:
+            actions:
+              - action: PAPAPLATTE_SCHAUEN
+                title: Auf dem TV schauen
+```
+
+### Gut zu wissen
+
+- Die Steuerung geht nur, solange PurpleTV auf dem TV geöffnet ist. Ist der TV aus oder läuft eine andere App, steht der Media-Player auf „aus“. Zum Starten nimmst du dann den Deep-Link über Android TV Remote.
+- Die Schnittstelle läuft nur im Heimnetz auf Port 8765 und ist mit dem Code geschützt. Abschalten oder einen neuen Code erzeugen kannst du in PurpleTV unter *Einstellungen → Home Assistant*.
 
 ## Selbst bauen
 

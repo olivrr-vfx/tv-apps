@@ -1,0 +1,66 @@
+{
+  "config": {
+    "flow_title": "PurpleTV ({host})",
+    "step": {
+      "user": {
+        "title": "Connect PurpleTV",
+        "description": "Find address and code in PurpleTV under Settings → Home Assistant. Optionally list channels that get a live sensor (e.g. {example}).",
+        "data": {
+          "host": "TV IP address",
+          "port": "Port",
+          "code": "Code",
+          "channels": "Channels with live sensor"
+        }
+      },
+      "confirm": {
+        "title": "PurpleTV found",
+        "description": "Found PurpleTV at {host}. Enter the code from Settings → Home Assistant. Optionally list channels for live sensors (e.g. {example}).",
+        "data": {
+          "code": "Code",
+          "channels": "Channels with live sensor"
+        }
+      },
+      "reauth_confirm": {
+        "title": "New code",
+        "description": "The code in PurpleTV changed. Enter the new code.",
+        "data": {
+          "code": "Code"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect. Is the TV on and PurpleTV open?",
+      "invalid_auth": "Wrong code."
+    },
+    "abort": {
+      "already_configured": "This TV is already set up.",
+      "reauth_successful": "Code updated."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Live sensors",
+        "description": "Channels that get a live sensor, comma separated (e.g. {example}).",
+        "data": {
+          "channels": "Channels"
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "watching": {
+        "name": "Watching Twitch"
+      }
+    },
+    "sensor": {
+      "current_channel": {
+        "name": "Current channel"
+      },
+      "followed_live": {
+        "name": "Followed channels live"
+      }
+    }
+  }
+}
