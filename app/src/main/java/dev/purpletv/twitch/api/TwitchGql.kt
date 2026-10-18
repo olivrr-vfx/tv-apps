@@ -125,8 +125,9 @@ class TwitchGql(private val deviceId: String) {
     private fun query(query: String, variables: JSONObject = JSONObject()): JSONObject {
         val json = JSONObject(Http.postJson(URL, JSONObject().put("query", query).put("variables", variables), headers))
         val data = json.optJSONObject("data")
-        if (data == null) {
-            val message = json.optJSONArray("errors")?.optJSONObject(0)?.optString("message")
+        val message = json.optJSONArray("errors")?.optJSONObject(0)?.optString("message")
+        // A failing field comes back as null next to an error; treat that as a failure, not as "nothing found".
+        if (data == null || (message != null && data.keys().asSequence().all { data.isNull(it) })) {
             throw Exception("Twitch antwortet nicht richtig" + (message?.let { ": $it" } ?: ""))
         }
         return data
@@ -176,7 +177,7 @@ class TwitchGql(private val deviceId: String) {
     private val userFields = "id login displayName description profileImageURL(width: 300) offlineImageURL"
 
     /** Most watched live streams, optionally of one category and in one language ("DE"). */
-    fun topStreams(gameId: String? = null, language: String? = null, first: Int = 60): List<StreamInfo> {
+    fun topStreams(gameId: String? = null, language: String? = null, first: Int = 30): List<StreamInfo> {
         val lang = language?.uppercase()?.filter { it.isLetter() }?.takeIf { it.length == 2 }
         val options = "{sort: VIEWER_COUNT" + (lang?.let { ", broadcasterLanguages: [$it]" } ?: "") + "}"
         return if (gameId != null) {
@@ -189,7 +190,7 @@ class TwitchGql(private val deviceId: String) {
         }
     }
 
-    fun topGames(first: Int = 60): List<Game> =
+    fun topGames(first: Int = 30): List<Game> =
         query("query { games(first: $first) { edges { node { id name displayName boxArtURL(width: 285, height: 380) } } } }")
             .optJSONObject("games")?.edges().orEmpty().map {
                 Game(it.str("id"), it.str("displayName").ifEmpty { it.str("name") }, it.str("boxArtURL"))
@@ -197,7 +198,7 @@ class TwitchGql(private val deviceId: String) {
 
     /** Channels matching [text], live ones first. */
     fun searchChannels(text: String): List<StreamInfo> =
-        query("query(\$q: String!) { searchUsers(userQuery: \$q, first: 40) { edges { node { id login displayName profileImageURL(width: 150) stream { $streamFields } } } } }",
+        query("query(\$q: String!) { searchUsers(userQuery: \$q, first: 30) { edges { node { id login displayName profileImageURL(width: 150) stream { $streamFields } } } } }",
             JSONObject().put("q", text))
             .optJSONObject("searchUsers")?.edges().orEmpty().mapNotNull { user ->
                 user.optJSONObject("stream")?.toStream(user)?.copy(avatarUrl = user.str("profileImageURL"))
@@ -222,7 +223,7 @@ class TwitchGql(private val deviceId: String) {
     /** Past broadcasts ("archive") or highlights of a channel, newest first. */
     fun videos(userId: String, type: String): List<VideoInfo> {
         val kind = if (type == "highlight") "HIGHLIGHT" else "ARCHIVE"
-        return query("query(\$id: ID!) { user(id: \$id) { videos(first: 60, type: $kind, sort: TIME) { edges { node { $videoFields } } } } }",
+        return query("query(\$id: ID!) { user(id: \$id) { videos(first: 30, type: $kind, sort: TIME) { edges { node { $videoFields } } } } }",
             JSONObject().put("id", userId))
             .optJSONObject("user")?.optJSONObject("videos")?.edges().orEmpty().map { it.toVideo() }
     }

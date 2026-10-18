@@ -21,4 +21,8 @@ q highlights "query { user(login: \"papaplatte\") { videos(first: 3, type: HIGHL
 VID=$(grep -o '"id":"[0-9]\{6,\}"' $OUT/videos.json | head -1 | cut -d'"' -f4)
 q video "query { video(id: \"$VID\") { id title lengthSeconds createdAt viewCount previewThumbnailURL(width: 320, height: 180) owner { id login displayName } game { name } } }"
 q users_by_id "query { users(ids: [\"$(grep -o '"id":"[0-9]*"' $OUT/user.json | head -1 | cut -d'"' -f4)\"]) { id login profileImageURL(width: 70) } }"
+
+q top60 "query { streams(first: 60, options: {sort: VIEWER_COUNT}) { edges { node { id } } } }"
+q top30 "query { streams(first: 30, options: {sort: VIEWER_COUNT}) { edges { node { id } } } }"
+q games60 "query { games(first: 60) { edges { node { id } } } }"
 exit 0

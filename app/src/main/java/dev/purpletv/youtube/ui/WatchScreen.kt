@@ -216,7 +216,7 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
                 embedPlayer.poll()
                 embedPlayer.error?.let { code ->
                     if (loadError == null) loadError = when (code) {
-                        "101", "150" -> "Der Kanal erlaubt das Abspielen außerhalb von YouTube nicht."
+                        "101", "150" -> "YouTube lässt dieses Video hier gerade nicht abspielen."
                         "100" -> "Video nicht gefunden."
                         else -> "YouTube spielt dieses Video gerade nicht ab (Fehler $code)."
                     }
