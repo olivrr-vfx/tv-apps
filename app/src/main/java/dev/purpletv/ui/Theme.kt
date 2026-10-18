@@ -1,7 +1,5 @@
 package dev.purpletv.ui
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -75,7 +72,10 @@ fun PurpleTheme(content: @Composable () -> Unit) {
 }
 
 /**
- * D-pad friendly clickable container: grows, gets a white outline and a purple glow when focused.
+ * D-pad friendly clickable container: grows and gets a white outline when focused.
+ *
+ * Kept deliberately cheap: the scale animation only touches the graphics layer (no
+ * recomposition per frame) and there are no shadows, which are expensive on TV GPUs.
  */
 @Composable
 fun Focusable(
@@ -85,25 +85,24 @@ fun Focusable(
     focusedScale: Float = 1.06f,
     background: Color = Color.Transparent,
     focusedBackground: Color = background,
-    glow: Boolean = true,
     onFocus: (() -> Unit)? = null,
     content: @Composable BoxScope.(focused: Boolean) -> Unit,
 ) {
     var focused by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(if (focused) focusedScale else 1f, label = "scale")
-    val elevation by animateDpAsState(if (focused && glow) 18.dp else 0.dp, label = "glow")
-    val bg by animateColorAsState(if (focused) focusedBackground else background, label = "bg")
+    val scale = animateFloatAsState(if (focused) focusedScale else 1f, label = "scale")
     Box(
         modifier
-            .graphicsLayer { scaleX = scale; scaleY = scale }
-            .shadow(elevation, shape, clip = false, ambientColor = Colors.Purple, spotColor = Colors.Purple)
+            .graphicsLayer {
+                scaleX = scale.value
+                scaleY = scale.value
+            }
             .onFocusChanged {
                 if (it.isFocused && !focused) onFocus?.invoke()
                 focused = it.isFocused
             }
-            .border(if (focused) 2.5.dp else 0.dp, if (focused) Color.White else Color.Transparent, shape)
+            .then(if (focused) Modifier.border(2.5.dp, Color.White, shape) else Modifier)
             .clip(shape)
-            .background(bg)
+            .background(if (focused) focusedBackground else background)
             .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null, onClick = onClick),
     ) {
         content(focused)

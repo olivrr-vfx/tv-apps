@@ -84,7 +84,7 @@ class Settings(context: Context) {
         get() = prefs.getBoolean("auto_update", true)
         set(value) = putBool("auto_update", value)
     var livePreview: Boolean
-        get() = prefs.getBoolean("live_preview", true)
+        get() = prefs.getBoolean("live_preview", false)
         set(value) = putBool("live_preview", value)
     var showStats: Boolean
         get() = prefs.getBoolean("show_stats", false)

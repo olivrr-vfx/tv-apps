@@ -147,7 +147,6 @@ private fun PanelItem(row: PanelRow, modifier: Modifier) {
         focusedScale = 1.02f,
         background = Color.Transparent,
         focusedBackground = Color.White,
-        glow = false,
     ) { focused ->
         val fg = if (focused) Color.Black else Color.White
         Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {

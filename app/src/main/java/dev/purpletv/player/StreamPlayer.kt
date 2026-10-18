@@ -93,7 +93,7 @@ class StreamPlayer(
                 .build()
         } else if (lowLatency) {
             DefaultLoadControl.Builder()
-                .setBufferDurationsMs(1_500, 20_000, 500, 1_000)
+                .setBufferDurationsMs(2_500, 20_000, 1_000, 2_000)
                 .setPrioritizeTimeOverSizeThresholds(true)
                 .build()
         } else {
@@ -108,7 +108,7 @@ class StreamPlayer(
             .build()
 
         if (mode == PlayerMode.PREVIEW) {
-            player.trackSelectionParameters = player.trackSelectionParameters.buildUpon().setMaxVideoSize(Int.MAX_VALUE, 480).build()
+            player.trackSelectionParameters = player.trackSelectionParameters.buildUpon().setMaxVideoSize(Int.MAX_VALUE, 360).build()
             player.volume = 0f
         } else {
             applyDefaultQuality(settings.defaultQuality)
@@ -234,9 +234,9 @@ class StreamPlayer(
                 .setMimeType(MimeTypes.APPLICATION_M3U8)
                 .setLiveConfiguration(
                     MediaItem.LiveConfiguration.Builder()
-                        .setTargetOffsetMs(if (lowLatency) 2_500 else 6_000)
-                        .setMinPlaybackSpeed(0.97f)
-                        .setMaxPlaybackSpeed(1.05f)
+                        .setTargetOffsetMs(if (lowLatency) 3_500 else 7_000)
+                        .setMinPlaybackSpeed(0.98f)
+                        .setMaxPlaybackSpeed(1.02f)
                         .build()
                 )
                 .build()

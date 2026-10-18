@@ -1,11 +1,11 @@
 package dev.purpletv.ui
 
-import android.view.ViewGroup
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import android.view.TextureView
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.graphics.graphicsLayer
+import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,8 +71,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
-import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
 import dev.purpletv.player.PlaybackState
 import dev.purpletv.player.PlayerMode
@@ -122,19 +120,17 @@ fun HomeScreen(vm: HomeViewModel, actions: HomeActions) {
 
     Box(Modifier.fillMaxSize().background(Colors.Background)) {
         Box(Modifier.fillMaxSize().padding(start = NAV_COLLAPSED)) {
-            Crossfade(tab, label = "tab") { t ->
-                when (t) {
-                    Tab.START -> StartTab(vm, actions)
-                    Tab.FOLLOWED -> PageWithTitle("Live – Gefolgt") {
-                        StreamListPane(vm, "followed", vm.followed, actions, empty = "Keiner deiner Kanäle ist gerade live.")
-                    }
-                    Tab.TOP -> PageWithTitle("Beliebt auf Twitch") {
-                        StreamListPane(vm, "top", vm.top, actions, empty = "Keine Streams gefunden.")
-                    }
-                    Tab.GAMES -> PageWithTitle("Kategorien") { GamesPane(vm, actions) }
-                    Tab.SEARCH -> PageWithTitle("Suche") { SearchPane(vm, actions) }
-                    Tab.SETTINGS -> PageWithTitle("Einstellungen") { SettingsScreen(vm, actions.login) }
+            when (tab) {
+                Tab.START -> StartTab(vm, actions)
+                Tab.FOLLOWED -> PageWithTitle("Live – Gefolgt") {
+                    StreamListPane(vm, "followed", vm.followed, actions, empty = "Keiner deiner Kanäle ist gerade live.")
                 }
+                Tab.TOP -> PageWithTitle("Beliebt auf Twitch") {
+                    StreamListPane(vm, "top", vm.top, actions, empty = "Keine Streams gefunden.")
+                }
+                Tab.GAMES -> PageWithTitle("Kategorien") { GamesPane(vm, actions) }
+                Tab.SEARCH -> PageWithTitle("Suche") { SearchPane(vm, actions) }
+                Tab.SETTINGS -> PageWithTitle("Einstellungen") { SettingsScreen(vm, actions.login) }
             }
         }
         NavRail(vm, tab, Modifier.zIndex(1f))
@@ -144,66 +140,78 @@ fun HomeScreen(vm: HomeViewModel, actions: HomeActions) {
 @Composable
 private fun NavRail(vm: HomeViewModel, tab: Tab, modifier: Modifier) {
     var expanded by remember { mutableStateOf(false) }
-    val width by animateDpAsState(if (expanded) 230.dp else NAV_COLLAPSED, label = "rail")
     val name by vm.loggedInName.collectAsState()
     val initialFocus = remember { FocusRequester() }
+    // Switch pages only when the focus rests on an item, not while scrolling through the rail.
+    var pending by remember { mutableStateOf<Tab?>(null) }
+    LaunchedEffect(pending) {
+        val target = pending ?: return@LaunchedEffect
+        delay(350)
+        vm.tab.value = target
+    }
     LaunchedEffect(Unit) {
         if (vm.focusMemory.isEmpty()) runCatching { initialFocus.requestFocus() }
     }
-    Column(
-        modifier
-            .fillMaxHeight()
-            .width(width)
-            .background(
-                if (expanded) Brush.horizontalGradient(listOf(Color(0xF2101014), Color(0xE6101014), Color.Transparent))
-                else Brush.horizontalGradient(listOf(Color(0xFF101014), Color(0xFF101014)))
-            )
-            .onFocusChanged { expanded = it.hasFocus }
-            .padding(vertical = 28.dp, horizontal = 14.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Row(Modifier.padding(start = 6.dp, bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(Colors.purpleGradient), contentAlignment = Alignment.Center) {
-                Icon(Icons.Filled.PlayArrow, null, tint = Color.White, modifier = Modifier.size(28.dp))
+    Row(modifier.fillMaxHeight()) {
+        Column(
+            Modifier
+                .fillMaxHeight()
+                .width(if (expanded) 236.dp else NAV_COLLAPSED)
+                .background(Color(0xFF111116))
+                .onFocusChanged {
+                    expanded = it.hasFocus
+                    if (!it.hasFocus) pending = null
+                }
+                .padding(vertical = 28.dp, horizontal = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(Modifier.padding(start = 6.dp, bottom = 18.dp), verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(Colors.purpleGradient), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Filled.PlayArrow, null, tint = Color.White, modifier = Modifier.size(28.dp))
+                }
+                if (expanded) {
+                    Spacer(Modifier.width(12.dp))
+                    Text("Purple", color = Colors.PurpleLight, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                    Text("TV", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                }
             }
+            Tab.entries.forEach { t ->
+                NavItem(
+                    t, selected = t == tab, expanded = expanded,
+                    onSelect = { pending = null; vm.tab.value = t },
+                    onFocus = { pending = t },
+                    modifier = if (t == tab) Modifier.focusRequester(initialFocus) else Modifier,
+                )
+            }
+            Spacer(Modifier.weight(1f))
             if (expanded) {
-                Spacer(Modifier.width(12.dp))
-                Text("Purple", color = Colors.PurpleLight, fontSize = 20.sp, fontWeight = FontWeight.Black)
-                Text("TV", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                Text(
+                    name ?: "Nicht angemeldet",
+                    modifier = Modifier.padding(start = 10.dp),
+                    color = Colors.TextDim,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
-        Tab.entries.forEach { t ->
-            NavItem(
-                t, selected = t == tab, expanded = expanded,
-                onSelect = { vm.tab.value = t },
-                modifier = if (t == tab) Modifier.focusRequester(initialFocus) else Modifier,
-            )
-        }
-        Spacer(Modifier.weight(1f))
+        // Soft edge so the opened rail doesn't end in a hard line.
         if (expanded) {
-            Text(
-                name ?: "Nicht angemeldet",
-                modifier = Modifier.padding(start = 10.dp),
-                color = Colors.TextDim,
-                fontSize = 12.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            Box(Modifier.fillMaxHeight().width(48.dp).background(Brush.horizontalGradient(listOf(Color(0xFF111116), Color.Transparent))))
         }
     }
 }
 
 @Composable
-private fun NavItem(tab: Tab, selected: Boolean, expanded: Boolean, onSelect: () -> Unit, modifier: Modifier) {
+private fun NavItem(tab: Tab, selected: Boolean, expanded: Boolean, onSelect: () -> Unit, onFocus: () -> Unit, modifier: Modifier) {
     Focusable(
         onClick = onSelect,
-        onFocus = onSelect,
+        onFocus = onFocus,
         modifier = modifier.fillMaxWidth().height(52.dp),
         shape = RoundedCornerShape(14.dp),
         focusedScale = 1.03f,
-        background = if (selected) Colors.Purple.copy(alpha = 0.22f) else Color.Transparent,
+        background = if (selected) Colors.Purple.copy(alpha = 0.25f) else Color.Transparent,
         focusedBackground = Color.White,
-        glow = false,
     ) { focused ->
         val tint = when {
             focused -> Color.Black
@@ -214,7 +222,13 @@ private fun NavItem(tab: Tab, selected: Boolean, expanded: Boolean, onSelect: ()
             Icon(tab.icon, contentDescription = tab.label, tint = tint, modifier = Modifier.size(26.dp))
             if (expanded) {
                 Spacer(Modifier.width(16.dp))
-                Text(tab.label, color = if (focused) Color.Black else Color.White, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                Text(
+                    tab.label,
+                    color = if (focused) Color.Black else Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                )
             }
         }
     }
@@ -254,7 +268,8 @@ private fun StreamInfo.hero() = Hero(
         if (viewers > 0) "${formatViewers(viewers)} Zuschauer" else null,
         formatUptime(startedAtMillis()).ifBlank { null },
     ).joinToString("  ·  "),
-    image = thumbnail(1280, 720),
+    // Same URL as the card thumbnail, so it's already in the image cache.
+    image = thumbnail(),
     avatar = avatarUrl,
     liveLogin = if (isLive) login else null,
 )
@@ -262,9 +277,22 @@ private fun StreamInfo.hero() = Hero(
 private fun VideoInfo.hero() = Hero(
     title = userName,
     headline = title,
-    details = listOfNotNull(formatAgo(createdAtMillis()).ifBlank { null }, "VOD").joinToString("  ·  "),
-    image = thumbnail(1280, 720),
+    details = listOfNotNull(formatAgo(createdAtMillis()).ifBlank { null }, "Video").joinToString("  ·  "),
+    image = thumbnail(),
 )
+
+/**
+ * The focused card writes [target]; [shown] follows with a small delay so fast scrolling
+ * doesn't swap images on every step. Only the hero composables read these, so focus changes
+ * don't recompose the rows.
+ */
+@Stable
+private class HeroHolder {
+    var target by mutableStateOf<Hero?>(null)
+    var shown by mutableStateOf<Hero?>(null)
+}
+
+private val HERO_HEIGHT = 196.dp
 
 @Composable
 private fun StartTab(vm: HomeViewModel, actions: HomeActions) {
@@ -273,83 +301,91 @@ private fun StartTab(vm: HomeViewModel, actions: HomeActions) {
     val games by vm.games.collectAsState()
     val channels by vm.channels.collectAsState()
     val history by vm.continueWatching.collectAsState()
-    var hero by remember { mutableStateOf<Hero?>(null) }
+    val holder = remember { HeroHolder() }
 
     if (followed == Load.NeedLogin || top == Load.NeedLogin) {
         Welcome(actions.login)
         return
     }
     val liveFollowed = followed.items()
-    val firstHero = liveFollowed.firstOrNull()?.hero() ?: top.items().firstOrNull()?.hero()
-    val shown = hero ?: firstHero
+    val topStreams = top.items()
+    val fallback = remember(liveFollowed, topStreams) { (liveFollowed.firstOrNull() ?: topStreams.firstOrNull())?.hero() }
+
+    LaunchedEffect(holder, fallback) {
+        snapshotFlow { holder.target ?: fallback }.collectLatest {
+            if (holder.shown != null) delay(300)
+            holder.shown = it
+        }
+    }
 
     Box(Modifier.fillMaxSize()) {
-        HeroBackground(shown, vm)
-        LazyColumn(
-            contentPadding = PaddingValues(top = 250.dp, bottom = 40.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            if (liveFollowed.isNotEmpty()) item("followed") {
-                ContentRow("Live – Gefolgt") {
-                    itemsIndexed(liveFollowed, key = { _, s -> s.login }) { i, s ->
-                        RestorableCard(vm, "start-followed", i) { m ->
-                            StreamCard(s, onClick = { vm.focusMemory["start-followed"] = i; actions.play(liveFollowed, i) }, modifier = m.width(260.dp), onFocus = { hero = s.hero() })
+        HeroImage(holder, vm)
+        Column(Modifier.fillMaxSize()) {
+            HeroInfo(holder)
+            LazyColumn(
+                contentPadding = PaddingValues(bottom = 40.dp),
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+            ) {
+                if (liveFollowed.isNotEmpty()) item("followed") {
+                    ContentRow("Live – Gefolgt") {
+                        itemsIndexed(liveFollowed, key = { _, s -> s.login }) { i, s ->
+                            RestorableCard(vm, "start-followed", i) { m ->
+                                StreamCard(s, onClick = { vm.focusMemory["start-followed"] = i; actions.play(liveFollowed, i) }, modifier = m.width(244.dp), onFocus = { holder.target = s.hero() })
+                            }
                         }
                     }
                 }
-            }
-            if (history.isNotEmpty()) item("history") {
-                ContentRow("Weiter schauen") {
-                    itemsIndexed(history, key = { _, e -> e.video.id }) { i, e ->
-                        RestorableCard(vm, "start-history", i) { m ->
-                            VideoCard(
-                                e.video,
-                                onClick = { vm.focusMemory["start-history"] = i; actions.vod(e.video) },
-                                modifier = m.width(260.dp),
-                                progress = e.progress,
-                                showChannel = true,
-                                onFocus = { hero = e.video.hero() },
-                            )
+                if (history.isNotEmpty()) item("history") {
+                    ContentRow("Weiter schauen") {
+                        itemsIndexed(history, key = { _, e -> e.video.id }) { i, e ->
+                            RestorableCard(vm, "start-history", i) { m ->
+                                VideoCard(
+                                    e.video,
+                                    onClick = { vm.focusMemory["start-history"] = i; actions.vod(e.video) },
+                                    modifier = m.width(244.dp),
+                                    progress = e.progress,
+                                    showChannel = true,
+                                    onFocus = { holder.target = e.video.hero() },
+                                )
+                            }
                         }
                     }
                 }
-            }
-            val chans = channels.items()
-            if (chans.isNotEmpty()) item("channels") {
-                val liveLogins = liveFollowed.map { it.login }.toSet()
-                val sorted = chans.sortedByDescending { it.login in liveLogins }
-                ContentRow("Deine Kanäle") {
-                    itemsIndexed(sorted, key = { _, c -> c.id }) { i, c ->
-                        RestorableCard(vm, "start-channels", i) { m ->
-                            ChannelCard(c, live = c.login in liveLogins, onClick = { vm.focusMemory["start-channels"] = i; actions.channel(c.login) }, modifier = m.width(124.dp))
+                val chans = channels.items()
+                if (chans.isNotEmpty()) item("channels") {
+                    val liveLogins = remember(liveFollowed) { liveFollowed.map { it.login }.toSet() }
+                    val sorted = remember(chans, liveLogins) { chans.sortedByDescending { it.login in liveLogins } }
+                    ContentRow("Deine Kanäle") {
+                        itemsIndexed(sorted, key = { _, c -> c.id }) { i, c ->
+                            RestorableCard(vm, "start-channels", i) { m ->
+                                ChannelCard(c, live = c.login in liveLogins, onClick = { vm.focusMemory["start-channels"] = i; actions.channel(c.login) }, modifier = m.width(118.dp))
+                            }
                         }
                     }
                 }
-            }
-            val topStreams = top.items()
-            if (topStreams.isNotEmpty()) item("top") {
-                ContentRow("Beliebt auf Twitch") {
-                    itemsIndexed(topStreams, key = { _, s -> s.login }) { i, s ->
-                        RestorableCard(vm, "start-top", i) { m ->
-                            StreamCard(s, onClick = { vm.focusMemory["start-top"] = i; actions.play(topStreams, i) }, modifier = m.width(260.dp), onFocus = { hero = s.hero() })
+                if (topStreams.isNotEmpty()) item("top") {
+                    ContentRow("Beliebt auf Twitch") {
+                        itemsIndexed(topStreams, key = { _, s -> s.login }) { i, s ->
+                            RestorableCard(vm, "start-top", i) { m ->
+                                StreamCard(s, onClick = { vm.focusMemory["start-top"] = i; actions.play(topStreams, i) }, modifier = m.width(244.dp), onFocus = { holder.target = s.hero() })
+                            }
                         }
                     }
                 }
-            }
-            val gameList = games.items()
-            if (gameList.isNotEmpty()) item("games") {
-                ContentRow("Top-Kategorien") {
-                    itemsIndexed(gameList, key = { _, g -> g.id }) { i, g ->
-                        RestorableCard(vm, "start-games", i) { m ->
-                            GameCard(g, onClick = { vm.focusMemory["start-games"] = i; actions.game(g) }, modifier = m.width(124.dp))
+                val gameList = games.items()
+                if (gameList.isNotEmpty()) item("games") {
+                    ContentRow("Top-Kategorien") {
+                        itemsIndexed(gameList, key = { _, g -> g.id }) { i, g ->
+                            RestorableCard(vm, "start-games", i) { m ->
+                                GameCard(g, onClick = { vm.focusMemory["start-games"] = i; actions.game(g) }, modifier = m.width(118.dp))
+                            }
                         }
                     }
                 }
-            }
-            if (followed == Load.Loading && top == Load.Loading) item("loading") {
-                Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = Colors.Purple)
+                if (followed == Load.Loading && top == Load.Loading) item("loading") {
+                    Box(Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Colors.Purple)
+                    }
                 }
             }
         }
@@ -359,7 +395,7 @@ private fun StartTab(vm: HomeViewModel, actions: HomeActions) {
 @Composable
 private fun ContentRow(title: String, content: androidx.compose.foundation.lazy.LazyListScope.() -> Unit) {
     Column {
-        SectionTitle(title, Modifier.padding(start = 40.dp, top = 8.dp))
+        SectionTitle(title, Modifier.padding(start = 40.dp, top = 6.dp))
         LazyRow(
             contentPadding = PaddingValues(horizontal = 40.dp, vertical = 14.dp),
             horizontalArrangement = Arrangement.spacedBy(18.dp),
@@ -383,41 +419,50 @@ private fun RestorableCard(vm: HomeViewModel, key: String, index: Int, content: 
     }
 }
 
+/** Picture behind the hero text, fading into the page well before the rows start. */
 @Composable
-private fun HeroBackground(hero: Hero?, vm: HomeViewModel) {
-    Box(Modifier.fillMaxWidth().height(400.dp)) {
-        Crossfade(hero?.image, label = "hero") { image ->
-            if (image != null) {
-                AsyncImage(image, null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+private fun HeroImage(holder: HeroHolder, vm: HomeViewModel) {
+    val hero = holder.shown
+    Box(Modifier.fillMaxWidth().height(HERO_HEIGHT + 40.dp)) {
+        Box(Modifier.align(Alignment.TopEnd).fillMaxHeight().aspectRatio(16f / 9f)) {
+            if (hero != null) {
+                AsyncImage(hero.image, null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
             }
+            val live = hero?.liveLogin
+            if (live != null && vm.app.settings.livePreview) LivePreview(live, vm)
         }
-        if (vm.app.settings.livePreview) hero?.liveLogin?.let { LivePreview(it, vm) }
-        // Fade the picture into the page so the rows stay readable.
-        Box(Modifier.fillMaxSize().background(Brush.horizontalGradient(listOf(Colors.Background, Colors.Background.copy(alpha = 0.7f), Color.Transparent))))
-        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.4f to Color.Transparent, 1f to Colors.Background)))
-        hero?.let {
-            Column(Modifier.padding(start = 40.dp, top = 40.dp).width(560.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (it.avatar.isNotEmpty()) {
-                        Avatar(it.avatar, 40.dp, live = it.liveLogin != null)
-                        Spacer(Modifier.width(12.dp))
-                    }
-                    if (it.liveLogin != null) {
-                        LiveBadge()
-                        Spacer(Modifier.width(10.dp))
-                    }
-                    Text(it.title, color = Color.White, fontSize = 30.sp, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                Spacer(Modifier.height(8.dp))
-                Text(it.headline, color = Colors.Text, fontSize = 16.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Spacer(Modifier.height(6.dp))
-                Text(it.details, color = Colors.PurpleLight, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-            }
-        }
+        Box(Modifier.fillMaxSize().background(Brush.horizontalGradient(0f to Colors.Background, 0.45f to Colors.Background, 0.75f to Colors.Background.copy(alpha = 0.35f), 1f to Color.Transparent)))
+        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(0.55f to Color.Transparent, 1f to Colors.Background)))
     }
 }
 
-/** Muted low-res live preview of the focused stream, started after a short delay. */
+@Composable
+private fun HeroInfo(holder: HeroHolder) {
+    val hero = holder.shown
+    Column(Modifier.fillMaxWidth().height(HERO_HEIGHT).padding(start = 40.dp, top = 30.dp, end = 360.dp)) {
+        if (hero == null) return@Column
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (hero.avatar.isNotEmpty()) {
+                Avatar(hero.avatar, 40.dp, live = hero.liveLogin != null)
+                Spacer(Modifier.width(12.dp))
+            }
+            if (hero.liveLogin != null) {
+                LiveBadge()
+                Spacer(Modifier.width(10.dp))
+            }
+            Text(hero.title, color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.Black, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(hero.headline, color = Colors.Text, fontSize = 15.sp, maxLines = 2, overflow = TextOverflow.Ellipsis, lineHeight = 20.sp)
+        Spacer(Modifier.height(6.dp))
+        Text(hero.details, color = Colors.PurpleLight, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
+    }
+}
+
+/**
+ * Muted low-res live preview of the focused stream. Uses a TextureView: a SurfaceView would
+ * punch through the Compose layers and show up in the wrong places.
+ */
 @Composable
 private fun LivePreview(login: String, vm: HomeViewModel) {
     val context = LocalContext.current
@@ -426,24 +471,13 @@ private fun LivePreview(login: String, vm: HomeViewModel) {
     DisposableEffect(Unit) { onDispose { player.release() } }
     LaunchedEffect(login) {
         player.stop()
-        delay(1_200)
+        delay(1_500)
         player.play(login)
     }
-    AnimatedVisibility(state == PlaybackState.Playing, enter = fadeIn(), exit = fadeOut()) {
-        AndroidView(
-            factory = { ctx ->
-                PlayerView(ctx).apply {
-                    useController = false
-                    resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                    isFocusable = false
-                    setShutterBackgroundColor(android.graphics.Color.TRANSPARENT)
-                    layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-                    this.player = player.player
-                }
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
-    }
+    AndroidView(
+        factory = { ctx -> TextureView(ctx).also { player.player.setVideoTextureView(it) } },
+        modifier = Modifier.fillMaxSize().graphicsLayer { alpha = if (state == PlaybackState.Playing) 1f else 0f },
+    )
 }
 
 @Composable
