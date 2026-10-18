@@ -1,4 +1,4 @@
-"""PurpleTV: control the PurpleTV Twitch app on Android TV and watch Twitch live status."""
+"""PurpleTV: control the PurpleTV TV hub (Twitch, YouTube) on Android TV and watch Twitch live status."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from .api import PurpleTVClient
 from .const import CONF_CODE
 from .coordinator import LiveCoordinator, TVCoordinator
 
-PLATFORMS = [Platform.MEDIA_PLAYER, Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS = [Platform.MEDIA_PLAYER, Platform.REMOTE, Platform.SELECT, Platform.BINARY_SENSOR, Platform.SENSOR]
 
 
 @dataclass

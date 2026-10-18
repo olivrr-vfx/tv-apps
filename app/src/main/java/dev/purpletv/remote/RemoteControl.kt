@@ -177,5 +177,6 @@ object RemoteControl {
         .put("thumbnail", v.thumbnail)
         .put("duration", v.durationSec)
         .put("uploaded", v.uploadedText)
+        .put("uploaded_ms", v.uploadedMillis)
         .put("live", v.isLive)
 }

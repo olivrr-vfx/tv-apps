@@ -12,7 +12,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import PurpleTVConfigEntry
 from .coordinator import LiveCoordinator, TVCoordinator
-from .entity import tv_device, twitch_device
+from .entity import current_media, tv_device, twitch_device
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: PurpleTVConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
@@ -23,7 +23,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PurpleTVConfigEntry, asy
 
 
 class WatchingSensor(CoordinatorEntity[TVCoordinator], BinarySensorEntity):
-    """On while a stream or video is open in PurpleTV (also when paused)."""
+    """On while a stream or video (Twitch or YouTube) is open in PurpleTV, also when paused."""
 
     _attr_has_entity_name = True
     _attr_translation_key = "watching"
@@ -36,7 +36,7 @@ class WatchingSensor(CoordinatorEntity[TVCoordinator], BinarySensorEntity):
     @property
     def is_on(self) -> bool:
         s = self.coordinator.data
-        return bool(s) and s.get("screen") in ("live", "vod")
+        return bool(s) and s.get("screen") != "background" and current_media(s) is not None
 
     @property
     def icon(self) -> str:
@@ -45,12 +45,13 @@ class WatchingSensor(CoordinatorEntity[TVCoordinator], BinarySensorEntity):
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         s = self.coordinator.data or {}
-        media = s.get("channel") or s.get("vod") or {}
+        media = current_media(s) or {}
         return {
-            "channel": media.get("display_name"),
+            "app": media.get("app"),
+            "channel": media.get("channel"),
             "title": media.get("title"),
             "paused": s.get("paused"),
-            "type": "live" if s.get("channel") else ("vod" if s.get("vod") else None),
+            "type": media.get("kind"),
         }
 
 

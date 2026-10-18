@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PurpleTV Design-System</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/tokens.css">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--pt-color-canvas); color: var(--pt-color-text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+      font-size: var(--pt-type-body-size); line-height: var(--pt-type-body-line);
+    }
+    main { max-width: 1100px; margin: 0 auto; padding: var(--pt-space-xxxl) var(--pt-space-xl); }
+    header { display: flex; gap: var(--pt-space-lg); align-items: center; margin-bottom: var(--pt-space-xxl); }
+    header img { width: 64px; height: 64px; }
+    h1 { font-size: var(--pt-type-display-size); line-height: var(--pt-type-display-line); font-weight: var(--pt-type-display-weight); letter-spacing: var(--pt-type-display-tracking); margin: 0; }
+    h2 { font-size: var(--pt-type-headline-size); font-weight: var(--pt-type-headline-weight); margin: var(--pt-space-xxxl) 0 var(--pt-space-lg); }
+    p { color: var(--pt-color-text-secondary); max-width: 70ch; }
+    code { background: var(--pt-color-surface-high); padding: 1px 6px; border-radius: var(--pt-radius-xs); font-size: .9em; }
+    .overline { font-size: var(--pt-type-overline-size); font-weight: var(--pt-type-overline-weight); letter-spacing: var(--pt-type-overline-tracking); color: var(--pt-color-hub-light); text-transform: uppercase; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--pt-space-md); }
+    .swatch { border-radius: var(--pt-radius-lg); overflow: hidden; background: var(--pt-color-surface); }
+    .swatch .chip { height: 72px; }
+    .swatch div:last-child { padding: var(--pt-space-sm) var(--pt-space-md); font-size: var(--pt-type-caption-size); }
+    .swatch b { display: block; font-size: var(--pt-type-label-size); }
+    .row { display: flex; flex-wrap: wrap; gap: var(--pt-space-md); align-items: center; }
+    .type-row { display: flex; gap: var(--pt-space-xl); align-items: baseline; padding: var(--pt-space-sm) 0; border-bottom: 1px solid var(--pt-color-outline); }
+    .type-row span:first-child { width: 120px; flex: none; color: var(--pt-color-text-tertiary); font-size: var(--pt-type-caption-size); }
+    .btn { border: 0; font: inherit; padding: 11px 22px; border-radius: var(--pt-radius-pill); font-weight: 600; font-size: var(--pt-type-label-size); color: #fff; background: var(--pt-color-surface-high); }
+    .btn.primary { background: var(--pt-color-hub); }
+    .btn.twitch { background: var(--pt-color-twitch); }
+    .btn.youtube { background: var(--pt-color-youtube); }
+    .btn.focus { background: var(--pt-color-focus); color: var(--pt-color-text-on-focus); transform: scale(1.04); }
+    .btn.ghost { background: transparent; color: var(--pt-color-text-secondary); }
+    .badge { font-size: var(--pt-type-caption-size); font-weight: 600; padding: 2px 7px; border-radius: var(--pt-radius-xs); background: rgba(0,0,0,.74); }
+    .live { background: var(--pt-color-live); font-size: var(--pt-type-overline-size); font-weight: 800; letter-spacing: 1.2px; }
+    .card { width: 268px; border-radius: var(--pt-radius-md); background: var(--pt-color-surface); overflow: hidden; }
+    .card.focus { outline: var(--pt-focus-ring-width) solid var(--pt-color-focus); transform: scale(1.06); background: var(--pt-color-surface-raised); }
+    .card .pic { aspect-ratio: 16/9; position: relative; background: linear-gradient(135deg, var(--pt-color-hub-deep), var(--pt-color-twitch)); }
+    .card.yt .pic { background: linear-gradient(135deg, var(--pt-color-youtube-deep), var(--pt-color-youtube)); }
+    .card .pic .live, .card .pic .badge { position: absolute; }
+    .card .pic .live { top: 8px; left: 8px; padding: 2px 7px; border-radius: 4px; }
+    .card .pic .badge { right: 8px; bottom: 8px; }
+    .card .txt { padding: var(--pt-space-md); }
+    .card .t { font-weight: 700; font-size: var(--pt-type-label-size); }
+    .card .s { color: var(--pt-color-text-secondary); font-size: var(--pt-type-body-small-size); }
+    .card .m { color: var(--pt-color-twitch-light); font-size: var(--pt-type-caption-size); font-weight: 600; }
+    .card.yt .m { color: var(--pt-color-youtube-light); }
+    .space { display: flex; align-items: flex-end; gap: var(--pt-space-md); }
+    .space div { background: var(--pt-color-hub); border-radius: 2px; }
+    .space span { display: block; font-size: var(--pt-type-caption-size); color: var(--pt-color-text-tertiary); margin-top: 4px; }
+    .radius div { width: 72px; height: 72px; background: var(--pt-color-surface-high); display: grid; place-items: center; font-size: var(--pt-type-caption-size); }
+    table { border-collapse: collapse; width: 100%; font-size: var(--pt-type-body-small-size); }
+    td, th { text-align: left; padding: 8px; border-bottom: 1px solid var(--pt-color-outline); }
+    th { color: var(--pt-color-text-tertiary); font-weight: 600; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="/icon.svg" alt="">
+    <div>
+      <div class="overline">PurpleTV</div>
+      <h1>Design-System</h1>
+    </div>
+  </header>
+  <p>Eine Quelle für alles: <code>design/tokens.json</code>. Daraus erzeugt <code>design/generate.py</code>
+    die Compose-Tokens für die TV-App, <code>tokens.css</code> für die Handy-Fernbedienung und dieses Dokument,
+    sowie ein Home-Assistant-Theme. Diese Seite liest die Werte live aus <code>tokens.css</code>.</p>
+
+  <h2>Farben</h2>
+  <div class="grid" id="colors"></div>
+
+  <h2>App-Akzente</h2>
+  <p>Jede App in PurpleTV bringt ihren Akzent mit (Compose: <code>AccentScope</code>). Komponenten färben sich automatisch.</p>
+  <div class="row">
+    <button class="btn primary">Hub</button>
+    <button class="btn twitch">Twitch</button>
+    <button class="btn youtube">YouTube</button>
+  </div>
+
+  <h2>Typografie</h2>
+  <div id="type"></div>
+
+  <h2>Abstände</h2>
+  <div class="space" id="space"></div>
+
+  <h2>Radien</h2>
+  <div class="row radius" id="radius"></div>
+
+  <h2>Fokus</h2>
+  <p>Auf dem TV ist das fokussierte Element immer das hellste: Buttons werden weiß mit dunkler Schrift,
+    Karten bekommen einen weißen Ring und wachsen um 6&nbsp;%. Keine Schatten, keine Unschärfe – das schont TV-GPUs.</p>
+  <div class="row">
+    <button class="btn">Sekundär</button>
+    <button class="btn focus">Fokussiert</button>
+    <button class="btn primary">Primär</button>
+    <button class="btn ghost">Ghost</button>
+  </div>
+
+  <h2>Karten &amp; Badges</h2>
+  <div class="row">
+    <div class="card"><div class="pic"><span class="live">● LIVE</span><span class="badge">2:14:08</span></div>
+      <div class="txt"><div class="t">Papaplatte</div><div class="s">CRAFTATTACK TAG 9</div><div class="m">Minecraft</div></div></div>
+    <div class="card focus"><div class="pic"><span class="live">● LIVE</span><span class="badge">● 36K</span></div>
+      <div class="txt"><div class="t">Fokussiert</div><div class="s">Ring + Skalierung</div><div class="m">Just Chatting</div></div></div>
+    <div class="card yt"><div class="pic"><span class="badge">12:34</span></div>
+      <div class="txt"><div class="t">YouTube-Video</div><div class="s">Kanalname</div><div class="m">1,2 Mio. Aufrufe · vor 2 Tagen</div></div></div>
+  </div>
+
+  <h2>Layout (TV)</h2>
+  <table id="layout"><tr><th>Token</th><th>Wert</th></tr></table>
+</main>
+<script>
+  (function () {
+    var css = getComputedStyle(document.documentElement);
+    var names = [];
+    for (var i = 0; i < document.styleSheets.length; i++) {
+      var rules;
+      try { rules = document.styleSheets[i].cssRules; } catch (e) { continue; }
+      for (var j = 0; j < rules.length; j++) {
+        if (rules[j].selectorText === ":root") {
+          for (var k = 0; k < rules[j].style.length; k++) names.push(rules[j].style[k]);
+        }
+      }
+    }
+    function val(n) { return css.getPropertyValue(n).trim(); }
+    function el(tag, attrs, html) { var e = document.createElement(tag); for (var a in attrs) e.setAttribute(a, attrs[a]); if (html != null) e.innerHTML = html; return e; }
+    names.forEach(function (n) {
+      var v = val(n);
+      if (n.indexOf("--pt-color-") === 0) {
+        var s = el("div", { "class": "swatch" });
+        s.appendChild(el("div", { "class": "chip", style: "background:var(" + n + ")" }));
+        s.appendChild(el("div", {}, "<b>" + n.replace("--pt-color-", "") + "</b>" + v));
+        document.getElementById("colors").appendChild(s);
+      } else if (/^--pt-type-.*-size$/.test(n)) {
+        var key = n.replace("--pt-type-", "").replace("-size", "");
+        var row = el("div", { "class": "type-row" });
+        row.appendChild(el("span", {}, key + "<br>" + v + " / " + val("--pt-type-" + key + "-line")));
+        row.appendChild(el("span", { style: "font-size:var(--pt-type-" + key + "-size);line-height:var(--pt-type-" + key + "-line);font-weight:var(--pt-type-" + key + "-weight);letter-spacing:var(--pt-type-" + key + "-tracking)" }, "Heute live: Twitch und YouTube"));
+        document.getElementById("type").appendChild(row);
+      } else if (n.indexOf("--pt-space-") === 0) {
+        var d = el("div", {});
+        d.appendChild(el("div", { style: "width:" + v + ";height:" + v }));
+        d.appendChild(el("span", {}, n.replace("--pt-space-", "") + " " + v));
+        document.getElementById("space").appendChild(d);
+      } else if (n.indexOf("--pt-radius-") === 0) {
+        document.getElementById("radius").appendChild(el("div", { style: "border-radius:" + v }, n.replace("--pt-radius-", "") + "<br>" + v));
+      } else if (n.indexOf("--pt-layout-") === 0) {
+        var tr = el("tr", {}, "<td>" + n.replace("--pt-layout-", "") + "</td><td>" + v + "</td>");
+        document.getElementById("layout").appendChild(tr);
+      }
+    });
+  })();
+</script>
+</body>
+</html>

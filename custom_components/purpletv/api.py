@@ -54,9 +54,9 @@ class PurpleTVClient:
     async def state(self) -> dict[str, Any]:
         return await self._request("GET", "state")
 
-    async def command(self, name: str, **params: Any) -> None:
+    async def command(self, endpoint: str, **params: Any) -> None:
         clean = {k: str(v).lower() if isinstance(v, bool) else str(v) for k, v in params.items() if v is not None}
-        await self._request("POST", name, params=clean)
+        await self._request("POST", endpoint, params=clean)
 
 
 GQL_URL = "https://gql.twitch.tv/gql"

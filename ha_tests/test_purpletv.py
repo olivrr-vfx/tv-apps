@@ -12,11 +12,12 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.purpletv.api import GQL_URL
 from custom_components.purpletv.config_flow import parse_channels
 from custom_components.purpletv.const import CONF_CHANNELS, CONF_CODE, DOMAIN
+from custom_components.purpletv.media_player import parse_media_id
 
 HOST = "192.168.1.50"
 BASE = f"http://{HOST}:8765/api"
 
-STATE_LIVE = {
+STATE_LEGACY = {
     "version": "1.0.12",
     "screen": "live",
     "playing": True,
@@ -38,6 +39,63 @@ STATE_LIVE = {
         {"login": "papaplatte", "display_name": "Papaplatte", "title": "", "game": "", "viewers": 1, "started_at": "", "thumbnail": "", "avatar": ""},
         {"login": "zarbex", "display_name": "zarbex", "title": "", "game": "", "viewers": 1, "started_at": "", "thumbnail": "", "avatar": ""},
     ],
+}
+
+NOW = __import__("time").time()
+
+STATE_LIVE = {
+    "version": "1.0.30",
+    "screen": "live",
+    "app": "twitch",
+    "apps": ["twitch", "youtube"],
+    "playing": True,
+    "paused": False,
+    "muted": False,
+    "volume": 0.8,
+    "media": {
+        "app": "twitch",
+        "kind": "live",
+        "id": "papaplatte",
+        "title": "CRAFTATTACK TAG 9",
+        "channel": "Papaplatte",
+        "channel_id": "papaplatte",
+        "thumbnail": "https://static-cdn.jtvnw.net/previews-ttv/live_user_papaplatte-640x360.jpg",
+        "avatar": "",
+        "game": "Minecraft",
+        "viewers": 36000,
+        "started_at": "2026-10-18T12:00:00Z",
+        "duration": 0,
+        "position": 0,
+        "live": True,
+    },
+    "channel": STATE_LEGACY["channel"],
+    "vod": None,
+    "followed_live": STATE_LEGACY["followed_live"],
+    "youtube_feed": [
+        {"id": "dQw4w9WgXcQ", "title": "Neues Video", "channel": "Kanal A", "channel_url": "https://www.youtube.com/channel/UCa",
+         "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg", "duration": 212, "uploaded": "", "uploaded_ms": int(NOW * 1000) - 3600_000, "live": False},
+        {"id": "aaaaaaaaaaa", "title": "Altes Video", "channel": "Kanal B", "channel_url": "https://www.youtube.com/channel/UCb",
+         "thumbnail": "", "duration": 60, "uploaded": "", "uploaded_ms": int(NOW * 1000) - 5 * 86400_000, "live": False},
+    ],
+}
+
+STATE_YOUTUBE = {
+    **STATE_LIVE,
+    "screen": "video",
+    "app": "youtube",
+    "media": {
+        "app": "youtube",
+        "kind": "video",
+        "id": "dQw4w9WgXcQ",
+        "title": "Neues Video",
+        "channel": "Kanal A",
+        "channel_id": "https://www.youtube.com/channel/UCa",
+        "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+        "duration": 212,
+        "position": 30,
+        "live": False,
+    },
+    "channel": None,
 }
 
 GQL_RESPONSE = {
@@ -148,9 +206,17 @@ async def test_entities_live(hass: HomeAssistant, aioclient_mock):
     assert player.attributes["volume_level"] == 0.8
     assert player.attributes["source_list"] == ["Papaplatte", "zarbex"]
 
-    assert hass.states.get("binary_sensor.purpletv_watching_twitch").state == "on"
+    assert player.attributes["app_name"] == "Twitch"
+    assert player.attributes["media_content_id"] == "papaplatte"
+
+    assert hass.states.get("binary_sensor.purpletv_watching").state == "on"
     assert hass.states.get("sensor.purpletv_current_channel").state == "Papaplatte"
     assert hass.states.get("sensor.purpletv_followed_channels_live").state == "2"
+    assert hass.states.get("sensor.purpletv_new_youtube_videos").state == "1"
+    assert hass.states.get("select.purpletv_app").state == "Twitch"
+    remote = hass.states.get("remote.purpletv_remote")
+    assert remote.state == "on"
+    assert remote.attributes["current_activity"] == "Twitch"
 
     papa = _find(hass, "binary_sensor", "papaplatte_live")
     assert papa.state == "on"
@@ -166,7 +232,9 @@ async def test_tv_off(hass: HomeAssistant, aioclient_mock):
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
     assert hass.states.get("media_player.purpletv").state == "off"
-    assert hass.states.get("binary_sensor.purpletv_watching_twitch").state == "off"
+    assert hass.states.get("binary_sensor.purpletv_watching").state == "off"
+    assert hass.states.get("remote.purpletv_remote").state == "off"
+    assert hass.states.get("select.purpletv_app").state == "unavailable"
     # Live sensors keep working with the TV off.
     assert _find(hass, "binary_sensor", "papaplatte_live").state == "on"
 
@@ -197,3 +265,77 @@ async def test_commands(hass: HomeAssistant, aioclient_mock):
     assert posts[3][1] == {"login": "papaplatte"}
     assert posts[4][1] == {"id": "123456"}
     assert posts[6][1] == {"login": "zarbex"}
+
+
+async def test_legacy_app_state(hass: HomeAssistant, aioclient_mock):
+    """A TV still running PurpleTV 1.x only sends channel/vod."""
+    await _setup(hass, aioclient_mock, STATE_LEGACY)
+    player = hass.states.get("media_player.purpletv")
+    assert player.state == "playing"
+    assert player.attributes["media_artist"] == "Papaplatte"
+    assert hass.states.get("binary_sensor.purpletv_watching").state == "on"
+    assert hass.states.get("sensor.purpletv_current_channel").state == "Papaplatte"
+
+
+async def test_youtube_state(hass: HomeAssistant, aioclient_mock):
+    await _setup(hass, aioclient_mock, STATE_YOUTUBE)
+    player = hass.states.get("media_player.purpletv")
+    assert player.state == "playing"
+    assert player.attributes["app_name"] == "YouTube"
+    assert player.attributes["media_content_id"] == "youtube:dQw4w9WgXcQ"
+    assert player.attributes["media_duration"] == 212
+    assert player.attributes["media_position"] == 30
+    assert hass.states.get("select.purpletv_app").state == "YouTube"
+
+
+def test_parse_media_id():
+    assert parse_media_id("channel", "Papaplatte") == ("open", {"login": "papaplatte"})
+    assert parse_media_id("channel", "twitch:Zarbex") == ("open", {"login": "zarbex"})
+    assert parse_media_id("video", "https://www.twitch.tv/videos/123") == ("vod", {"id": "123"})
+    assert parse_media_id("video", "https://youtu.be/dQw4w9WgXcQ") == ("youtube", {"id": "dQw4w9WgXcQ"})
+    assert parse_media_id("video", "https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=1") == ("youtube", {"id": "dQw4w9WgXcQ"})
+    assert parse_media_id("video", "youtube:dQw4w9WgXcQ") == ("youtube", {"id": "dQw4w9WgXcQ"})
+    assert parse_media_id("video", "https://www.youtube.com/@LinusTechTips") == ("youtube/channel", {"url": "https://www.youtube.com/@LinusTechTips"})
+    assert parse_media_id("app", "app:youtube") == ("app", {"name": "youtube"})
+    assert parse_media_id("video", "youtube_search:lofi") == ("youtube/search", {"q": "lofi"})
+
+
+async def test_remote_select_and_youtube_commands(hass: HomeAssistant, aioclient_mock):
+    await _setup(hass, aioclient_mock, STATE_LIVE)
+    for path in ["key", "home", "app", "youtube", "seek"]:
+        aioclient_mock.post(f"{BASE}/{path}", json={"ok": True})
+
+    await hass.services.async_call(
+        "remote", "send_command", {"entity_id": "remote.purpletv_remote", "command": ["up", "select", "back", "home"], "delay_secs": 0}, blocking=True
+    )
+    await hass.services.async_call("remote", "turn_on", {"entity_id": "remote.purpletv_remote", "activity": "YouTube"}, blocking=True)
+    await hass.services.async_call("select", "select_option", {"entity_id": "select.purpletv_app", "option": "Twitch"}, blocking=True)
+    await hass.services.async_call(
+        "media_player", "play_media",
+        {"entity_id": "media_player.purpletv", "media_content_type": "video", "media_content_id": "https://youtu.be/dQw4w9WgXcQ"},
+        blocking=True,
+    )
+    await hass.services.async_call("media_player", "media_seek", {"entity_id": "media_player.purpletv", "seek_position": 90}, blocking=True)
+
+    posts = [(c[1].path.split("/api/")[1], dict(c[1].query)) for c in aioclient_mock.mock_calls if c[0] == "POST" and "/api/" in str(c[1])]
+    assert posts == [
+        ("key", {"code": "up"}),
+        ("key", {"code": "ok"}),
+        ("key", {"code": "back"}),
+        ("home", {}),
+        ("app", {"name": "youtube"}),
+        ("app", {"name": "twitch"}),
+        ("youtube", {"id": "dQw4w9WgXcQ"}),
+        ("seek", {"position": "90"}),
+    ]
+
+
+async def test_browse_media(hass: HomeAssistant, aioclient_mock, hass_ws_client):
+    await _setup(hass, aioclient_mock, STATE_LIVE)
+    client = await hass_ws_client(hass)
+    await client.send_json({"id": 1, "type": "media_player/browse_media", "entity_id": "media_player.purpletv"})
+    root = (await client.receive_json())["result"]
+    assert [c["media_content_id"] for c in root["children"]] == ["twitch_live", "youtube_feed", "apps"]
+    await client.send_json({"id": 2, "type": "media_player/browse_media", "entity_id": "media_player.purpletv", "media_content_id": "youtube_feed", "media_content_type": "purpletv"})
+    feed = (await client.receive_json())["result"]
+    assert feed["children"][0]["media_content_id"] == "youtube:dQw4w9WgXcQ"
