@@ -8,7 +8,7 @@ import dev.purpletv.core.AppId
 import dev.purpletv.data.Settings
 
 /**
- * Every app inside PurpleTV also gets its own tile on the TV home screen (an activity-alias in
+ * Every app inside Couch also gets its own tile on the TV home screen (an activity-alias in
  * the manifest). Disabled apps lose their tile.
  */
 object AppLauncher {
@@ -26,7 +26,7 @@ object AppLauncher {
         }
     }
 
-    /** The app tile the activity was started from, null for the main PurpleTV tile. */
+    /** The app tile the activity was started from, null for the main Couch tile. */
     fun appFor(intent: Intent?): AppId? {
         val name = intent?.component?.className ?: return null
         return AppId.entries.firstOrNull { it.launcherAlias == name }

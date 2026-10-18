@@ -116,7 +116,7 @@ private fun StartTab(vm: YouTubeViewModel, nav: Navigator, play: (YtVideo, List<
             item("onboarding") {
                 EmptyState(
                     "Noch keine Abos",
-                    body = "PurpleTV braucht kein Google-Konto: Such Kanäle und abonniere sie hier auf dem TV – oder füge sie bequem mit der Handy-Fernbedienung hinzu.",
+                    body = "Couch braucht kein Google-Konto: Such Kanäle und abonniere sie hier auf dem TV – oder füge sie bequem mit der Handy-Fernbedienung hinzu.",
                     icon = Icons.Filled.Subscriptions,
                     action = "Kanäle suchen",
                     onAction = { vm.tab.value = YouTubeTab.SEARCH },
@@ -213,7 +213,7 @@ private fun SearchTab(vm: YouTubeViewModel, nav: Navigator, play: (YtVideo, List
         when (val r = result) {
             null -> EmptyState(
                 "YouTube durchsuchen",
-                body = "Tipp: Auf dem Handy tippst du schneller – öffne die PurpleTV-Fernbedienung und such dort.",
+                body = "Tipp: Auf dem Handy tippst du schneller – öffne Couch auf dem Handy oder Mac und such dort.",
                 icon = Icons.Filled.Search,
             )
             else -> LoadContent(r, onRetry = { vm.search() }) { data ->

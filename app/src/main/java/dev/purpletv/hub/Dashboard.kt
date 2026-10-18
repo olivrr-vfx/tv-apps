@@ -111,7 +111,7 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
                             when (appId) {
                                 AppId.TWITCH -> AccentScope(Accent.Twitch) {
                                     AppTile(
-                                        title = "Twitch",
+                                        title = AppId.TWITCH.label,
                                         status = when (val f = followed) {
                                             is Load.Ok -> if (f.data.isEmpty()) "Niemand live" else "${f.data.size} Kanäle live"
                                             Load.NeedLogin -> "Nicht angemeldet"
@@ -143,7 +143,7 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
                         }
                     }
                     item("phone") {
-                        UtilityTile("Handy-Fernbedienung", "iPhone als Fernbedienung", Icons.Filled.PhoneIphone, onClick = onPhoneRemote,
+                        UtilityTile("Handy & Mac", "Steuern, teilen, Bildschirm zeigen", Icons.Filled.PhoneIphone, onClick = onPhoneRemote,
                             modifier = Modifier.width(Tokens.Layout.appTile))
                     }
                     item("settings") {
@@ -251,7 +251,7 @@ private fun Header() {
         }
         Spacer(Modifier.weight(1f))
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("PurpleTV", color = Palette.textFaint, style = Type.label)
+            Text(dev.purpletv.core.HUB_NAME, color = Palette.textFaint, style = Type.label)
         }
     }
 }

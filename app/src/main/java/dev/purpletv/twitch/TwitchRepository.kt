@@ -24,7 +24,7 @@ import kotlinx.coroutines.withContext
  * App-wide Twitch data: followed live channels, followed channels, top streams and categories.
  *
  * Lives as long as the app (not a screen), so every screen and the player see the same, fresh
- * list. While PurpleTV is visible the followed list refreshes every [FOLLOWED_INTERVAL_MS] and
+ * list. While Couch is visible the followed list refreshes every [FOLLOWED_INTERVAL_MS] and
  * immediately when the app comes back to the foreground; this is what removes channels that went
  * offline. Before, the list was only refreshed at start and while the home screen was open.
  */
@@ -79,7 +79,7 @@ class TwitchRepository(
         }
     }
 
-    /** PurpleTV became visible: refresh what is stale and keep refreshing until [onBackground]. */
+    /** Couch became visible: refresh what is stale and keep refreshing until [onBackground]. */
     fun onForeground() {
         if (!started) {
             start()

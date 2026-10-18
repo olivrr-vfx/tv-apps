@@ -26,7 +26,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.purpletv.PurpleApp
 import dev.purpletv.core.AppId
@@ -75,6 +77,7 @@ class MainActivity : ComponentActivity() {
                 HubApp(app, launchedFrom)
             }
         }
+        lifecycleScope.launch { repeatOnLifecycle(Lifecycle.State.STARTED) { updateLoop() } }
         // Phone remote: D-pad keys become real key events, so they move the focus like the TV remote.
         lifecycleScope.launch {
             RemoteControl.keys.collect { name -> if (RemoteControl.foreground) injectKey(name) }
@@ -117,12 +120,18 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         RemoteControl.foreground = true
         app.onForeground()
-        if (!app.settings.autoUpdate) return
-        val now = System.currentTimeMillis()
-        // Re-check right away when coming back from the permission screen.
-        if (Updater.state.value == UpdateState.NeedsPermission || now - lastUpdateCheck > 30 * 60_000) {
-            lastUpdateCheck = now
-            lifecycleScope.launch { Updater.checkAndInstall(this@MainActivity) }
+    }
+
+    /** Checks for updates when Couch comes to the front and every hour while it stays open. */
+    private suspend fun updateLoop() {
+        while (true) {
+            val now = System.currentTimeMillis()
+            // Re-check right away when coming back from the permission screen.
+            if (app.settings.autoUpdate && (Updater.state.value == UpdateState.NeedsPermission || now - lastUpdateCheck > 30 * 60_000)) {
+                lastUpdateCheck = now
+                Updater.checkAndInstall(this)
+            }
+            kotlinx.coroutines.delay(60 * 60_000L)
         }
     }
 
@@ -173,6 +182,8 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
                 is Route.App -> route.app.key
                 Route.TwitchLogin, is Route.TwitchGame, is Route.TwitchChannel, is Route.TwitchLive, is Route.TwitchVod -> "twitch"
                 is Route.YouTubeChannel, is Route.YouTubeWatch -> "youtube"
+                is Route.ScreenShare -> "screen"
+                is Route.Media -> "media"
             }
             if (route is Route.App) app.settings.lastApp = route.app
         }
@@ -205,6 +216,10 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
                 pendingYouTubeSearch.value = command.query
                 nav.showSection(Route.App(AppId.YOUTUBE))
             }
+            is RemoteControl.Command.ShowScreenShare -> nav.open(Route.ScreenShare(command.id))
+            is RemoteControl.Command.CloseScreenShare -> if ((nav.current as? Route.ScreenShare)?.id == command.id) nav.pop()
+            // An open viewer picks up new photos itself.
+            is RemoteControl.Command.ShowMedia -> if (nav.current !is Route.Media) nav.open(Route.Media(command.id))
             else -> Unit
         }
     }
@@ -286,6 +301,8 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
                 is Route.YouTubeChannel -> AccentScope(Accent.YouTube) {
                     saveable.SaveableStateProvider("yt-channel-${route.url}") { YtChannelScreen(viewModel(), route.url, nav) }
                 }
+                is Route.ScreenShare -> ScreenShareScreen(app, route.id, onExit = { nav.pop() })
+                is Route.Media -> MediaViewerScreen(route.id, onExit = { nav.pop() })
                 is Route.YouTubeWatch -> AccentScope(Accent.YouTube) {
                     val vm = viewModel<YouTubeViewModel>()
                     WatchScreen(

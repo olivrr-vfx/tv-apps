@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import dev.purpletv.PurpleApp
+import dev.purpletv.design.Accent
 import dev.purpletv.design.ButtonStyle
 import dev.purpletv.design.CornerToast
 import dev.purpletv.design.DialogButtons
@@ -36,11 +37,11 @@ import dev.purpletv.update.UpdateState
 import dev.purpletv.update.Updater
 import kotlinx.coroutines.delay
 
-/** QR code that opens the phone remote already paired, plus how to install it on an iPhone. */
+/** QR code that opens the Couch web app already paired, plus the addresses for a computer. */
 @Composable
 fun PhoneRemoteDialog(app: PurpleApp, onDismiss: () -> Unit) {
     var enabled by remember { mutableStateOf(app.settings.remoteEnabled) }
-    TvDialog("Handy als Fernbedienung", onDismiss = onDismiss, width = 860.dp) {
+    TvDialog("Couch auf Handy und Mac", onDismiss = onDismiss, width = 900.dp) {
         if (!enabled) {
             Text("Dafür muss die Steuerung im Heimnetz an sein.", color = Palette.textDim, style = Type.body)
             Spacer(Modifier.height(Tokens.Space.xl))
@@ -55,15 +56,19 @@ fun PhoneRemoteDialog(app: PurpleApp, onDismiss: () -> Unit) {
             return@TvDialog
         }
         val url = remember { RemoteServer.pairingUrl(app.settings) }
+        val secureUrl = remember { RemoteServer.secureUrl(app.settings) }
         Row(horizontalArrangement = Arrangement.spacedBy(Tokens.Space.xxl), verticalAlignment = Alignment.CenterVertically) {
             QrCode(url, 240.dp)
             Column(verticalArrangement = Arrangement.spacedBy(Tokens.Space.sm)) {
-                Text("1. QR-Code mit der iPhone-Kamera scannen (gleiches WLAN wie der TV).", color = Palette.text, style = Type.body)
-                Text("2. In Safari: Teilen → „Zum Home-Bildschirm“.", color = Palette.text, style = Type.body)
-                Text("3. Fertig – PurpleTV ist jetzt eine App auf deinem iPhone.", color = Palette.text, style = Type.body)
+                Text("iPhone", color = Palette.text, style = Type.titleSmall)
+                Text("QR-Code mit der Kamera scannen, dann in Safari: Teilen → „Zum Home-Bildschirm“.", color = Palette.textDim, style = Type.body)
                 Spacer(Modifier.height(Tokens.Space.sm))
-                Text("Funktioniert auch mit Android und am PC. Adresse:", color = Palette.textDim, style = Type.bodySmall)
-                Text(url, color = Palette.textDim, style = Type.label)
+                Text("Mac oder PC (Chrome)", color = Palette.text, style = Type.titleSmall)
+                Text(url, color = Accent.Hub.light, style = Type.label)
+                Text("Zum Bildschirm teilen die sichere Adresse öffnen und die Zertifikatswarnung einmal bestätigen:", color = Palette.textDim, style = Type.bodySmall)
+                Text(secureUrl, color = Accent.Hub.light, style = Type.label)
+                Spacer(Modifier.height(Tokens.Space.sm))
+                Text("Handy oder Mac müssen im selben WLAN sein.", color = Palette.textFaint, style = Type.caption)
             }
         }
         Spacer(Modifier.height(Tokens.Space.xl))
@@ -90,7 +95,7 @@ fun UpdateOverlay() {
             )
         }
         is UpdateState.Installing -> CornerToast { Text("Update ${s.version} wird installiert…", color = Color.White, style = Type.bodySmall) }
-        UpdateState.UpToDate -> AutoDismiss { CornerToast { Text("PurpleTV ist aktuell", color = Color.White, style = Type.bodySmall) } }
+        UpdateState.UpToDate -> AutoDismiss { CornerToast { Text("Couch ist aktuell", color = Color.White, style = Type.bodySmall) } }
         is UpdateState.Failed -> AutoDismiss { CornerToast { Text(s.message, color = Color.White, style = Type.bodySmall) } }
         UpdateState.NeedsPermission -> {
             var noSettings by remember { mutableStateOf(false) }
@@ -98,9 +103,9 @@ fun UpdateOverlay() {
                 "Neues Update verfügbar",
                 onDismiss = { Updater.dismiss() },
                 body = if (noSettings) {
-                    "Öffne auf dem TV Einstellungen → Apps → Sicherheit & Einschränkungen → Unbekannte Quellen und erlaube PurpleTV. Danach die App neu starten."
+                    "Öffne auf dem TV Einstellungen → Apps → Sicherheit & Einschränkungen → Unbekannte Quellen und erlaube Couch. Danach die App neu starten."
                 } else {
-                    "Damit sich PurpleTV selbst aktualisieren kann, musst du einmalig erlauben, dass es Apps installieren darf."
+                    "Damit sich Couch selbst aktualisieren kann, musst du einmalig erlauben, dass es Apps installieren darf."
                 },
             ) {
                 DialogButtons {

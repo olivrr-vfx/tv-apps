@@ -51,7 +51,7 @@ fun Thumbnail(url: String, modifier: Modifier = Modifier, contentScale: ContentS
     }
 }
 
-/** Brand mark of an app inside PurpleTV. */
+/** Brand mark of an app inside Couch. */
 @Composable
 fun AppMark(app: AppId, size: Dp, modifier: Modifier = Modifier) {
     val res = when (app) {
@@ -63,7 +63,7 @@ fun AppMark(app: AppId, size: Dp, modifier: Modifier = Modifier) {
 
 @Composable
 fun HubMark(size: Dp, modifier: Modifier = Modifier) {
-    Image(painterResource(R.drawable.mark_hub), contentDescription = "PurpleTV", modifier = modifier.size(size))
+    Image(painterResource(R.drawable.mark_hub), contentDescription = dev.purpletv.core.HUB_NAME, modifier = modifier.size(size))
 }
 
 @Composable
@@ -97,7 +97,7 @@ fun Badge(text: String, modifier: Modifier = Modifier, color: Color = Color.Blac
     )
 }
 
-/** Small "Twitch"/"YouTube" tag so mixed rows on the dashboard stay readable. */
+/** Small "Twitch"/"YouTube" tag (the content's platform) so mixed rows on the dashboard stay readable. */
 @Composable
 fun AppTag(app: AppId, modifier: Modifier = Modifier) {
     Row(
@@ -109,6 +109,6 @@ fun AppTag(app: AppId, modifier: Modifier = Modifier) {
     ) {
         AppMark(app, 14.dp)
         Spacer(Modifier.width(4.dp))
-        Text(app.label, color = Color.White, style = Type.caption)
+        Text(app.service, color = Color.White, style = Type.caption)
     }
 }

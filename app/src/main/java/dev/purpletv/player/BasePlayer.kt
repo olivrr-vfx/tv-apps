@@ -58,7 +58,7 @@ fun loadControlFor(mode: PlayerMode, lowLatency: Boolean): LoadControl = when {
 }
 
 /**
- * ExoPlayer wrapper shared by every app in PurpleTV: playback state, quality list and selection,
+ * ExoPlayer wrapper shared by every app in Couch: playback state, quality list and selection,
  * statistics, volume and seeking. Subclasses only know how to load their content.
  */
 abstract class BasePlayer(

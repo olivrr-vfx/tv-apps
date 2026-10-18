@@ -12,6 +12,7 @@ import dev.purpletv.data.Settings
 import dev.purpletv.data.WatchHistory
 import dev.purpletv.hub.AppLauncher
 import dev.purpletv.remote.RemoteServer
+import dev.purpletv.remote.WebPlayback
 import dev.purpletv.twitch.TwitchRepository
 import dev.purpletv.twitch.api.Helix
 import dev.purpletv.twitch.api.TwitchAuth
@@ -78,16 +79,20 @@ class PurpleApp : Application(), ImageLoaderFactory {
         youtube.onBackground()
     }
 
-    private var remote: RemoteServer? = null
+    /** Twitch streams relayed to browsers (Couch web app player). */
+    val webPlayback by lazy { WebPlayback(this) }
 
+    private var remote: List<RemoteServer> = emptyList()
+
+    /** Starts the web server for Home Assistant and the Couch web app (HTTP + HTTPS). */
     fun startRemote() {
-        if (remote != null) return
-        remote = RemoteServer(this).also { it.startAll() }
+        if (remote.isNotEmpty()) return
+        remote = listOf(RemoteServer(this), RemoteServer(this, secure = true)).onEach { it.startAll() }
     }
 
     fun stopRemote() {
-        remote?.stopAll()
-        remote = null
+        remote.forEach { it.stopAll() }
+        remote = emptyList()
     }
 
     // Animated emotes (7TV/BTTV webp + gif) need the platform ImageDecoder on Android 9+.

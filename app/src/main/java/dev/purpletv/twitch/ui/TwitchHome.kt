@@ -151,7 +151,10 @@ private fun TwitchHeader(vm: TwitchViewModel, tab: TwitchTab) {
     ) {
         AppMark(AppId.TWITCH, 36.dp)
         Spacer(Modifier.width(Tokens.Space.md))
-        Text("Twitch", color = Palette.text, style = Type.title)
+        Column {
+            Text("TWITCH", color = LocalAccent.current.light, style = Type.overline)
+            Text("PurpleTV", color = Palette.text, style = Type.title)
+        }
         Spacer(Modifier.width(Tokens.Space.xl))
         TopTabs(
             tabs = TwitchTab.entries,
@@ -231,7 +234,7 @@ private fun StartTab(vm: TwitchViewModel, actions: TwitchActions, holder: HeroHo
 
     if (followed == Load.NeedLogin || top == Load.NeedLogin) {
         EmptyState(
-            "Willkommen bei Twitch",
+            "Willkommen bei PurpleTV",
             body = "Melde dich an, um deine Kanäle, VODs und Empfehlungen zu sehen. Ohne Login kannst du Kanäle über die Suche öffnen.",
             icon = Icons.Filled.Login,
             action = "Mit Twitch anmelden",

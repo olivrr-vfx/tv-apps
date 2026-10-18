@@ -23,7 +23,7 @@ sealed interface UpdateState {
     data object UpToDate : UpdateState
     data class Downloading(val version: String, val progress: Float) : UpdateState
     data class Installing(val version: String) : UpdateState
-    /** The user has to allow "install unknown apps" for PurpleTV once. */
+    /** The user has to allow "install unknown apps" for Couch once. */
     data object NeedsPermission : UpdateState
     data class Failed(val message: String) : UpdateState
 }
@@ -48,8 +48,8 @@ object Updater {
         )
         val code = json.optString("tag_name").removePrefix("build-").toIntOrNull() ?: return null
         val assets = json.optJSONArray("assets") ?: return null
-        val apk = (0 until assets.length()).map { assets.getJSONObject(it) }
-            .firstOrNull { it.optString("name").endsWith(".apk") } ?: return null
+        val apks = (0 until assets.length()).map { assets.getJSONObject(it) }.filter { it.optString("name").endsWith(".apk") }
+        val apk = apks.firstOrNull { it.optString("name") == "Couch.apk" } ?: apks.firstOrNull() ?: return null
         return Release(code, json.optString("name").ifBlank { "1.0.$code" }, apk.getString("browser_download_url"))
     }
 
@@ -84,7 +84,7 @@ object Updater {
         val installer = context.packageManager.packageInstaller
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL).apply {
             setAppPackageName(context.packageName)
-            // Android 12+: once PurpleTV is its own installer of record, updates go through
+            // Android 12+: once Couch is its own installer of record, updates go through
             // without a confirmation dialog.
             if (Build.VERSION.SDK_INT >= 31) setRequireUserAction(PackageInstaller.SessionParams.USER_ACTION_NOT_REQUIRED)
         }
@@ -95,7 +95,7 @@ object Updater {
                 if (!response.isSuccessful) throw IllegalStateException("HTTP ${response.code}")
                 val body = response.body ?: throw IllegalStateException("Leere Antwort")
                 val total = body.contentLength()
-                session.openWrite("PurpleTV.apk", 0, total).use { out ->
+                session.openWrite("Couch.apk", 0, total).use { out ->
                     body.byteStream().use { input ->
                         val buffer = ByteArray(64 * 1024)
                         var written = 0L
@@ -124,7 +124,7 @@ object Updater {
         }
     }
 
-    /** Opens the "install unknown apps" setting for PurpleTV (not present on every TV). */
+    /** Opens the "install unknown apps" setting for Couch (not present on every TV). */
     fun openPermissionSettings(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < 26) return false
         return runCatching {
