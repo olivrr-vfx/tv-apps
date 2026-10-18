@@ -143,7 +143,7 @@ private fun TwitchSettings(app: PurpleApp, nav: Navigator) {
     }
     s.lastAuthError?.let { Text("Letztes Login-Problem: $it", color = Palette.textFaint, style = Type.bodySmall) }
     Row(verticalAlignment = Alignment.CenterVertically) {
-        TvTextField(clientId, { clientId = it }, label = "Twitch Client-ID (dev.twitch.tv)", onSubmit = { s.clientId = clientId; changed() }, modifier = Modifier.width(460.dp))
+        TvTextField(clientId, { clientId = it }, label = "Twitch Client-ID (dev.twitch.tv)", onSubmit = { s.clientId = clientId; changed() }, modifier = Modifier.weight(1f))
         Spacer(Modifier.width(Tokens.Space.lg))
         TvButton("Speichern", onClick = { s.clientId = clientId; changed() })
     }

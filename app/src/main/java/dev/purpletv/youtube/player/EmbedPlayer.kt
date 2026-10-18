@@ -10,15 +10,21 @@ import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import dev.purpletv.core.AppLog
 
 /**
- * Fallback player: YouTube's own embedded player in a WebView. Used when YouTube refuses to hand
- * out stream URLs to the extractor (bot check, changed player code). It shows YouTube's ads, but
- * the video plays. Controlled through the page's <video> element, so the D-pad and the phone
+ * Fallback player: YouTube's own embedded player (IFrame Player API) in a WebView. Used when
+ * YouTube refuses to hand out stream URLs to the extractor (bot check, changed player code). It
+ * shows YouTube's ads, but the video plays. Driven through the API, so the D-pad and the phone
  * remote work the same as with the normal player.
+ *
+ * The page is loaded with the app id as origin: YouTube refuses embeds without an identifiable
+ * embedder (error 152/153), and for apps it asks for https://<package name>.
  */
 @SuppressLint("SetJavaScriptEnabled")
 class EmbedPlayer(context: Context) {
+
+    private val origin = "https://${context.packageName}"
 
     val view: WebView = WebView(context).apply {
         setBackgroundColor(Color.BLACK)
@@ -30,9 +36,7 @@ class EmbedPlayer(context: Context) {
         settings.domStorageEnabled = true
         settings.mediaPlaybackRequiresUserGesture = false
         webChromeClient = WebChromeClient()
-        webViewClient = object : WebViewClient() {
-            override fun onPageFinished(view: WebView?, url: String?) = js(STYLE)
-        }
+        webViewClient = WebViewClient()
     }
 
     @Volatile var positionMs = 0L; private set
@@ -41,6 +45,8 @@ class EmbedPlayer(context: Context) {
     @Volatile var paused = false; private set
     @Volatile var muted = false; private set
     @Volatile var volume = 1f; private set
+    /** YouTube's error code when the embed refuses the video (e.g. 101/150: embedding disabled). */
+    @Volatile var error: String? = null; private set
     var videoId: String? = null; private set
 
     fun load(id: String, startMs: Long) {
@@ -49,17 +55,20 @@ class EmbedPlayer(context: Context) {
         durationMs = 0
         ended = false
         paused = false
-        val start = startMs / 1000
-        val url = "https://www.youtube-nocookie.com/embed/$id?autoplay=1&controls=0&rel=0&playsinline=1" +
-            "&iv_load_policy=3&fs=0&disablekb=1&start=$start"
-        // Without a referrer the embed refuses to play ("error 153").
-        view.loadUrl(url, mapOf("Referer" to "https://www.youtube.com/"))
+        error = null
+        val safeId = id.filter { it.isLetterOrDigit() || it == '_' || it == '-' }
+        view.loadDataWithBaseURL("$origin/", page(safeId, startMs / 1000), "text/html", "utf-8", null)
     }
 
-    /** Reads the page state; call about once a second. Also starts playback if autoplay was blocked. */
+    /** Reads the player state; call about once a second. */
     fun poll() {
-        view.evaluateJavascript(STATE) { raw ->
+        view.evaluateJavascript("typeof couchState==='function'?couchState():''") { raw ->
             val parts = raw.trim('"').split(',')
+            if (parts.size == 2 && parts[0] == "err") {
+                if (error == null) AppLog.e("YouTube", "Eingebetteter Player: Fehler ${parts[1]} für $videoId")
+                error = parts[1]
+                return@evaluateJavascript
+            }
             if (parts.size < 4) return@evaluateJavascript
             positionMs = ((parts[0].toDoubleOrNull() ?: 0.0) * 1000).toLong()
             durationMs = ((parts[1].toDoubleOrNull() ?: 0.0) * 1000).toLong()
@@ -68,20 +77,20 @@ class EmbedPlayer(context: Context) {
         }
     }
 
-    fun toggle() = js("var v=document.querySelector('video');if(v){if(v.paused)v.play();else v.pause();}").also { paused = !paused }
-    fun play() = js("var v=document.querySelector('video');if(v)v.play();").also { paused = false }
-    fun pause() = js("var v=document.querySelector('video');if(v)v.pause();").also { paused = true }
-    fun seekTo(ms: Long) = js("var v=document.querySelector('video');if(v)v.currentTime=${ms.coerceAtLeast(0) / 1000.0};")
+    fun toggle() = js("if(player&&ready){player.getPlayerState()===1?player.pauseVideo():player.playVideo();}").also { paused = !paused }
+    fun play() = js("if(player&&ready)player.playVideo();").also { paused = false }
+    fun pause() = js("if(player&&ready)player.pauseVideo();").also { paused = true }
+    fun seekTo(ms: Long) = js("if(player&&ready)player.seekTo(${ms.coerceAtLeast(0) / 1000.0},true);")
     fun seekBy(ms: Long) = seekTo(positionMs + ms)
 
     fun setMuted(mute: Boolean) {
         muted = mute
-        js("var v=document.querySelector('video');if(v)v.muted=$mute;")
+        js(if (mute) "if(player&&ready)player.mute();" else "if(player&&ready)player.unMute();")
     }
 
     fun setVolume(level: Float) {
         volume = level.coerceIn(0f, 1f)
-        js("var v=document.querySelector('video');if(v)v.volume=$volume;")
+        js("if(player&&ready)player.setVolume(${(volume * 100).toInt()});")
     }
 
     fun release() {
@@ -92,18 +101,24 @@ class EmbedPlayer(context: Context) {
 
     private fun js(code: String) = view.evaluateJavascript("(function(){$code})()", null)
 
-    private companion object {
-        /** position,duration,ended,paused. Clicks the big play button when autoplay did not start. */
-        const val STATE = "(function(){var v=document.querySelector('video');" +
-            "if(!v){var b=document.querySelector('.ytp-large-play-button');if(b)b.click();return '';}" +
-            "if(v.currentTime<1&&v.paused&&!v.dataset.couch){v.dataset.couch='1';v.play();}" +
-            "return [v.currentTime,v.duration||0,v.ended,v.paused].join(',');})()"
-
-        /** Hides YouTube's title bar and buttons; the TV shows its own overlay. */
-        const val STYLE = "var s=document.createElement('style');" +
-            "s.textContent='.ytp-chrome-top,.ytp-chrome-bottom,.ytp-pause-overlay,.ytp-watermark,.ytp-gradient-top,.ytp-gradient-bottom{display:none!important}body{background:#000}';" +
-            "document.head.appendChild(s);"
-    }
+    private fun page(id: String, startSec: Long) = """
+        <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+        <style>html,body{margin:0;height:100%;background:#000;overflow:hidden}#p{position:fixed;inset:0;width:100%;height:100%;border:0}</style>
+        </head><body><div id="p"></div><script>
+        var player=null, ready=false, err='';
+        function onYouTubeIframeAPIReady(){
+          player=new YT.Player('p',{width:'100%',height:'100%',videoId:'$id',host:'https://www.youtube-nocookie.com',
+            playerVars:{autoplay:1,controls:0,rel:0,playsinline:1,iv_load_policy:3,fs:0,disablekb:1,start:$startSec,origin:'$origin'},
+            events:{onReady:function(e){ready=true;e.target.playVideo();},onError:function(e){err=String(e.data);}}});
+        }
+        function couchState(){
+          if(err) return 'err,'+err;
+          if(!ready) return '';
+          var s=player.getPlayerState();
+          return [player.getCurrentTime()||0,player.getDuration()||0,s===0,s===2].join(',');
+        }
+        </script><script src="https://www.youtube.com/iframe_api"></script></body></html>
+    """.trimIndent()
 }
 
 @Composable

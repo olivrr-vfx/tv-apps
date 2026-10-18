@@ -1,12 +1,17 @@
 package dev.purpletv
 
 import android.app.Application
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import dev.purpletv.core.AppId
+import dev.purpletv.core.AppLog
 import dev.purpletv.data.Http
 import dev.purpletv.data.Settings
 import dev.purpletv.data.WatchHistory
@@ -50,6 +55,30 @@ class PurpleApp : Application(), ImageLoaderFactory {
         _enabled.value = enabledApps()
         AppLauncher.sync(this, settings)
         if (settings.remoteEnabled) startRemote()
+        watchNetwork()
+    }
+
+    /**
+     * A TV often starts Couch before its Wi-Fi is up (waking from standby). When the network
+     * comes (back), everything that failed loads again instead of staying empty.
+     */
+    private fun watchNetwork() {
+        val cm = getSystemService(ConnectivityManager::class.java) ?: return
+        val main = Handler(Looper.getMainLooper())
+        runCatching {
+            cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    AppLog.i("Netz", "verbunden")
+                    // Give DNS a moment after the link comes up.
+                    main.postDelayed({
+                        twitch.retryFailed()
+                        youtube.retryFailed()
+                    }, 1_500)
+                }
+
+                override fun onLost(network: Network) = AppLog.i("Netz", "getrennt")
+            })
+        }.onFailure { AppLog.e("Netz", "Netzwerk-Überwachung nicht möglich", it) }
     }
 
     fun enabledApps(): List<AppId> = AppId.entries.filter { settings.isEnabled(it) }

@@ -214,6 +214,13 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
         while (true) {
             if (embed) {
                 embedPlayer.poll()
+                embedPlayer.error?.let { code ->
+                    if (loadError == null) loadError = when (code) {
+                        "101", "150" -> "Der Kanal erlaubt das Abspielen außerhalb von YouTube nicht."
+                        "100" -> "Video nicht gefunden."
+                        else -> "YouTube spielt dieses Video gerade nicht ab (Fehler $code)."
+                    }
+                }
                 position = embedPlayer.positionMs
                 embedPlayer.durationMs.takeIf { it > 0 }?.let { duration = it }
                 paused = embedPlayer.paused
@@ -361,7 +368,8 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
                     return@onPreviewKeyEvent when (ev.key) {
                         Key.DirectionLeft, Key.MediaRewind -> { embedPlayer.seekBy(-10_000); true }
                         Key.DirectionRight, Key.MediaFastForward -> { embedPlayer.seekBy(10_000); true }
-                        Key.DirectionCenter, Key.Enter, Key.NumPadEnter, Key.MediaPlayPause, Key.MediaPlay, Key.MediaPause -> { togglePause(); true }
+                        Key.DirectionCenter, Key.Enter, Key.NumPadEnter -> { if (loadError != null) attempt++ else togglePause(); true }
+                        Key.MediaPlayPause, Key.MediaPlay, Key.MediaPause -> { togglePause(); true }
                         Key.MediaNext -> { playNext(next); true }
                         Key.DirectionUp, Key.DirectionDown, Key.Menu -> true
                         else -> false

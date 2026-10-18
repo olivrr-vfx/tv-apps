@@ -39,6 +39,8 @@ class TwitchRepository(
         const val TOP_INTERVAL_MS = 5 * 60_000L
         /** Coming back after this long refreshes right away. */
         const val STALE_AFTER_MS = 30_000L
+        /** Waits before trying a failed request again (e.g. the TV woke up before its Wi-Fi). */
+        val RETRY_DELAYS_MS = longArrayOf(2_000, 5_000, 10_000, 20_000, 40_000)
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -104,7 +106,13 @@ class TwitchRepository(
         loop = null
     }
 
-    private fun <T> load(target: MutableStateFlow<Load<T>>, showLoading: Boolean = true, onOk: (T) -> Unit = {}, block: () -> T) {
+    private fun <T> load(
+        target: MutableStateFlow<Load<T>>,
+        showLoading: Boolean = true,
+        onOk: (T) -> Unit = {},
+        attempt: Int = 0,
+        block: () -> T,
+    ) {
         if (showLoading || target.value !is Load.Ok) target.value = Load.Loading
         scope.launch {
             val result = withContext(Dispatchers.IO) {
@@ -120,7 +128,23 @@ class TwitchRepository(
             if (result is Load.Ok) onOk(result.data)
             // Keep showing old data if a silent refresh fails.
             if (result is Load.Ok || showLoading || target.value !is Load.Ok) target.value = result
+            if (result is Load.Error && attempt < RETRY_DELAYS_MS.size) {
+                delay(RETRY_DELAYS_MS[attempt])
+                // Something else (a manual refresh, the network callback) may have fixed it already.
+                if (target.value is Load.Error || (target.value is Load.Ok && !showLoading)) {
+                    load(target, showLoading = false, onOk = onOk, attempt = attempt + 1, block = block)
+                }
+            }
         }
+    }
+
+    /** The network came back: load again whatever failed. */
+    fun retryFailed() {
+        if (!started) return
+        if (_followed.value is Load.Error) refreshFollowed()
+        if (_top.value is Load.Error) refreshTop()
+        if (_channels.value is Load.Error) load(_channels) { helix.followedChannels() }
+        if (_games.value is Load.Error) load(_games) { helix.topGames() }
     }
 
     fun refreshAll() {
