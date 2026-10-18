@@ -1,0 +1,2 @@
+{"channels":[{"login":"papaplatte","display_name":"Papaplatte","title":"","game":"","viewers":0,"started_at":"","thumbnail":"","avatar":"https:\/\/static-cdn.jtvnw.net\/jtv_user_pictures\/04abc1b4-7bad-4b55-8da8-c0f1cf031bda-profile_image-150x150.png","live":true}]}
+200 0.400125s
