@@ -1,0 +1,605 @@
+--------- beginning of main
+10-18 21:00:24.041 I/dev.purpletv( 2814): Using CollectorTypeCC GC.
+10-18 21:00:24.042 W/dev.purpletv( 2814): Unexpected CPU variant for x86: x86_64.
+10-18 21:00:24.042 W/dev.purpletv( 2814): Known variants: atom, sandybridge, silvermont, kabylake, default
+10-18 21:00:24.388 D/CompatibilityChangeReporter( 2814): Compat change id reported: 171979766; UID 10174; state: ENABLED
+10-18 21:00:24.397 D/nativeloader( 2814): Configuring classloader-namespace for other apk /data/app/~~RH2YYYn8LbJ4dA4OWZnEIQ==/dev.purpletv-u4YugEZTcOsDvGNez5GyEg==/base.apk. target_sdk_version=35, uses_libraries=, library_path=/data/app/~~RH2YYYn8LbJ4dA4OWZnEIQ==/dev.purpletv-u4YugEZTcOsDvGNez5GyEg==/lib/x86_64:/data/app/~~RH2YYYn8LbJ4dA4OWZnEIQ==/dev.purpletv-u4YugEZTcOsDvGNez5GyEg==/base.apk!/lib/x86_64, permitted_path=/data:/mnt/expand:/data/user/0/dev.purpletv
+10-18 21:00:24.501 V/GraphicsEnvironment( 2814): ANGLE Developer option for 'dev.purpletv' set to: 'default'
+10-18 21:00:24.502 V/GraphicsEnvironment( 2814): ANGLE GameManagerService for dev.purpletv: false
+10-18 21:00:24.502 V/GraphicsEnvironment( 2814): Neither updatable production driver nor prerelease driver is supported.
+10-18 21:00:24.503 D/NetworkSecurityConfig( 2814): Using Network Security Config from resource network_security_config debugBuild: false
+10-18 21:00:24.503 D/NetworkSecurityConfig( 2814): Using Network Security Config from resource network_security_config debugBuild: false
+10-18 21:00:24.543 D/TrafficStats( 2814): tagSocket(70) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:24.557 D/CompatibilityChangeReporter( 2814): Compat change id reported: 235355681; UID 10174; state: ENABLED
+10-18 21:00:24.888 D/TrafficStats( 2814): tagSocket(73) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:24.918 D/libEGL  ( 2814): loaded /vendor/lib64/egl/libEGL_emulation.so
+10-18 21:00:24.919 D/libEGL  ( 2814): loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
+10-18 21:00:24.925 D/libEGL  ( 2814): loaded /vendor/lib64/egl/libGLESv2_emulation.so
+10-18 21:00:24.941 D/CompatibilityChangeReporter( 2814): Compat change id reported: 237531167; UID 10174; state: DISABLED
+10-18 21:00:24.979 W/Couch/Twitch( 2814): GQL fehlgeschlagen
+10-18 21:00:24.980 W/Couch/Twitch( 2814): Laden fehlgeschlagen
+10-18 21:00:24.980 W/Couch/Twitch( 2814): GQL fehlgeschlagen
+10-18 21:00:24.980 W/Couch/Twitch( 2814): Laden fehlgeschlagen
+10-18 21:00:24.998 W/Parcel  ( 2814): Expecting binder but got null!
+10-18 21:00:25.124 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:00:25.130 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:00:25.141 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c55ed0: maj 3 min 0 rcv 3
+10-18 21:00:25.144 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c55ed0: ver 3 0 (tinfo 0x7102c9c59080) (first time)
+10-18 21:00:25.221 I/Gralloc4( 2814): mapper 4.x is not supported
+10-18 21:00:25.233 W/Gralloc4( 2814): allocator 4.x is not supported
+10-18 21:00:25.241 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:00:26.123 I/OpenGLRenderer( 2814): Davey! duration=1586ms; Flags=1, FrameTimelineVsyncId=3042, IntendedVsync=36216324623, Vsync=36699657937, InputEventId=0, HandleInputStart=36703126845, AnimationStart=36703127275, PerformTraversalsStart=36703176589, DrawStart=36942027731, FrameDeadline=36232991289, FrameInterval=36703122999, FrameStartTime=16666666, SyncQueued=36991482627, SyncStart=36991625299, IssueDrawCommandsStart=36991724026, SwapBuffers=37662893315, FrameCompleted=37803392256, DequeueBufferDuration=3275, QueueBufferDuration=1652303, GpuCompleted=37803341410, SwapBuffersCompleted=37803392256, DisplayPresentTime=0, CommandSubmissionCompleted=37662893315, 
+10-18 21:00:26.237 W/Updater ( 2814): check failed
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal trending_music
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal trending_podcasts_episodes
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal live
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal trending_gaming
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal trending_movies_and_shows
+10-18 21:00:26.239 I/Choreographer( 2814): Skipped 73 frames!  The application may be doing too much work on its main thread.
+10-18 21:00:26.313 I/OpenGLRenderer( 2814): Davey! duration=1255ms; Flags=0, FrameTimelineVsyncId=3076, IntendedVsync=36716324603, Vsync=37932991221, InputEventId=0, HandleInputStart=37939895932, AnimationStart=37939896663, PerformTraversalsStart=37943307167, DrawStart=37943382099, FrameDeadline=37832991225, FrameInterval=37939881911, FrameStartTime=16666666, SyncQueued=37945213930, SyncStart=37945238626, IssueDrawCommandsStart=37945461128, SwapBuffers=37950741340, FrameCompleted=37972100121, DequeueBufferDuration=3395, QueueBufferDuration=1147471, GpuCompleted=37972002716, SwapBuffersCompleted=37972100121, DisplayPresentTime=0, CommandSubmissionCompleted=37950741340, 
+10-18 21:00:26.768 I/Couch/Netz( 2814): verbunden
+10-18 21:00:28.281 D/EGL_emulation( 2814): app_time_stats: avg=726.13ms min=60.21ms max=1949.48ms count=3
+10-18 21:00:28.302 D/TrafficStats( 2814): tagSocket(112) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:28.302 D/TrafficStats( 2814): tagSocket(116) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:28.303 D/TrafficStats( 2814): tagSocket(119) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:28.304 D/TrafficStats( 2814): tagSocket(106) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:28.305 D/TrafficStats( 2814): tagSocket(120) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:28.336 D/TrafficStats( 2814): tagSocket(117) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:28.336 D/TrafficStats( 2814): tagSocket(115) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:28.888 D/TrafficStats( 2814): tagSocket(129) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:28.902 D/TrafficStats( 2814): tagSocket(126) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:28.906 D/TrafficStats( 2814): tagSocket(136) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:29.130 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:00:29.131 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:00:29.134 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c5e8d0: maj 3 min 0 rcv 3
+10-18 21:00:29.135 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c5e8d0: ver 3 0 (tinfo 0x7102c9c59100) (first time)
+10-18 21:00:29.139 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:00:29.142 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:00:29.192 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:00:29.353 D/EGL_emulation( 2814): app_time_stats: avg=153.17ms min=39.85ms max=264.09ms count=7
+10-18 21:00:30.308 D/ProfileInstaller( 2814): Installing profile for dev.purpletv
+10-18 21:00:30.508 D/EGL_emulation( 2814): app_time_stats: avg=70.40ms min=31.25ms max=340.77ms count=16
+10-18 21:00:30.515 I/dev.purpletv( 2814): NativeAlloc concurrent copying GC freed 679973(25MB) AllocSpace objects, 43(6200KB) LOS objects, 49% free, 11MB/23MB, paused 21us,12us total 259.974ms
+10-18 21:00:57.712 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:57.731 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:57.742 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:57.753 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:57.764 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:57.774 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:57.971 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:57.986 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:58.003 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:58.912 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:59.107 W/OnBackInvokedCallback( 2814): OnBackInvokedCallback is not enabled for the application.
+10-18 21:00:59.107 W/OnBackInvokedCallback( 2814): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+10-18 21:00:59.384 D/TrafficStats( 2814): tagSocket(6) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:59.384 D/TrafficStats( 2814): tagSocket(86) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:59.384 D/TrafficStats( 2814): tagSocket(149) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:59.384 D/TrafficStats( 2814): tagSocket(110) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:59.385 D/TrafficStats( 2814): tagSocket(81) with statsTag=0xffffffff, statsUid=-1
+10-18 21:00:59.462 D/EGL_emulation( 2814): app_time_stats: avg=28954.29ms min=28954.29ms max=28954.29ms count=1
+10-18 21:00:59.633 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:00:59.633 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:00:59.634 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c65350: maj 3 min 0 rcv 3
+10-18 21:00:59.634 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c65350: ver 3 0 (tinfo 0x7102c9c59100) (first time)
+10-18 21:00:59.649 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:00:59.655 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:00:59.657 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:01:19.896 D/EGL_emulation( 2814): app_time_stats: avg=1459.49ms min=33.49ms max=19654.30ms count=14
+10-18 21:01:24.971 D/EGL_emulation( 2814): app_time_stats: avg=2537.55ms min=122.24ms max=4952.85ms count=2
+10-18 21:01:27.405 D/EGL_emulation( 2814): app_time_stats: avg=2433.58ms min=2433.58ms max=2433.58ms count=1
+10-18 21:01:36.909 D/EGL_emulation( 2814): app_time_stats: avg=4751.94ms min=72.04ms max=9431.83ms count=2
+10-18 21:01:47.541 D/EGL_emulation( 2814): app_time_stats: avg=1768.59ms min=5.98ms max=10245.67ms count=6
+10-18 21:02:01.407 I/ExoPlayerImpl( 2814): Init ea1c5c [AndroidXMedia3/1.5.1] [emu64x, sdk_gphone64_x86_64, Google, 33]
+10-18 21:02:01.521 D/CompatibilityChangeReporter( 2814): Compat change id reported: 210923482; UID 10174; state: ENABLED
+10-18 21:02:01.530 D/CompatibilityChangeReporter( 2814): Compat change id reported: 171228096; UID 10174; state: ENABLED
+10-18 21:02:01.648 I/dev.purpletv( 2814): Background young concurrent copying GC freed 141423(7847KB) AllocSpace objects, 64(3244KB) LOS objects, 45% free, 12MB/23MB, paused 73us,9us total 145.607ms
+10-18 21:02:01.790 D/EGL_emulation( 2814): app_time_stats: avg=3557.36ms min=23.53ms max=14146.31ms count=4
+10-18 21:02:01.880 D/TrafficStats( 2814): tagSocket(135) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:01.882 D/TrafficStats( 2814): tagSocket(120) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:01.981 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:01.982 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:02:01.982 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c660d0: maj 3 min 0 rcv 3
+10-18 21:02:01.984 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c660d0: ver 3 0 (tinfo 0x7102c9c59100) (first time)
+10-18 21:02:02.042 D/TrafficStats( 2814): tagSocket(102) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:02.342 D/TrafficStats( 2814): tagSocket(105) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:02.403 D/TrafficStats( 2814): tagSocket(106) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:03.288 D/TrafficStats( 2814): tagSocket(112) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:03.490 I/DMCodecAdapterFactory( 2814): Creating an asynchronous MediaCodec adapter for track type video
+10-18 21:02:03.514 D/EGL_emulation( 2814): app_time_stats: avg=138.83ms min=4.12ms max=1268.65ms count=12
+10-18 21:02:03.514 D/CCodec  ( 2814): allocate(c2.goldfish.h264.decoder)
+10-18 21:02:03.537 I/Codec2Client( 2814): Available Codec2 services: "default" "software"
+10-18 21:02:03.559 I/CCodec  ( 2814): setting up 'default' as default (vendor) store
+10-18 21:02:03.574 I/CCodec  ( 2814): Created component [c2.goldfish.h264.decoder]
+10-18 21:02:03.575 D/CCodecConfig( 2814): read media type: video/avc
+10-18 21:02:03.577 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: algo.buffers.max-count.values
+10-18 21:02:03.577 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: output.subscribed-indices.values
+10-18 21:02:03.578 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: input.buffers.allocator-ids.values
+10-18 21:02:03.578 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: output.buffers.allocator-ids.values
+10-18 21:02:03.578 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: algo.buffers.allocator-ids.values
+10-18 21:02:03.578 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: output.buffers.pool-ids.values
+10-18 21:02:03.578 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: algo.buffers.pool-ids.values
+10-18 21:02:03.579 D/ReflectedParamUpdater( 2814): ignored struct field coded.color-format.locations
+10-18 21:02:03.580 D/CCodecConfig( 2814): ignoring local param raw.size (0xd2001800) as it is already supported
+10-18 21:02:03.580 D/CCodecConfig( 2814): ignoring local param default.color (0x5200180b) as it is already supported
+10-18 21:02:03.580 D/ReflectedParamUpdater( 2814): ignored struct field raw.hdr-static-info.mastering
+10-18 21:02:03.581 I/CCodecConfig( 2814): query failed after returning 12 values (BAD_INDEX)
+10-18 21:02:03.581 D/CCodecConfig( 2814): c2 config diff is Dict {
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 coded.pl.level = 20496
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 coded.pl.profile = 20481
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 coded.vui.color.matrix = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 coded.vui.color.primaries = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 coded.vui.color.range = 2
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 coded.vui.color.transfer = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 default.color.matrix = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 default.color.primaries = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 default.color.range = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 default.color.transfer = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 input.buffers.max-size.value = 6291456
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 input.delay.value = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   string input.media-type.value = "video/avc"
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 output.delay.value = 8
+10-18 21:02:03.581 D/CCodecConfig( 2814):   string output.media-type.value = "video/raw"
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.color.matrix = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.color.primaries = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.color.range = 2
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.color.transfer = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.max-size.height = 240
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.max-size.width = 320
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.pixel-format.value = 35
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::i32 raw.rotation.flip = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::i32 raw.rotation.value = 0
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.sar.height = 1
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.sar.width = 1
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.size.height = 240
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2::u32 raw.size.width = 320
+10-18 21:02:03.581 D/CCodecConfig( 2814):   c2:
+10-18 21:02:03.581 W/ColorUtils( 2814): expected specified color aspects (2:0:0:0)
+10-18 21:02:03.586 I/MediaCodec( 2814): MediaCodec will operate in async mode
+10-18 21:02:03.588 D/MediaCodec( 2814): flushMediametrics
+10-18 21:02:03.592 D/SurfaceUtils( 2814): connecting to surface 0x710195c87f90, reason connectToSurface
+10-18 21:02:03.592 I/MediaCodec( 2814): [c2.goldfish.h264.decoder] setting surface generation to 2881537
+10-18 21:02:03.592 D/SurfaceUtils( 2814): disconnecting from surface 0x710195c87f90, reason connectToSurface(reconnect)
+10-18 21:02:03.592 D/SurfaceUtils( 2814): connecting to surface 0x710195c87f90, reason connectToSurface(reconnect)
+10-18 21:02:03.592 D/CCodec  ( 2814): [c2.goldfish.h264.decoder] buffers are bound to CCodec for this session
+10-18 21:02:03.592 D/CCodecConfig( 2814): no c2 equivalents for log-session-id
+10-18 21:02:03.592 D/CCodecConfig( 2814): no c2 equivalents for color-standard
+10-18 21:02:03.592 D/CCodecConfig( 2814): no c2 equivalents for csd-1
+10-18 21:02:03.592 D/CCodecConfig( 2814): no c2 equivalents for native-window
+10-18 21:02:03.592 D/CCodecConfig( 2814): no c2 equivalents for flags
+10-18 21:02:03.593 D/CCodecConfig( 2814): config failed => CORRUPTED
+10-18 21:02:03.593 D/CCodecConfig( 2814): c2 config diff is   c2::u32 default.color.matrix = 1
+10-18 21:02:03.593 D/CCodecConfig( 2814):   c2::u32 default.color.primaries = 1
+10-18 21:02:03.593 D/CCodecConfig( 2814):   c2::u32 default.color.range = 1
+10-18 21:02:03.593 D/CCodecConfig( 2814):   c2::u32 default.color.transfer = 3
+10-18 21:02:03.593 D/CCodecConfig( 2814):   c2::u32 raw.max-size.height = 1080
+10-18 21:02:03.593 D/CCodecConfig( 2814):   c2::u32 raw.max-size.width = 1920
+10-18 21:02:03.593 D/CCodecConfig( 2814):   c2::u32 raw.size.height = 480
+10-18 21:02:03.593 D/CCodecConfig( 2814):   c2::u32 raw.size.width = 852
+10-18 21:02:03.594 W/Codec2Client( 2814): query -- param skipped: index = 1107298332.
+10-18 21:02:03.594 D/CCodec  ( 2814): client requested max input size 1566720, which is smaller than what component recommended (6291456); overriding with component recommendation.
+10-18 21:02:03.594 W/CCodec  ( 2814): This behavior is subject to change. It is recommended that app developers double check whether the requested max input size is in reasonable range.
+10-18 21:02:03.594 D/CCodec  ( 2814): encoding statistics level = 0
+10-18 21:02:03.594 D/CCodec  ( 2814): setup formats input: AMessage(what = 0x00000000) = {
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t height = 480
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t level = 65536
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t max-input-size = 6291456
+10-18 21:02:03.594 D/CCodec  ( 2814):   string mime = "video/avc"
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t profile = 65536
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t width = 852
+10-18 21:02:03.594 D/CCodec  ( 2814):   Rect crop(0, 0, 851, 479)
+10-18 21:02:03.594 D/CCodec  ( 2814): }
+10-18 21:02:03.594 D/CCodec  ( 2814): setup formats output: AMessage(what = 0x00000000) = {
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t android._color-format = 2135033992
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t android._video-scaling = 1
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t rotation-degrees = 0
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t color-standard = 1
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t color-range = 2
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t color-transfer = 3
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t sar-height = 1
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t sar-width = 1
+10-18 21:02:03.594 D/CCodec  ( 2814):   Rect crop(0, 0, 851, 479)
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t width = 852
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t height = 480
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t max-height = 1080
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t max-width = 1920
+10-18 21:02:03.594 D/CCodec  ( 2814):   string mime = "video/raw"
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t android._dataspace = 260
+10-18 21:02:03.594 D/CCodec  ( 2814):   int32_t color-format = 2130708361
+10-18 21:02:03.594 D/CCodec  ( 2814): }
+10-18 21:02:03.594 I/CCodecConfig( 2814): query failed after returning 12 values (BAD_INDEX)
+10-18 21:02:03.594 D/CCodecConfig( 2814): c2 config diff is   c2::u32 raw.color.matrix = 1
+10-18 21:02:03.594 D/CCodecConfig( 2814):   c2::u32 raw.color.primaries = 1
+10-18 21:02:03.594 D/CCodecConfig( 2814):   c2::u32 raw.color.transfer = 3
+10-18 21:02:03.594 D/MediaCodec( 2814): keep callback message for reclaim
+10-18 21:02:03.595 W/Codec2Client( 2814): query -- param skipped: index = 1342179345.
+10-18 21:02:03.595 W/Codec2Client( 2814): query -- param skipped: index = 2415921170.
+10-18 21:02:03.595 W/Codec2Client( 2814): query -- param skipped: index = 1610614798.
+10-18 21:02:03.595 W/Codec2Client( 2814): query -- param skipped: index = 2684356609.
+10-18 21:02:03.595 D/C2Store ( 2814): Using DMABUF Heaps
+10-18 21:02:03.596 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Created input block pool with allocatorID 16 => poolID 17 - OK (0)
+10-18 21:02:03.596 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Query output surface allocator returned 0 params => BAD_INDEX (6)
+10-18 21:02:03.596 I/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Created output block pool with allocatorID 18 => poolID 17 - OK
+10-18 21:02:03.596 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Configured output block pool ids 17 => OK
+10-18 21:02:03.596 D/Codec2-OutputBufferQueue( 2814): remote graphic buffer migration 0/0
+10-18 21:02:03.596 D/Codec2Client( 2814): setOutputSurface -- failed to set consumer usage (6/BAD_INDEX)
+10-18 21:02:03.596 D/Codec2Client( 2814): setOutputSurface -- generation=2881537 consumer usage=0x900
+10-18 21:02:03.626 D/Codec2Client( 2814): Surface configure completed
+10-18 21:02:03.626 I/DMABUFHEAPS( 2814): Using DMA-BUF heap named: system
+10-18 21:02:03.632 I/DMCodecAdapterFactory( 2814): Creating an asynchronous MediaCodec adapter for track type audio
+10-18 21:02:03.635 D/CCodec  ( 2814): allocate(c2.android.aac.decoder)
+10-18 21:02:03.637 I/CCodec  ( 2814): setting up 'default' as default (vendor) store
+10-18 21:02:03.649 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Ignoring stale input buffer done callback: last flush index = 0, frameIndex = 0
+10-18 21:02:03.699 I/CCodec  ( 2814): Created component [c2.android.aac.decoder]
+10-18 21:02:03.699 D/CCodecConfig( 2814): read media type: audio/mp4a-latm
+10-18 21:02:03.703 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: algo.buffers.max-count.values
+10-18 21:02:03.704 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: output.subscribed-indices.values
+10-18 21:02:03.704 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: input.buffers.allocator-ids.values
+10-18 21:02:03.704 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: output.buffers.allocator-ids.values
+10-18 21:02:03.704 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: algo.buffers.allocator-ids.values
+10-18 21:02:03.705 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: output.buffers.pool-ids.values
+10-18 21:02:03.705 D/ReflectedParamUpdater( 2814): extent() != 1 for single value type: algo.buffers.pool-ids.values
+10-18 21:02:03.710 I/CCodecConfig( 2814): query failed after returning 20 values (BAD_INDEX)
+10-18 21:02:03.710 D/CCodecConfig( 2814): c2 config diff is Dict {
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 coded.aac-packaging.value = 0
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 coded.bitrate.value = 64000
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 coded.pl.level = 0
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 coded.pl.profile = 8192
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::i32 coding.drc.album-mode.value = 0
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::float coding.drc.attenuation-factor.value = 1
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::float coding.drc.boost-factor.value = 1
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::i32 coding.drc.compression-mode.value = 3
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::i32 coding.drc.effect-type.value = 3
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::float coding.drc.encoded-level.value = 0.25
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::float coding.drc.reference-level.value = -16
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 input.buffers.max-size.value = 8192
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 input.delay.value = 0
+10-18 21:02:03.710 D/CCodecConfig( 2814):   string input.media-type.value = "audio/mp4a-latm"
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 output.delay.value = 2
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::float output.drc.output-loudness.value = 0.25
+10-18 21:02:03.710 D/CCodecConfig( 2814):   string output.media-type.value = "audio/raw"
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 raw.channel-count.value = 1
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 raw.channel-mask.value = 0
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 raw.max-channel-count.value = 8
+10-18 21:02:03.710 D/CCodecConfig( 2814):   c2::u32 raw.sample-rate.value = 44100
+10-18 21:02:03.710 D/CCodecConfig( 2814): }
+10-18 21:02:03.711 I/MediaCodec( 2814): MediaCodec will operate in async mode
+10-18 21:02:03.711 D/MediaCodec( 2814): flushMediametrics
+10-18 21:02:03.711 D/CCodec  ( 2814): [c2.android.aac.decoder] buffers are bound to CCodec for this session
+10-18 21:02:03.711 D/CCodecConfig( 2814): no c2 equivalents for log-session-id
+10-18 21:02:03.711 D/CCodecConfig( 2814): no c2 equivalents for flags
+10-18 21:02:03.712 D/CCodecConfig( 2814): c2 config diff is   c2::u32 raw.channel-count.value = 2
+10-18 21:02:03.712 D/CCodecConfig( 2814):   c2::u32 raw.sample-rate.value = 48000
+10-18 21:02:03.712 W/Codec2Client( 2814): query -- param skipped: index = 1107298332.
+10-18 21:02:03.712 D/CCodec  ( 2814): encoding statistics level = 0
+10-18 21:02:03.713 D/CCodec  ( 2814): setup formats input: AMessage(what = 0x00000000) = {
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-drc-album-mode = 0
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-drc-boost-level = 127
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-drc-cut-level = 127
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-drc-effect-type = 3
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-encoded-target-level = -1
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-max-output-channel_count = 8
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-target-ref-level = 64
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t bitrate = 64000
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t channel-count = 2
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t channel-mask = 0
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t level = 0
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t max-input-size = 8192
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t max-output-channel-count = 8
+10-18 21:02:03.713 D/CCodec  ( 2814):   string mime = "audio/mp4a-latm"
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t profile = 2
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t sample-rate = 48000
+10-18 21:02:03.713 D/CCodec  ( 2814): }
+10-18 21:02:03.713 D/CCodec  ( 2814): setup formats output: AMessage(what = 0x00000000) = {
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-drc-album-mode = 0
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-drc-boost-level = 127
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-drc-cut-level = 127
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-drc-effect-type = 3
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-drc-output-loudness = -1
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-encoded-target-level = -1
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-max-output-channel_count = 8
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t aac-target-ref-level = 64
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t channel-count = 2
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t channel-mask = 0
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t max-output-channel-count = 8
+10-18 21:02:03.713 D/CCodec  ( 2814):   string mime = "audio/raw"
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t sample-rate = 48000
+10-18 21:02:03.713 D/CCodec  ( 2814):   int32_t android._config-pcm-encoding = 2
+10-18 21:02:03.713 D/CCodec  ( 2814): }
+10-18 21:02:03.713 I/CCodecConfig( 2814): query failed after returning 20 values (BAD_INDEX)
+10-18 21:02:03.713 D/MediaCodec( 2814): keep callback message for reclaim
+10-18 21:02:03.724 W/Codec2Client( 2814): query -- param skipped: index = 1342179345.
+10-18 21:02:03.724 W/Codec2Client( 2814): query -- param skipped: index = 2415921170.
+10-18 21:02:03.724 W/Codec2Client( 2814): query -- param skipped: index = 1610614798.
+10-18 21:02:03.725 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Created input block pool with allocatorID 16 => poolID 18 - OK (0)
+10-18 21:02:03.733 I/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Created output block pool with allocatorID 16 => poolID 26 - OK
+10-18 21:02:03.733 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Configured output block pool ids 26 => OK
+10-18 21:02:03.749 D/CCodecConfig( 2814): c2 config diff is   c2::u32 raw.channel-mask.value = 12
+10-18 21:02:03.749 D/CCodecBuffers( 2814): [c2.android.aac.decoder#787:Output[N]] popFromStashAndRegister: at 1000028013333us, output format changed to AMessage(what = 0x00000000) = {
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t aac-drc-album-mode = 0
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t aac-drc-boost-level = 127
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t aac-drc-cut-level = 127
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t aac-drc-effect-type = 3
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t aac-drc-output-loudness = -1
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t aac-encoded-target-level = -1
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t aac-max-output-channel_count = 8
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t aac-target-ref-level = 64
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t channel-count = 2
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t channel-mask = 12
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t max-output-channel-count = 8
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   string mime = "audio/raw"
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t sample-rate = 48000
+10-18 21:02:03.749 D/CCodecBuffers( 2814):   int32_t android._config-pcm-encoding = 2
+10-18 21:02:03.749 D/CCodecBuffers( 2814): }
+10-18 21:02:03.798 D/CCodecConfig( 2814): c2 config diff is   c2::u32 raw.color.range = 1
+10-18 21:02:03.798 D/CCodecConfig( 2814):   c2::u32 raw.crop.height = 480
+10-18 21:02:03.798 D/CCodecConfig( 2814):   c2::u32 raw.crop.left = 0
+10-18 21:02:03.798 D/CCodecConfig( 2814):   c2::u32 raw.crop.top = 0
+10-18 21:02:03.798 D/CCodecConfig( 2814):   c2::u32 raw.crop.width = 852
+10-18 21:02:03.798 D/CCodecBuffers( 2814): [c2.goldfish.h264.decoder#83:2D-Output] popFromStashAndRegister: at 1000028000000us, output format changed to AMessage(what = 0x00000000) = {
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t android._color-format = 2135033992
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t android._video-scaling = 1
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t rotation-degrees = 0
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t color-standard = 1
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t color-range = 1
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t color-transfer = 3
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t sar-height = 1
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t sar-width = 1
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   Rect crop(0, 0, 851, 479)
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t width = 852
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t height = 480
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t max-height = 1080
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t max-width = 1920
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   string mime = "video/raw"
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t android._dataspace = 146866176
+10-18 21:02:03.798 D/CCodecBuffers( 2814):   int32_t color-format = 2130708361
+10-18 21:02:03.798 D/CCodecBuffers( 2814): }
+10-18 21:02:04.700 D/EGL_emulation( 2814): app_time_stats: avg=296.48ms min=22.51ms max=535.16ms count=4
+10-18 21:02:05.453 I/dev.purpletv( 2814): Background concurrent copying GC freed 394458(17MB) AllocSpace objects, 68(1704KB) LOS objects, 45% free, 28MB/52MB, paused 261us,15us total 480.897ms
+10-18 21:02:05.870 D/TrafficStats( 2814): tagSocket(111) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:05.973 D/EGL_emulation( 2814): app_time_stats: avg=117.30ms min=7.76ms max=355.07ms count=10
+10-18 21:02:06.062 D/TrafficStats( 2814): tagSocket(101) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:06.304 D/TrafficStats( 2814): tagSocket(160) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:06.383 I/dev.purpletv( 2814): Compiler allocated 4422KB to compile void android.support.v4.media.session.b.f(dev.purpletv.PurpleApp, java.util.List, java.lang.String, boolean, W3.a, W3.c, J.p, int)
+10-18 21:02:07.403 D/EGL_emulation( 2814): app_time_stats: avg=174.52ms min=17.65ms max=1069.28ms count=8
+10-18 21:02:08.418 D/EGL_emulation( 2814): app_time_stats: avg=71.93ms min=7.62ms max=316.58ms count=13
+10-18 21:02:09.053 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca2bf8 : 5(31457280 size) total buffers - 4(25165824 size) used buffers - 170/175 (recycle/alloc) - 5/174 (fetch/transfer)
+10-18 21:02:09.194 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca1bc8 : 5(40960 size) total buffers - 1(8192 size) used buffers - 255/260 (recycle/alloc) - 5/259 (fetch/transfer)
+10-18 21:02:09.442 D/EGL_emulation( 2814): app_time_stats: avg=40.42ms min=3.01ms max=96.42ms count=22
+10-18 21:02:10.462 D/EGL_emulation( 2814): app_time_stats: avg=37.09ms min=8.04ms max=98.15ms count=25
+10-18 21:02:11.496 D/EGL_emulation( 2814): app_time_stats: avg=42.08ms min=10.08ms max=99.35ms count=23
+10-18 21:02:12.544 D/EGL_emulation( 2814): app_time_stats: avg=52.49ms min=8.62ms max=147.14ms count=19
+10-18 21:02:13.579 D/EGL_emulation( 2814): app_time_stats: avg=40.01ms min=6.30ms max=156.64ms count=23
+10-18 21:02:14.196 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca2bf8 : 5(31457280 size) total buffers - 5(31457280 size) used buffers - 511/516 (recycle/alloc) - 5/515 (fetch/transfer)
+10-18 21:02:14.608 D/EGL_emulation( 2814): app_time_stats: avg=29.06ms min=4.93ms max=84.72ms count=32
+10-18 21:02:14.635 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca1bc8 : 5(40960 size) total buffers - 1(8192 size) used buffers - 511/516 (recycle/alloc) - 5/515 (fetch/transfer)
+10-18 21:02:15.614 D/EGL_emulation( 2814): app_time_stats: avg=31.78ms min=3.97ms max=73.85ms count=28
+10-18 21:02:16.622 D/EGL_emulation( 2814): app_time_stats: avg=42.91ms min=17.48ms max=117.04ms count=22
+10-18 21:02:17.653 D/EGL_emulation( 2814): app_time_stats: avg=38.59ms min=9.83ms max=98.54ms count=25
+10-18 21:02:18.809 D/EGL_emulation( 2814): app_time_stats: avg=66.42ms min=13.04ms max=199.15ms count=16
+10-18 21:02:19.350 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca2bf8 : 5(31457280 size) total buffers - 4(25165824 size) used buffers - 767/772 (recycle/alloc) - 5/772 (fetch/transfer)
+10-18 21:02:19.822 D/EGL_emulation( 2814): app_time_stats: avg=53.58ms min=6.87ms max=120.24ms count=18
+10-18 21:02:19.898 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca1bc8 : 5(40960 size) total buffers - 4(32768 size) used buffers - 758/763 (recycle/alloc) - 5/763 (fetch/transfer)
+10-18 21:02:20.882 D/EGL_emulation( 2814): app_time_stats: avg=62.13ms min=15.40ms max=181.42ms count=17
+10-18 21:02:21.884 D/EGL_emulation( 2814): app_time_stats: avg=55.64ms min=15.32ms max=113.17ms count=17
+10-18 21:02:22.919 D/EGL_emulation( 2814): app_time_stats: avg=63.39ms min=4.98ms max=201.78ms count=15
+10-18 21:02:23.965 D/EGL_emulation( 2814): app_time_stats: avg=49.55ms min=2.75ms max=107.33ms count=19
+10-18 21:02:24.430 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca2bf8 : 5(31457280 size) total buffers - 4(25165824 size) used buffers - 1087/1092 (recycle/alloc) - 5/1090 (fetch/transfer)
+10-18 21:02:25.004 D/EGL_emulation( 2814): app_time_stats: avg=66.30ms min=12.93ms max=231.73ms count=15
+10-18 21:02:25.293 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca1bc8 : 5(40960 size) total buffers - 4(32768 size) used buffers - 1012/1017 (recycle/alloc) - 5/1014 (fetch/transfer)
+10-18 21:02:26.040 D/EGL_emulation( 2814): app_time_stats: avg=34.76ms min=9.02ms max=97.86ms count=28
+10-18 21:02:27.068 D/EGL_emulation( 2814): app_time_stats: avg=39.07ms min=14.62ms max=101.39ms count=25
+10-18 21:02:28.104 D/EGL_emulation( 2814): app_time_stats: avg=49.56ms min=8.57ms max=115.09ms count=20
+10-18 21:02:29.118 D/EGL_emulation( 2814): app_time_stats: avg=35.62ms min=4.23ms max=88.37ms count=24
+10-18 21:02:29.495 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca2bf8 : 5(31457280 size) total buffers - 4(25165824 size) used buffers - 1414/1419 (recycle/alloc) - 5/1419 (fetch/transfer)
+10-18 21:02:30.171 D/EGL_emulation( 2814): app_time_stats: avg=49.20ms min=17.51ms max=168.12ms count=20
+10-18 21:02:30.573 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca1bc8 : 5(40960 size) total buffers - 4(32768 size) used buffers - 1253/1258 (recycle/alloc) - 5/1255 (fetch/transfer)
+10-18 21:02:31.143 I/dev.purpletv( 2814): Background young concurrent copying GC freed 299356(18MB) AllocSpace objects, 120(3344KB) LOS objects, 40% free, 31MB/52MB, paused 28us,18us total 151.742ms
+10-18 21:02:31.258 D/EGL_emulation( 2814): app_time_stats: avg=88.00ms min=6.30ms max=187.60ms count=12
+10-18 21:02:32.360 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] MediaCodec discarded an unknown buffer
+10-18 21:02:32.361 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Discard frames from previous generation.
+10-18 21:02:32.361 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] MediaCodec discarded an unknown buffer
+10-18 21:02:32.361 D/MediaCodec( 2814): keep callback message for reclaim
+10-18 21:02:32.361 D/PipelineWatcher( 2814): onInputBufferReleased: frameIndex not found (1554); ignored
+10-18 21:02:32.361 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Ignoring stale input buffer done callback: last flush index = 1555, frameIndex = 1554
+10-18 21:02:32.361 I/CCodecConfig( 2814): query failed after returning 12 values (BAD_INDEX)
+10-18 21:02:32.361 D/CCodecConfig( 2814): c2 config diff is   c2::u32 coded.vui.color.matrix = 1
+10-18 21:02:32.361 D/CCodecConfig( 2814):   c2::u32 coded.vui.color.primaries = 1
+10-18 21:02:32.361 D/CCodecConfig( 2814):   c2::u32 coded.vui.color.range = 1
+10-18 21:02:32.361 D/CCodecConfig( 2814):   c2::u32 coded.vui.color.transfer = 3
+10-18 21:02:32.362 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Discard frames from previous generation.
+10-18 21:02:32.362 W/Codec2Client( 2814): query -- param skipped: index = 1342179345.
+10-18 21:02:32.362 W/Codec2Client( 2814): query -- param skipped: index = 2415921170.
+10-18 21:02:32.362 W/Codec2Client( 2814): query -- param skipped: index = 1610614798.
+10-18 21:02:32.371 D/EGL_emulation( 2814): app_time_stats: avg=68.13ms min=2.56ms max=254.13ms count=16
+10-18 21:02:32.398 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Ignoring stale input buffer done callback: last flush index = 1555, frameIndex = 1555
+10-18 21:02:33.290 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:33.291 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:02:33.304 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c5e450: maj 3 min 0 rcv 3
+10-18 21:02:33.353 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c5e450: ver 3 0 (tinfo 0x7102c9c59100) (first time)
+10-18 21:02:33.711 D/EGL_emulation( 2814): app_time_stats: avg=81.75ms min=5.87ms max=369.59ms count=16
+10-18 21:02:34.668 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca2bf8 : 5(31457280 size) total buffers - 4(25165824 size) used buffers - 1686/1691 (recycle/alloc) - 5/1688 (fetch/transfer)
+10-18 21:02:34.749 D/EGL_emulation( 2814): app_time_stats: avg=57.21ms min=17.18ms max=126.64ms count=17
+10-18 21:02:35.787 D/EGL_emulation( 2814): app_time_stats: avg=81.89ms min=21.12ms max=209.99ms count=12
+10-18 21:02:35.937 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca1bc8 : 5(40960 size) total buffers - 4(32768 size) used buffers - 1502/1507 (recycle/alloc) - 5/1505 (fetch/transfer)
+10-18 21:02:36.826 D/EGL_emulation( 2814): app_time_stats: avg=73.77ms min=24.57ms max=191.56ms count=13
+10-18 21:02:37.860 D/EGL_emulation( 2814): app_time_stats: avg=56.27ms min=14.69ms max=129.14ms count=17
+10-18 21:02:38.863 D/EGL_emulation( 2814): app_time_stats: avg=46.70ms min=15.10ms max=79.20ms count=20
+10-18 21:02:39.089 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:39.090 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c5e450: maj 3 min 0 rcv 3
+10-18 21:02:39.091 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c5e450: ver 3 0 (tinfo 0x7102c9c59400) (first time)
+10-18 21:02:39.106 E/EGL_emulation( 2814): eglQueryContext 32c0  EGL_BAD_ATTRIBUTE
+10-18 21:02:39.106 E/EGL_emulation( 2814): tid 6571: eglQueryContext(2122): error 0x3004 (EGL_BAD_ATTRIBUTE)
+10-18 21:02:39.106 D/SurfaceUtils( 2814): connecting to surface 0x710195c8e5c0, reason connectToSurface
+10-18 21:02:39.106 I/MediaCodec( 2814): [c2.goldfish.h264.decoder] setting surface generation to 2881538
+10-18 21:02:39.106 D/SurfaceUtils( 2814): disconnecting from surface 0x710195c8e5c0, reason connectToSurface(reconnect)
+10-18 21:02:39.106 D/SurfaceUtils( 2814): connecting to surface 0x710195c8e5c0, reason connectToSurface(reconnect)
+10-18 21:02:39.107 D/Codec2-OutputBufferQueue( 2814): remote graphic buffer migration 4/4
+10-18 21:02:39.107 D/Codec2Client( 2814): setOutputSurface -- failed to set consumer usage (6/BAD_INDEX)
+10-18 21:02:39.107 D/Codec2Client( 2814): setOutputSurface -- generation=2881538 consumer usage=0x900
+10-18 21:02:39.111 D/Codec2Client( 2814): Surface configure completed
+10-18 21:02:39.111 D/SurfaceUtils( 2814): disconnecting from surface 0x710195c87f90, reason disconnectFromSurface
+10-18 21:02:39.130 I/ExoPlayerImpl( 2814): Release ea1c5c [AndroidXMedia3/1.5.1] [emu64x, sdk_gphone64_x86_64, Google, 33] [media3.common, media3.exoplayer, media3.decoder, media3.ui, media3.exoplayer.hls, media3.datasource.okhttp, media3.datasource, media3.extractor]
+10-18 21:02:39.145 D/MediaCodec( 2814): keep callback message for reclaim
+10-18 21:02:39.146 I/CCodecConfig( 2814): query failed after returning 12 values (BAD_INDEX)
+10-18 21:02:39.146 W/Codec2Client( 2814): query -- param skipped: index = 1342179345.
+10-18 21:02:39.146 W/Codec2Client( 2814): query -- param skipped: index = 2415921170.
+10-18 21:02:39.146 W/Codec2Client( 2814): query -- param skipped: index = 1610614798.
+10-18 21:02:39.149 D/MediaCodec( 2814): keep callback message for reclaim
+10-18 21:02:39.150 I/CCodecConfig( 2814): query failed after returning 20 values (BAD_INDEX)
+10-18 21:02:39.150 W/Codec2Client( 2814): query -- param skipped: index = 1342179345.
+10-18 21:02:39.150 W/Codec2Client( 2814): query -- param skipped: index = 2415921170.
+10-18 21:02:39.150 W/Codec2Client( 2814): query -- param skipped: index = 1610614798.
+10-18 21:02:39.156 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Ignoring stale input buffer done callback: last flush index = 1653, frameIndex = 1649
+10-18 21:02:39.156 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Discard frames from previous generation.
+10-18 21:02:39.161 D/SurfaceUtils( 2814): connecting to surface 0x710195c907d0, reason connectToSurface
+10-18 21:02:39.161 I/MediaCodec( 2814): [c2.goldfish.h264.decoder] setting surface generation to 2881539
+10-18 21:02:39.161 D/SurfaceUtils( 2814): disconnecting from surface 0x710195c907d0, reason connectToSurface(reconnect)
+10-18 21:02:39.161 D/SurfaceUtils( 2814): connecting to surface 0x710195c907d0, reason connectToSurface(reconnect)
+10-18 21:02:39.161 D/PipelineWatcher( 2814): onInputBufferReleased: frameIndex not found (1967); ignored
+10-18 21:02:39.161 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] Ignoring stale input buffer done callback: last flush index = 1970, frameIndex = 1967
+10-18 21:02:39.161 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Discard frames from previous generation.
+10-18 21:02:39.161 D/Codec2-OutputBufferQueue( 2814): remote graphic buffer migration 0/0
+10-18 21:02:39.161 D/Codec2Client( 2814): setOutputSurface -- failed to set consumer usage (6/BAD_INDEX)
+10-18 21:02:39.161 D/Codec2Client( 2814): setOutputSurface -- generation=2881539 consumer usage=0x900
+10-18 21:02:39.165 D/Codec2Client( 2814): Surface configure completed
+10-18 21:02:39.165 D/SurfaceUtils( 2814): disconnecting from surface 0x710195c8e5c0, reason disconnectFromSurface
+10-18 21:02:39.165 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] MediaCodec discarded an unknown buffer
+10-18 21:02:39.165 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] MediaCodec discarded an unknown buffer
+10-18 21:02:39.165 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] MediaCodec discarded an unknown buffer
+10-18 21:02:39.165 D/CCodecBufferChannel( 2814): [c2.goldfish.h264.decoder#83] MediaCodec discarded an unknown buffer
+10-18 21:02:39.166 E/BufferQueueProducer( 2814): [SurfaceTexture-1-2814-0](id:afe00000002,api:0,p:-1,c:2814) cancelBuffer: BufferQueue has no connected producer
+10-18 21:02:39.166 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Discard frames from previous generation.
+10-18 21:02:39.166 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Ignoring stale input buffer done callback: last flush index = 1653, frameIndex = 1650
+10-18 21:02:39.166 D/PipelineWatcher( 2814): onInputBufferReleased: frameIndex not found (1651); ignored
+10-18 21:02:39.166 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Ignoring stale input buffer done callback: last flush index = 1653, frameIndex = 1651
+10-18 21:02:39.166 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Discard frames from previous generation.
+10-18 21:02:39.166 D/PipelineWatcher( 2814): onInputBufferReleased: frameIndex not found (1652); ignored
+10-18 21:02:39.166 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] Ignoring stale input buffer done callback: last flush index = 1653, frameIndex = 1652
+10-18 21:02:39.166 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] MediaCodec discarded an unknown buffer
+10-18 21:02:39.166 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] MediaCodec discarded an unknown buffer
+10-18 21:02:39.166 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] MediaCodec discarded an unknown buffer
+10-18 21:02:39.167 D/CCodecBufferChannel( 2814): [c2.android.aac.decoder#787] MediaCodec discarded an unknown buffer
+10-18 21:02:39.186 I/hw-BpHwBinder( 2814): onLastStrongRef automatically unlinking death recipients
+10-18 21:02:39.186 D/SurfaceUtils( 2814): disconnecting from surface 0x710195c907d0, reason disconnectFromSurface
+10-18 21:02:39.186 D/MediaCodec( 2814): flushMediametrics
+10-18 21:02:39.187 D/MediaCodec( 2814): flushMediametrics
+10-18 21:02:39.187 D/MediaCodec( 2814): flushMediametrics
+10-18 21:02:39.188 D/MediaCodec( 2814): flushMediametrics
+10-18 21:02:39.188 I/hw-BpHwBinder( 2814): onLastStrongRef automatically unlinking death recipients
+10-18 21:02:39.215 D/TrafficStats( 2814): tagSocket(81) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:39.941 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:39.942 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:02:39.943 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c70090: maj 3 min 0 rcv 3
+10-18 21:02:39.951 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c70090: ver 3 0 (tinfo 0x7102c9c59100) (first time)
+10-18 21:02:40.000 D/EGL_emulation( 2814): app_time_stats: avg=139.07ms min=5.66ms max=761.39ms count=8
+10-18 21:02:40.006 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:40.010 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:40.011 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:40.011 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:40.035 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:40.064 D/TrafficStats( 2814): tagSocket(101) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:41.002 D/EGL_emulation( 2814): app_time_stats: avg=87.94ms min=29.62ms max=484.61ms count=11
+10-18 21:02:43.717 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca2bf8 : 0(0 size) total buffers - 0(0 size) used buffers - 1971/1976 (recycle/alloc) - 5/1971 (fetch/transfer)
+10-18 21:02:43.717 D/BufferPoolAccessor2.0( 2814): evictor expired: 1, evicted: 1
+10-18 21:02:44.717 D/BufferPoolAccessor2.0( 2814): bufferpool2 0x7100f5ca1bc8 : 0(0 size) total buffers - 0(0 size) used buffers - 1651/1658 (recycle/alloc) - 5/1653 (fetch/transfer)
+10-18 21:02:44.717 D/BufferPoolAccessor2.0( 2814): evictor expired: 1, evicted: 1
+10-18 21:02:54.661 D/TrafficStats( 2814): tagSocket(102) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:54.664 D/TrafficStats( 2814): tagSocket(130) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:54.665 D/TrafficStats( 2814): tagSocket(118) with statsTag=0xffffffff, statsUid=-1
+10-18 21:02:54.675 D/EGL_emulation( 2814): app_time_stats: avg=2732.88ms min=31.28ms max=13516.32ms count=5
+10-18 21:02:55.277 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:02:55.277 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:02:55.278 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c774d0: maj 3 min 0 rcv 3
+10-18 21:02:55.278 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c774d0: ver 3 0 (tinfo 0x7102c9c59100) (first time)
+10-18 21:02:55.677 D/EGL_emulation( 2814): app_time_stats: avg=46.80ms min=7.17ms max=525.45ms count=20
+10-18 21:03:19.859 D/EGL_emulation( 2814): app_time_stats: avg=12089.93ms min=17.47ms max=24162.39ms count=2
+10-18 21:03:19.957 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:03:19.957 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:03:19.958 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c77410: maj 3 min 0 rcv 3
+10-18 21:03:19.959 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c77410: ver 3 0 (tinfo 0x7102c9c59100) (first time)
+10-18 21:03:21.068 D/EGL_emulation( 2814): app_time_stats: avg=398.85ms min=17.12ms max=1032.95ms count=3
+10-18 21:03:26.601 I/ExoPlayerImpl( 2814): Init 577bf52 [AndroidXMedia3/1.5.1] [emu64x, sdk_gphone64_x86_64, Google, 33]
+10-18 21:03:26.613 I/WebViewFactory( 2814): Loading com.google.android.webview version 109.0.5414.123 (code 541412337)
+10-18 21:03:26.620 W/ziparchive( 2814): Unable to open '/data/app/~~OZbiQ8y8ySFOp4wlKMwssA==/com.google.android.trichromelibrary_541412337-ubt_ZVR00IWXWAXFejFtWw==/TrichromeLibrary.dm': No such file or directory
+10-18 21:03:26.620 W/ziparchive( 2814): Unable to open '/data/app/~~OZbiQ8y8ySFOp4wlKMwssA==/com.google.android.trichromelibrary_541412337-ubt_ZVR00IWXWAXFejFtWw==/TrichromeLibrary.dm': No such file or directory
+10-18 21:03:26.620 W/dev.purpletv( 2814): Entry not found
+10-18 21:03:26.622 D/nativeloader( 2814): Configuring classloader-namespace for other apk /data/app/~~OZbiQ8y8ySFOp4wlKMwssA==/com.google.android.trichromelibrary_541412337-ubt_ZVR00IWXWAXFejFtWw==/TrichromeLibrary.apk. target_sdk_version=33, uses_libraries=ALL, library_path=/data/app/~~74OibuD6v7PFmHSVw3BCIA==/com.google.android.webview-fsirRvbHxWWrSOXXI7C4aA==/lib/x86_64:/data/app/~~74OibuD6v7PFmHSVw3BCIA==/com.google.android.webview-fsirRvbHxWWrSOXXI7C4aA==/WebViewGoogle.apk!/lib/x86_64:/data/app/~~OZbiQ8y8ySFOp4wlKMwssA==/com.google.android.trichromelibrary_541412337-ubt_ZVR00IWXWAXFejFtWw==/TrichromeLibrary.apk!/lib/x86_64, permitted_path=/data:/mnt/expand
+10-18 21:03:26.626 D/nativeloader( 2814): Configuring classloader-namespace for other apk /data/app/~~74OibuD6v7PFmHSVw3BCIA==/com.google.android.webview-fsirRvbHxWWrSOXXI7C4aA==/WebViewGoogle.apk. target_sdk_version=33, uses_libraries=, library_path=/data/app/~~74OibuD6v7PFmHSVw3BCIA==/com.google.android.webview-fsirRvbHxWWrSOXXI7C4aA==/lib/x86_64:/data/app/~~74OibuD6v7PFmHSVw3BCIA==/com.google.android.webview-fsirRvbHxWWrSOXXI7C4aA==/WebViewGoogle.apk!/lib/x86_64:/data/app/~~OZbiQ8y8ySFOp4wlKMwssA==/com.google.android.trichromelibrary_541412337-ubt_ZVR00IWXWAXFejFtWw==/TrichromeLibrary.apk!/lib/x86_64, permitted_path=/data:/mnt/expand
+10-18 21:03:26.652 I/cr_WVCFactoryProvider( 2814): Loaded version=109.0.5414.123 minSdkVersion=29 isBundle=false multiprocess=true packageId=2
+10-18 21:03:26.667 I/cr_LibraryLoader( 2814): Successfully loaded native library
+10-18 21:03:26.668 I/cr_CachingUmaRecorder( 2814): Flushed 9 samples from 9 histograms.
+10-18 21:03:26.679 I/cr_VariationsUtils( 2814): Failed reading seed file "/data/user/0/dev.purpletv/app_webview/variations_seed_new"
+10-18 21:03:26.680 I/cr_VariationsUtils( 2814): Failed reading seed file "/data/user/0/dev.purpletv/app_webview/variations_seed"
+10-18 21:03:26.680 I/cr_VariationsUtils( 2814): Requesting new seed from IVariationsSeedServer
+10-18 21:03:26.733 D/CompatibilityChangeReporter( 2814): Compat change id reported: 183155436; UID 10174; state: ENABLED
+10-18 21:03:26.818 D/CompatibilityChangeReporter( 2814): Compat change id reported: 214741472; UID 10174; state: ENABLED
+10-18 21:03:26.930 D/EGL_emulation( 2814): app_time_stats: avg=1166.05ms min=19.22ms max=5654.11ms count=5
+10-18 21:03:27.015 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:03:27.020 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:03:27.021 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c777d0: maj 3 min 0 rcv 3
+10-18 21:03:27.022 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c777d0: ver 3 0 (tinfo 0x7102c9c59100) (first time)
+10-18 21:03:27.030 D/TrafficStats( 2814): tagSocket(134) with statsTag=0xffffffff, statsUid=-1
+10-18 21:03:27.354 W/Couch/YouTube( 2814): Video HInC6VSKERU
+10-18 21:03:27.354 W/Couch/YouTube( 2814): F3.c: YouTube möchte bestätigen, dass du kein Bot bist. Bitte später nochmal versuchen.
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at F3.b.e(SourceFile:278)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at H3.i.l(SourceFile:29)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at P3.a.q(SourceFile:9)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at g4.H.run(SourceFile:107)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at h4.c.run(SourceFile:9)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at n4.j.run(SourceFile:3)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at n4.a.run(SourceFile:93)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): Caused by: Q4.l: YouTube probably temporarily blocked anonymous watch access with this IP , got error LOGIN_REQUIRED: "Sign in to confirm that you're not a bot"
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at c5.M.i(SourceFile:295)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at M4.a.b(SourceFile:25)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at h5.e.f(SourceFile:53)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at F3.b.e(SourceFile:18)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	... 6 more
+10-18 21:03:27.354 I/Couch/YouTube( 2814): Spiele HInC6VSKERU über den YouTube-Player
+10-18 21:03:27.361 W/cr_media( 2814): BLUETOOTH_CONNECT permission is missing.
+10-18 21:03:27.364 W/cr_media( 2814): registerBluetoothIntentsIfNeeded: Requires BLUETOOTH permission
+10-18 21:03:27.384 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:03:27.387 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c7fd50: maj 3 min 0 rcv 3
+10-18 21:03:27.387 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c7fd50: ver 3 0 (tinfo 0x7102c9c59480) (first time)
+10-18 21:03:27.388 D/CompatibilityChangeReporter( 2814): Compat change id reported: 193247900; UID 10174; state: ENABLED
+10-18 21:03:27.458 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c7fd50: maj 3 min 0 rcv 3
+10-18 21:03:27.530 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c7f750: maj 3 min 0 rcv 3
+10-18 21:03:27.693 I/chromium( 2814): [INFO:CONSOLE(148)] "Unrecognized feature: 'picture-in-picture'.", source: https://www.youtube.com/s/player/0229cd64/www-widgetapi.vflset/www-widgetapi.js (148)
+10-18 21:03:27.693 I/chromium( 2814): [INFO:CONSOLE(148)] "Unrecognized feature: 'web-share'.", source: https://www.youtube.com/s/player/0229cd64/www-widgetapi.vflset/www-widgetapi.js (148)
+10-18 21:03:27.955 I/chromium( 2814): [INFO:CONSOLE(164)] "Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://www.youtube-nocookie.com') does not match the recipient window's origin ('https://dev.purpletv').", source: https://www.youtube.com/s/player/0229cd64/www-widgetapi.vflset/www-widgetapi.js (164)
+10-18 21:03:28.086 D/EGL_emulation( 2814): app_time_stats: avg=86.05ms min=8.68ms max=604.79ms count=13
+10-18 21:03:28.203 I/chromium( 2814): [INFO:CONSOLE(164)] "Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://www.youtube-nocookie.com') does not match the recipient window's origin ('https://dev.purpletv').", source: https://www.youtube.com/s/player/0229cd64/www-widgetapi.vflset/www-widgetapi.js (164)
+10-18 21:03:28.411 I/chromium( 2814): [INFO:CONSOLE(0)] "Error with Permissions-Policy header: Unrecognized feature: 'ch-ua-form-factors'.", source:  (0)
+10-18 21:03:28.648 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c80890: maj 3 min 0 rcv 3
+10-18 21:03:28.675 E/cr_MediaCodecUtil( 2814): Decoder for type video/av01 is not supported on this device [requireSoftware=false, requireHardware=true].
+10-18 21:03:28.866 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c80a10: maj 3 min 0 rcv 3
+10-18 21:03:29.327 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c81b50: maj 3 min 0 rcv 3
+10-18 21:03:29.419 D/EGL_emulation( 2814): app_time_stats: avg=222.08ms min=41.92ms max=472.85ms count=6
+10-18 21:03:29.737 E/chromium( 2814): [ERROR:web_contents_delegate.cc(239)] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+10-18 21:03:29.738 E/chromium( 2814): [ERROR:web_contents_delegate.cc(239)] WebContentsDelegate::CheckMediaAccessPermission: Not supported.
+10-18 21:03:29.740 W/cr_media( 2814): Requires MODIFY_AUDIO_SETTINGS and RECORD_AUDIO. No audio device will be available for recording
+10-18 21:03:29.773 I/CameraManagerGlobal( 2814): Connecting to camera service
+10-18 21:03:29.800 W/Couch/YouTube( 2814): Eingebetteter Player: Fehler 150 für HInC6VSKERU
+10-18 21:04:17.079 I/ExoPlayerImpl( 2814): Release 577bf52 [AndroidXMedia3/1.5.1] [emu64x, sdk_gphone64_x86_64, Google, 33] [media3.common, media3.exoplayer, media3.decoder, media3.ui, media3.exoplayer.hls, media3.datasource.okhttp, media3.datasource, media3.extractor]
+10-18 21:04:17.148 D/TrafficStats( 2814): tagSocket(117) with statsTag=0xffffffff, statsUid=-1
+10-18 21:04:17.157 D/EGL_emulation( 2814): app_time_stats: avg=6816.95ms min=13.18ms max=46873.55ms count=7
+10-18 21:04:18.182 W/dev.purpletv( 2814): Cleared Reference was only reachable from finalizer (only reported once)
+10-18 21:04:18.194 W/System  ( 2814): A resource failed to call close. 
+10-18 21:04:18.194 W/System  ( 2814): A resource failed to call close. 
+10-18 21:04:18.194 W/System  ( 2814): A resource failed to call close. 
+10-18 21:04:18.228 D/TrafficStats( 2814): tagSocket(81) with statsTag=0xffffffff, statsUid=-1
+10-18 21:04:18.228 D/EGL_emulation( 2814): app_time_stats: avg=209.34ms min=8.37ms max=957.69ms count=5
+10-18 21:04:18.293 D/HostConnection( 2814): HostComposition ext ANDROID_EMU_CHECKSUM_HELPER_v1 ANDROID_EMU_native_sync_v2 ANDROID_EMU_dma_v1 ANDROID_EMU_direct_mem ANDROID_EMU_host_composition_v1 ANDROID_EMU_host_composition_v2 ANDROID_EMU_vulkan ANDROID_EMU_deferred_vulkan_commands ANDROID_EMU_vulkan_null_optional_strings ANDROID_EMU_vulkan_create_resources_with_requirements ANDROID_EMU_YUV_Cache ANDROID_EMU_vulkan_ignored_handles ANDROID_EMU_has_shared_slots_host_memory_allocator ANDROID_EMU_vulkan_free_memory_sync ANDROID_EMU_vulkan_shader_float16_int8 ANDROID_EMU_vulkan_async_queue_submit ANDROID_EMU_vulkan_queue_submit_with_commands ANDROID_EMU_sync_buffer_data ANDROID_EMU_vulkan_async_qsri ANDROID_EMU_read_color_buffer_dma ANDROID_EMU_hwc_multi_configs ANDROID_EMU_hwc_color_transform GL_OES_EGL_image_external_essl3 GL_OES_vertex_array_object GL_KHR_texture_compression_astc_ldr ANDROID_EMU_host_side_tracing ANDROID_EMU_gles_max_version_3_0 
+10-18 21:04:18.293 W/OpenGLRenderer( 2814): Failed to initialize 101010-2 format, error = EGL_SUCCESS
+10-18 21:04:18.293 D/EGL_emulation( 2814): eglCreateContext: 0x7100a5c65a10: maj 3 min 0 rcv 3
+10-18 21:04:18.295 D/EGL_emulation( 2814): eglMakeCurrent: 0x7100a5c65a10: ver 3 0 (tinfo 0x7102c9c59100) (first time)
+10-18 21:04:37.368 D/EGL_emulation( 2814): app_time_stats: avg=1469.64ms min=12.54ms max=18802.09ms count=13
+10-18 21:04:45.780 D/EGL_emulation( 2814): app_time_stats: avg=2804.21ms min=69.11ms max=8215.91ms count=3
+10-18 21:04:50.344 D/EGL_emulation( 2814): app_time_stats: avg=2281.79ms min=40.06ms max=4523.51ms count=2
+10-18 21:04:56.388 W/OnBackInvokedCallback( 2814): OnBackInvokedCallback is not enabled for the application.
+10-18 21:04:56.388 W/OnBackInvokedCallback( 2814): Set 'android:enableOnBackInvokedCallback="true"' in the application manifest.
+10-18 21:04:56.426 D/EGL_emulation( 2814): app_time_stats: avg=3040.45ms min=29.24ms max=6051.66ms count=2
+10-18 21:05:02.772 D/EGL_emulation( 2814): app_time_stats: avg=2115.26ms min=24.84ms max=6275.84ms count=3
+10-18 21:05:08.135 D/EGL_emulation( 2814): app_time_stats: avg=2679.94ms min=13.51ms max=5346.37ms count=2
+10-18 21:05:13.501 D/EGL_emulation( 2814): app_time_stats: avg=2675.85ms min=11.27ms max=5340.44ms count=2
+10-18 21:05:18.829 D/TrafficStats( 2814): tagSocket(107) with statsTag=0xffffffff, statsUid=-1

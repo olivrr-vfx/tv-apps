@@ -1,0 +1,47 @@
+10-18 21:00:24.979 W/Couch/Twitch( 2814): GQL fehlgeschlagen
+10-18 21:00:24.980 W/Couch/Twitch( 2814): Laden fehlgeschlagen
+10-18 21:00:24.980 W/Couch/Twitch( 2814): GQL fehlgeschlagen
+10-18 21:00:24.980 W/Couch/Twitch( 2814): Laden fehlgeschlagen
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal trending_music
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal trending_podcasts_episodes
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal live
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal trending_gaming
+10-18 21:00:26.237 W/Couch/YouTube( 2814): Regal trending_movies_and_shows
+10-18 21:00:26.768 I/Couch/Netz( 2814): verbunden
+10-18 21:00:58.831 I/AndroidRuntime( 5005): VM exiting with result code 0, cleanup skipped.
+10-18 21:00:59.367 I/AndroidRuntime( 5275): VM exiting with result code 0, cleanup skipped.
+10-18 21:00:59.794 I/AndroidRuntime( 5357): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:03.902 I/AndroidRuntime( 5585): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:04.077 I/AndroidRuntime( 5617): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:10.280 I/AndroidRuntime( 5818): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:10.345 I/AndroidRuntime( 5838): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:11.721 I/AndroidRuntime( 5859): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:11.823 I/AndroidRuntime( 5875): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:11.875 I/AndroidRuntime( 5893): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:13.999 I/AndroidRuntime( 5938): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:14.111 I/AndroidRuntime( 5957): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:14.192 I/AndroidRuntime( 5975): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:14.253 I/AndroidRuntime( 5993): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:53.434 I/AndroidRuntime( 6213): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:53.524 I/AndroidRuntime( 6232): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:53.585 I/AndroidRuntime( 6249): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:53.639 I/AndroidRuntime( 6267): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:53.690 I/AndroidRuntime( 6284): VM exiting with result code 0, cleanup skipped.
+10-18 21:01:53.746 I/AndroidRuntime( 6301): VM exiting with result code 0, cleanup skipped.
+10-18 21:03:27.354 W/Couch/YouTube( 2814): Video HInC6VSKERU
+10-18 21:03:27.354 W/Couch/YouTube( 2814): F3.c: YouTube möchte bestätigen, dass du kein Bot bist. Bitte später nochmal versuchen.
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at F3.b.e(SourceFile:278)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at H3.i.l(SourceFile:29)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at P3.a.q(SourceFile:9)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at g4.H.run(SourceFile:107)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at h4.c.run(SourceFile:9)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at n4.j.run(SourceFile:3)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at n4.a.run(SourceFile:93)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): Caused by: Q4.l: YouTube probably temporarily blocked anonymous watch access with this IP , got error LOGIN_REQUIRED: "Sign in to confirm that you're not a bot"
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at c5.M.i(SourceFile:295)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at M4.a.b(SourceFile:25)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at h5.e.f(SourceFile:53)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	at F3.b.e(SourceFile:18)
+10-18 21:03:27.354 W/Couch/YouTube( 2814): 	... 6 more
+10-18 21:03:27.354 I/Couch/YouTube( 2814): Spiele HInC6VSKERU über den YouTube-Player
+10-18 21:03:29.800 W/Couch/YouTube( 2814): Eingebetteter Player: Fehler 150 für HInC6VSKERU
