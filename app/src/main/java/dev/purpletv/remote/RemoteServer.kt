@@ -1,5 +1,6 @@
 package dev.purpletv.remote
 
+import dev.purpletv.core.AppLog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -314,6 +315,9 @@ class RemoteServer(private val app: PurpleApp, private val secure: Boolean = fal
         "/api/state" -> json(Response.Status.OK, RemoteControl.stateJson(BuildConfig.VERSION_NAME, app.enabledApps())
             .put("name", HUB_NAME)
             .put("https_port", HTTPS_PORT))
+        "/api/log" -> newFixedLengthResponse(Response.Status.OK, "text/plain; charset=utf-8",
+            "Couch ${BuildConfig.VERSION_NAME} · Android ${android.os.Build.VERSION.RELEASE} · ${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}\n\n" +
+                AppLog.text().ifEmpty { "Keine Fehler seit dem Start." })
         "/api/twitch/live" -> json(Response.Status.OK, JSONObject().put("channels", JSONArray(app.twitch.followed.value.items().map(RemoteControl::streamJson))))
         "/api/twitch/top" -> json(Response.Status.OK, JSONObject().put("channels", JSONArray(app.twitch.top.value.items().map(RemoteControl::streamJson))))
         "/api/twitch/search" -> {

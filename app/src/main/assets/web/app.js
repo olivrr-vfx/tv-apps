@@ -422,7 +422,11 @@
     var live = (s.followed_live || []).map(twitchItem);
     $("#start-live-count").textContent = live.length ? String(live.length) : "";
     $("#tw-count").textContent = live.length ? String(live.length) : "";
-    renderCards("#start-live", live, "Keiner deiner Kanäle ist live – oder du bist auf dem TV nicht bei Twitch angemeldet.");
+    // Nobody followed is live (or no login on the TV): show what is popular instead of nothing.
+    var top = twitchTop || [];
+    var showTop = !live.length && top.length > 0;
+    $("#start-live-title").textContent = showTop ? "Beliebt auf Twitch" : "Live auf Twitch";
+    renderCards("#start-live", showTop ? top.slice(0, 20) : live, "Keiner deiner Kanäle ist live.");
     renderCards("#tw-live", live, "Keiner deiner Kanäle ist gerade live.");
     renderCards("#start-yt", (s.youtube_feed || []).slice(0, 20).map(ytItem), "Noch keine YouTube-Abos. Unter YouTube → Kanäle verwalten hinzufügen.");
   }
@@ -527,7 +531,7 @@
   });
 
   function loadView(view) {
-    if (view === "start") loadHistory();
+    if (view === "start") { loadHistory(); loadTwitchTop(); }
     if (view === "twitch") loadTwitchTop();
     if (view === "youtube") ytView(currentYt);
   }
@@ -540,9 +544,12 @@
 
   // --- PurpleTV (Twitch) -----------------------------------------------------------------
 
+  var twitchTop = [];
   function loadTwitchTop() {
     api("GET", "twitch/top").then(function (r) {
-      renderCards("#tw-top", (r.channels || []).map(twitchItem), "Nicht verfügbar – auf dem TV bei Twitch anmelden.");
+      twitchTop = (r.channels || []).map(twitchItem);
+      renderCards("#tw-top", twitchTop, "Twitch lädt noch – gleich nochmal versuchen.");
+      if (state) render(state);
     }).catch(function () {});
   }
   $("#tw-search").addEventListener("submit", function (e) {

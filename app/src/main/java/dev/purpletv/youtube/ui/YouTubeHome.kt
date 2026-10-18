@@ -80,10 +80,10 @@ fun YouTubeHome(vm: YouTubeViewModel, nav: Navigator) {
             Spacer(Modifier.width(Tokens.Space.md))
             Text("YouTube", color = Palette.text, style = Type.title)
             Spacer(Modifier.width(Tokens.Space.xl))
-            TopTabs(YouTubeTab.entries, tab, label = { it.label }, icon = { it.icon }, onSelect = { vm.tab.value = it }, modifier = Modifier.padding(0.dp))
-            Spacer(Modifier.weight(1f))
+            TopTabs(YouTubeTab.entries, tab, label = { it.label }, icon = { it.icon }, onSelect = { vm.tab.value = it }, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(Tokens.Space.md))
             val subs by vm.repo.subscriptions.collectAsState()
-            Text("${subs.size} Abos · ohne Konto", color = Palette.textFaint, style = Type.caption)
+            Text("${subs.size} Abos", color = Palette.textFaint, style = Type.caption, maxLines = 1)
         }
         when (tab) {
             YouTubeTab.START -> StartTab(vm, nav, play)

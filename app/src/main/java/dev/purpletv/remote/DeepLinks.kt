@@ -58,7 +58,7 @@ object DeepLinks {
     fun parseText(text: String): Command? {
         val t = text.trim()
         if (t.startsWith("http")) return parse(Uri.parse(t))
-        if (t.startsWith("purpletv://")) return parse(Uri.parse(t))
+        if (t.startsWith("purpletv://") || t.startsWith("couch://")) return parse(Uri.parse(t))
         return null
     }
 

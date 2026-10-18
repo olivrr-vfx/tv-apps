@@ -1,5 +1,6 @@
 package dev.purpletv.youtube
 
+import dev.purpletv.core.AppLog
 import android.content.Context
 import dev.purpletv.core.Load
 import dev.purpletv.data.Settings
@@ -136,7 +137,10 @@ class YouTubeRepository(context: Context, private val settings: Settings) {
                     subs.map { ch ->
                         async {
                             channelCache[ch.id]?.takeIf { now - it.first < CHANNEL_CACHE_MS }?.second
-                                ?: limit.withPermit { runCatching { YouTubeClient.latestUploads(ch) }.getOrNull() }
+                                ?: limit.withPermit {
+                                    runCatching { YouTubeClient.latestUploads(ch) }
+                                        .onFailure { AppLog.e("YouTube", "Feed ${ch.name}", it) }.getOrNull()
+                                }
                                     ?.also { channelCache[ch.id] = now to it }
                         }
                     }.awaitAll()
@@ -164,7 +168,10 @@ class YouTubeRepository(context: Context, private val settings: Settings) {
                         YouTubeClient.shelf(id).filter { !(settings.youtubeHideShorts && it.isShort) }
                     }
                 }
-                flow.value = r.fold({ Load.Ok(it) }, { Load.Error(it.message ?: "Fehler") })
+                flow.value = r.fold({ Load.Ok(it) }, {
+                    AppLog.e("YouTube", "Regal $id", it)
+                    Load.Error(it.message ?: "Fehler")
+                })
             }
         }
     }

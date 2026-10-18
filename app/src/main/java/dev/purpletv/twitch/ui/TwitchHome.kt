@@ -162,13 +162,13 @@ private fun TwitchHeader(vm: TwitchViewModel, tab: TwitchTab) {
             label = { it.label },
             icon = { it.icon },
             onSelect = { vm.tab.value = it },
-            modifier = Modifier.padding(horizontal = 0.dp),
+            modifier = Modifier.weight(1f),
         )
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.width(Tokens.Space.md))
         Column(horizontalAlignment = Alignment.End) {
-            Text(name ?: "Nicht angemeldet", color = Palette.textDim, style = Type.label)
+            Text(name ?: "Nicht angemeldet", color = Palette.textDim, style = Type.label, maxLines = 1)
             if (updated > 0) {
-                Text("Live-Liste von ${clock(updated)}", color = Palette.textFaint, style = Type.caption)
+                Text("Stand ${clock(updated)}", color = Palette.textFaint, style = Type.caption, maxLines = 1)
             }
         }
     }
@@ -232,16 +232,7 @@ private fun StartTab(vm: TwitchViewModel, actions: TwitchActions, holder: HeroHo
     val history by vm.continueWatching.collectAsState()
     val memory = vm.focusMemory
 
-    if (followed == Load.NeedLogin || top == Load.NeedLogin) {
-        EmptyState(
-            "Willkommen bei PurpleTV",
-            body = "Melde dich an, um deine Kanäle, VODs und Empfehlungen zu sehen. Ohne Login kannst du Kanäle über die Suche öffnen.",
-            icon = Icons.Filled.Login,
-            action = "Mit Twitch anmelden",
-            onAction = { actions.login() },
-        )
-        return
-    }
+    val needLogin = followed == Load.NeedLogin
     val liveFollowed = followed.items()
     val topStreams = top.items()
     val fallback = remember(liveFollowed, topStreams) { (liveFollowed.firstOrNull() ?: topStreams.firstOrNull())?.hero() }
@@ -261,6 +252,16 @@ private fun StartTab(vm: TwitchViewModel, actions: TwitchActions, holder: HeroHo
     Column(Modifier.fillMaxSize()) {
         HeroInfo(holder)
         LazyColumn(contentPadding = PaddingValues(bottom = 40.dp), modifier = Modifier.weight(1f).fillMaxWidth()) {
+            if (needLogin) item("login") {
+                Row(
+                    Modifier.padding(horizontal = Tokens.Layout.safeHorizontal, vertical = Tokens.Space.md),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Tokens.Space.lg),
+                ) {
+                    TvButton("Mit Twitch anmelden", onClick = { actions.login() }, icon = Icons.Filled.Login)
+                    Text("Für deine gefolgten Kanäle. Alles andere geht auch ohne Login.", color = Palette.textDim, style = Type.body)
+                }
+            }
             if (liveFollowed.isNotEmpty()) item("followed") {
                 ContentRow("Live – Gefolgt", trailing = "${liveFollowed.size}") {
                     itemsIndexed(liveFollowed, key = { _, s -> s.login }) { i, s ->

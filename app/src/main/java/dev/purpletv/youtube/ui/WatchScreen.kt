@@ -1,5 +1,6 @@
 package dev.purpletv.youtube.ui
 
+import dev.purpletv.core.AppLog
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
@@ -78,6 +79,9 @@ import dev.purpletv.remote.RemoteControl
 import dev.purpletv.youtube.api.YouTubeClient
 import dev.purpletv.youtube.api.YtPlayback
 import dev.purpletv.youtube.api.YtVideo
+import dev.purpletv.youtube.api.YouTubeException
+import dev.purpletv.youtube.player.EmbedPlayer
+import dev.purpletv.youtube.player.EmbedSurface
 import dev.purpletv.youtube.player.YouTubePlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -102,6 +106,9 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
             withContext(Dispatchers.IO) { runCatching { YouTubeClient.playback(currentVideo.id) }.getOrNull() }
         }
     }
+    /** YouTube's own player, used when the extractor is blocked (see [EmbedPlayer]). */
+    val embedPlayer = remember { EmbedPlayer(context) }
+    var embed by remember { mutableStateOf(false) }
     val state by player.state.collectAsState()
     val qualities by player.qualities.collectAsState()
     val selectedQuality by player.selectedQuality.collectAsState()
@@ -127,6 +134,10 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
     }
 
     fun saveProgress() {
+        if (embed) {
+            history.save(video, embedPlayer.positionMs, embedPlayer.durationMs.takeIf { it > 0 } ?: duration)
+            return
+        }
         val d = player.durationMs.takeIf { it > 0 } ?: duration
         history.save(playback?.video ?: video, player.positionMs, d)
     }
@@ -138,16 +149,39 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
         upNextIn = 0
         position = 0
         duration = video.durationSec * 1000
+        val resume = history.position(video.id) ?: 0L
+        if (embed) embedPlayer.pause()
+        fun startEmbed() {
+            player.pause()
+            embed = true
+            controls = false
+            paused = false
+            embedPlayer.load(video.id, resume)
+        }
+        if (YouTubeClient.preferEmbed()) {
+            startEmbed()
+            return@LaunchedEffect
+        }
         val result = withContext(Dispatchers.IO) {
             runCatching {
                 YouTubeClient.init(settings.youtubeRegion)
                 YouTubeClient.playback(video.id)
             }
         }
+        result.onFailure { e ->
+            AppLog.e("YouTube", "Video ${video.id}", e)
+            if (e is YouTubeException && e.embeddable) {
+                AppLog.i("YouTube", "Spiele ${video.id} über den YouTube-Player")
+                if (e.blocked) YouTubeClient.preferEmbedUntil = System.currentTimeMillis() + 30 * 60_000L
+                startEmbed()
+                return@LaunchedEffect
+            }
+        }
         result.onSuccess {
+            embed = false
             playback = it
             video = it.video.copy(channelAvatar = it.video.channelAvatar.ifEmpty { video.channelAvatar })
-            player.play(it, history.position(video.id) ?: 0L)
+            player.play(it, resume)
             paused = false
         }.onFailure { loadError = it.message ?: "Video konnte nicht geladen werden" }
     }
@@ -156,6 +190,7 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
         onDispose {
             saveProgress()
             player.release()
+            embedPlayer.release()
         }
     }
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -164,6 +199,7 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
             if (event == Lifecycle.Event.ON_STOP) {
                 saveProgress()
                 player.pause()
+                if (embed) embedPlayer.pause()
                 paused = true
                 controls = true
             }
@@ -176,9 +212,16 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
     LaunchedEffect(Unit) {
         var ticks = 0
         while (true) {
-            position = player.positionMs
-            player.durationMs.takeIf { it > 0 }?.let { duration = it }
-            if (++ticks % 20 == 0 && state == PlaybackState.Playing) saveProgress()
+            if (embed) {
+                embedPlayer.poll()
+                position = embedPlayer.positionMs
+                embedPlayer.durationMs.takeIf { it > 0 }?.let { duration = it }
+                paused = embedPlayer.paused
+            } else {
+                position = player.positionMs
+                player.durationMs.takeIf { it > 0 }?.let { duration = it }
+            }
+            if (++ticks % 20 == 0 && (state == PlaybackState.Playing || (embed && !paused))) saveProgress()
             delay(500)
         }
     }
@@ -245,8 +288,20 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
     }
 
     fun togglePause() {
-        if (paused) player.resume() else player.pause()
+        if (embed) embedPlayer.toggle() else if (paused) player.resume() else player.pause()
         paused = !paused
+    }
+
+    // The embedded player has no Ended state in [player]; continue with the next video here.
+    LaunchedEffect(embed, video.id) {
+        while (embed) {
+            delay(1_000)
+            if (embedPlayer.ended && embedPlayer.videoId == video.id) {
+                saveProgress()
+                if (settings.youtubeAutoplay && next != null) playNext(next) else onExit()
+                break
+            }
+        }
     }
     fun toggleStats() {
         showStats = !showStats
@@ -260,12 +315,12 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
                 RemoteControl.Command.Play -> if (paused) togglePause()
                 RemoteControl.Command.Pause -> if (!paused) togglePause()
                 RemoteControl.Command.Toggle -> togglePause()
-                is RemoteControl.Command.Mute -> player.setMuted(c.mute)
-                is RemoteControl.Command.Volume -> player.setVolume(c.level)
+                is RemoteControl.Command.Mute -> if (embed) embedPlayer.setMuted(c.mute) else player.setMuted(c.mute)
+                is RemoteControl.Command.Volume -> if (embed) embedPlayer.setVolume(c.level) else player.setVolume(c.level)
                 RemoteControl.Command.Next -> playNext(nextRef)
-                RemoteControl.Command.Previous -> player.seekTo(player.positionMs - 10_000)
-                is RemoteControl.Command.Seek -> player.seekTo(c.positionSec * 1000)
-                is RemoteControl.Command.SeekBy -> player.seekTo(player.positionMs + c.deltaSec * 1000)
+                RemoteControl.Command.Previous -> if (embed) embedPlayer.seekBy(-10_000) else player.seekTo(player.positionMs - 10_000)
+                is RemoteControl.Command.Seek -> if (embed) embedPlayer.seekTo(c.positionSec * 1000) else player.seekTo(c.positionSec * 1000)
+                is RemoteControl.Command.SeekBy -> if (embed) embedPlayer.seekBy(c.deltaSec * 1000) else player.seekTo(player.positionMs + c.deltaSec * 1000)
                 else -> Unit
             }
         }
@@ -284,7 +339,7 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
                 avatar = v.channelAvatar,
                 viewers = if (v.isLive) v.views.coerceAtLeast(0) else 0,
                 durationSec = duration / 1000,
-                positionSec = player.positionMs / 1000,
+                positionSec = position / 1000,
                 isLive = v.isLive,
             )
             RemoteControl.paused = paused
@@ -302,6 +357,16 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
             .onPreviewKeyEvent { ev ->
                 if (ev.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
                 lastInput = System.currentTimeMillis()
+                if (embed) {
+                    return@onPreviewKeyEvent when (ev.key) {
+                        Key.DirectionLeft, Key.MediaRewind -> { embedPlayer.seekBy(-10_000); true }
+                        Key.DirectionRight, Key.MediaFastForward -> { embedPlayer.seekBy(10_000); true }
+                        Key.DirectionCenter, Key.Enter, Key.NumPadEnter, Key.MediaPlayPause, Key.MediaPlay, Key.MediaPause -> { togglePause(); true }
+                        Key.MediaNext -> { playNext(next); true }
+                        Key.DirectionUp, Key.DirectionDown, Key.Menu -> true
+                        else -> false
+                    }
+                }
                 when (ev.key) {
                     Key.Menu -> {
                         panel = if (panel != null) null else WatchPanel.MAIN
@@ -333,14 +398,15 @@ fun WatchScreen(app: PurpleApp, start: YtVideo, queue: List<YtVideo>, onExit: ()
             .focusRequester(rootFocus)
             .focusable(),
     ) {
-        VideoSurface(player, Modifier.fillMaxSize())
-        if (playback == null && loadError == null) {
+        if (embed) EmbedSurface(embedPlayer, Modifier.fillMaxSize()) else VideoSurface(player, Modifier.fillMaxSize())
+        if (playback == null && loadError == null && !embed) {
             // Poster while the stream URLs are resolved.
             Thumbnail(video.thumbnail, Modifier.fillMaxSize())
             Box(Modifier.fillMaxSize().background(Palette.scrim))
         }
         when {
             loadError != null -> PlayerMessage(Modifier.align(Alignment.Center), loadError!!, "OK: erneut versuchen  ·  Zurück: Übersicht")
+            embed -> if (paused) PlayerMessage(Modifier.align(Alignment.Center), video.title, "OK: weiter  ·  ◀ ▶ 10 Sekunden  ·  über den YouTube-Player")
             upNextIn > 0 && next != null -> UpNext(next, upNextIn, Modifier.align(Alignment.Center))
             else -> StatusOverlay(state, Modifier.align(Alignment.Center), offlineText = "Video nicht verfügbar")
         }

@@ -1,5 +1,6 @@
 package dev.purpletv.player
 
+import dev.purpletv.core.AppLog
 import android.content.Context
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
@@ -109,7 +110,10 @@ abstract class BasePlayer(
                 _qualities.value = buildQualities(tracks)
             }
 
-            override fun onPlayerError(error: PlaybackException) = handleError(error)
+            override fun onPlayerError(error: PlaybackException) {
+                AppLog.e("Player", "${this@BasePlayer.javaClass.simpleName}: ${error.errorCodeName}", error)
+                handleError(error)
+            }
         })
         player.addAnalyticsListener(object : AnalyticsListener {
             override fun onDroppedVideoFrames(eventTime: AnalyticsListener.EventTime, droppedFrames: Int, elapsedMs: Long) {

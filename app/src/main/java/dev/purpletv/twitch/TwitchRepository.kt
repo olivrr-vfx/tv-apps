@@ -1,5 +1,6 @@
 package dev.purpletv.twitch
 
+import dev.purpletv.core.AppLog
 import dev.purpletv.core.Load
 import dev.purpletv.data.Settings
 import dev.purpletv.remote.RemoteControl
@@ -112,6 +113,7 @@ class TwitchRepository(
                 } catch (e: NotLoggedInException) {
                     Load.NeedLogin
                 } catch (e: Exception) {
+                    AppLog.e("Twitch", "Laden fehlgeschlagen", e)
                     Load.Error(e.message ?: "Fehler")
                 }
             }

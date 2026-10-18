@@ -43,7 +43,7 @@ class PurpleApp : Application(), ImageLoaderFactory {
         settings = Settings(this)
         gql = TwitchGql(settings.deviceId)
         auth = TwitchAuth(settings)
-        helix = Helix(settings, auth)
+        helix = Helix(settings, auth, gql)
         history = WatchHistory(this)
         twitch = TwitchRepository(settings, auth, helix)
         youtube = YouTubeRepository(this, settings)

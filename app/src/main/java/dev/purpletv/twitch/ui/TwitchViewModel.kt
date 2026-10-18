@@ -1,5 +1,6 @@
 package dev.purpletv.twitch.ui
 
+import dev.purpletv.core.AppLog
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -40,7 +41,7 @@ class TwitchViewModel(application: Application) : AndroidViewModel(application) 
     val app = application as PurpleApp
     val repo = app.twitch
 
-    val tab = MutableStateFlow(if (app.auth.isLoggedIn) TwitchTab.START else TwitchTab.SEARCH)
+    val tab = MutableStateFlow(TwitchTab.START)
 
     private val _gameStreams = MutableStateFlow<Load<List<StreamInfo>>>(Load.Loading)
     val gameStreams: StateFlow<Load<List<StreamInfo>>> = _gameStreams
@@ -71,6 +72,7 @@ class TwitchViewModel(application: Application) : AndroidViewModel(application) 
                 } catch (e: NotLoggedInException) {
                     Load.NeedLogin
                 } catch (e: Exception) {
+                    AppLog.e("Twitch", "Laden fehlgeschlagen", e)
                     Load.Error(e.message ?: "Fehler")
                 }
             }
@@ -109,6 +111,7 @@ class TwitchViewModel(application: Application) : AndroidViewModel(application) 
                         Load.Error("Kanal \"$q\" nicht gefunden")
                     }
                 } catch (e: Exception) {
+                    AppLog.e("Twitch", "Suche fehlgeschlagen", e)
                     Load.Error(e.message ?: "Fehler")
                 }
             }
