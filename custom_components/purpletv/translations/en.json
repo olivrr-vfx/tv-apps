@@ -1,10 +1,10 @@
 {
   "config": {
-    "flow_title": "PurpleTV ({host})",
+    "flow_title": "Couch ({host})",
     "step": {
       "user": {
-        "title": "Connect PurpleTV",
-        "description": "Find address and code in PurpleTV under Settings → Remote & Home Assistant. Optionally list channels that get a live sensor (e.g. {example}).",
+        "title": "Connect Couch",
+        "description": "Find address and code in Couch under Settings → Remote & Home Assistant. Optionally list channels that get a live sensor (e.g. {example}).",
         "data": {
           "host": "TV IP address",
           "port": "Port",
@@ -13,8 +13,8 @@
         }
       },
       "confirm": {
-        "title": "PurpleTV found",
-        "description": "Found PurpleTV at {host}. Enter the code from Settings → Remote & Home Assistant. Optionally list channels for live sensors (e.g. {example}).",
+        "title": "Couch found",
+        "description": "Found Couch at {host}. Enter the code from Settings → Remote & Home Assistant. Optionally list channels for live sensors (e.g. {example}).",
         "data": {
           "code": "Code",
           "channels": "Channels with live sensor"
@@ -22,14 +22,14 @@
       },
       "reauth_confirm": {
         "title": "New code",
-        "description": "The code in PurpleTV changed. Enter the new code.",
+        "description": "The code in Couch changed. Enter the new code.",
         "data": {
           "code": "Code"
         }
       }
     },
     "error": {
-      "cannot_connect": "Cannot connect. Is the TV on and PurpleTV open?",
+      "cannot_connect": "Cannot connect. Is the TV on and Couch open?",
       "invalid_auth": "Wrong code."
     },
     "abort": {
@@ -75,7 +75,7 @@
         "name": "App",
         "state": {
           "Start": "Start",
-          "Twitch": "Twitch",
+          "PurpleTV": "PurpleTV",
           "YouTube": "YouTube"
         }
       }

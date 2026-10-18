@@ -1,4 +1,4 @@
-"""PurpleTV as a remote: D-pad keys and switching apps (like a TV remote, inside PurpleTV)."""
+"""Couch as a remote: D-pad keys and switching apps (like a TV remote, inside Couch)."""
 
 from __future__ import annotations
 
@@ -20,7 +20,7 @@ from .coordinator import TVCoordinator
 from .entity import tv_device
 from .media_player import NOT_RUNNING
 
-ACTIVITIES = {"Start": "dashboard", "Twitch": "twitch", "YouTube": "youtube"}
+ACTIVITIES = {"Start": "dashboard", "PurpleTV": "twitch", "YouTube": "youtube"}
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: PurpleTVConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
@@ -31,7 +31,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PurpleTVConfigEntry, asy
 class PurpleTVRemote(CoordinatorEntity[TVCoordinator], RemoteEntity):
     """send_command: up, down, left, right, ok, back, menu, play_pause, channel_up, channel_down, home.
 
-    turn_on with activity Start / Twitch / YouTube switches the app.
+    turn_on with activity Start / PurpleTV / YouTube switches the app.
     """
 
     _attr_has_entity_name = True

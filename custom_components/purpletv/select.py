@@ -1,4 +1,4 @@
-"""Which app is open on PurpleTV (Start, Twitch, YouTube)."""
+"""Which app is open on Couch (Start, PurpleTV, YouTube)."""
 
 from __future__ import annotations
 

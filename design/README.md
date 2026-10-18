@@ -1,15 +1,15 @@
-# PurpleTV Design-System
+# Couch Design-System
 
-Ein Design-System für alles, was zu PurpleTV gehört: die TV-App (Jetpack Compose), die
+Ein Design-System für alles, was zu Couch gehört: die TV-App (Jetpack Compose), die
 Handy-Fernbedienung (Web-App) und Home Assistant (Theme).
 
 ```
 design/tokens.json  ──►  design/generate.py  ──►  app/.../design/Tokens.kt        (TV-App)
                                              ├─►  app/src/main/assets/web/tokens.css (Handy, /design)
-                                             └─►  homeassistant/themes/purpletv.yaml (Home Assistant)
+                                             └─►  homeassistant/themes/couch.yaml (Home Assistant)
 ```
 
-Werte ändert man **nur** in `tokens.json` und lässt danach `python3 design/generate.py` laufen.
+Werte ändert man **nur** in `tokens.json` und lässt danach `python3 design/generate.py` laufen. Logos, App-Icons und TV-Banner zeichnet `python3 design/brand.py`.
 CI prüft mit `--check`, dass die erzeugten Dateien aktuell sind. Die Referenzseite mit allen
 Farben, Schriftgrößen und Komponenten zeigt der TV unter `http://<TV-IP>:8765/design`.
 
@@ -52,7 +52,7 @@ Farben, Schriftgrößen und Komponenten zeigt der TV unter `http://<TV-IP>:8765/
 | `VideoSurface`, `ControlsOverlay`, `SidePanel`, `SeekBar`, `StatusOverlay`, `StatsBox` | Player-Oberfläche |
 | `FocusMemory`, `RestorableFocus`, `Modifier.initialFocus()` | Fokus wiederherstellen |
 
-Eine neue App in PurpleTV braucht damit nur: einen Eintrag in `AppId`, einen `Accent`, ein
+Eine neue App in Couch braucht damit nur: einen Eintrag in `AppId`, einen `Accent`, ein
 Markenzeichen (`res/drawable/mark_<app>.xml`) und ihre Bildschirme aus diesen Komponenten.
 
 ## Web (Handy-Fernbedienung)
@@ -62,7 +62,7 @@ Markenzeichen (`res/drawable/mark_<app>.xml`) und ihre Bildschirme aus diesen Ko
 
 ## Home Assistant
 
-`homeassistant/themes/purpletv.yaml` nach `<config>/themes/` kopieren, in der
+`homeassistant/themes/couch.yaml` nach `<config>/themes/` kopieren, in der
 `configuration.yaml` `frontend: themes: !include_dir_merge_named themes` eintragen und im Profil
-„PurpleTV“ wählen. Zusätzlich gibt es die Variablen `--purpletv-twitch-color`,
-`--purpletv-youtube-color` und `--purpletv-live-color` für eigene Karten.
+„Couch“ wählen. Zusätzlich gibt es die Variablen `--couch-twitch-color`,
+`--couch-youtube-color` und `--couch-live-color` für eigene Karten.

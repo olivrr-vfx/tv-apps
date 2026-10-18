@@ -35,7 +35,7 @@ object Tokens {
         val textOnFocus = Color(0xFF0B0B10)
         /** Focus ring and focused button fill */
         val focus = Color(0xFFFFFFFF)
-        /** PurpleTV hub accent */
+        /** Couch hub accent */
         val hub = Color(0xFF7C6CFF)
         /** Hub accent on dark text */
         val hubLight = Color(0xFFB3A9FF)

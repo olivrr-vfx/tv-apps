@@ -1,4 +1,4 @@
-"""PurpleTV as a media player: what's on, play/pause, volume, seek, open Twitch/YouTube, browse."""
+"""Couch as a media player: what's on, play/pause, volume, seek, open Twitch/YouTube, browse."""
 
 from __future__ import annotations
 
@@ -43,8 +43,8 @@ FEATURES = (
 )
 
 NOT_RUNNING = (
-    "PurpleTV ist nicht erreichbar (TV aus oder App geschlossen). "
-    "Zum Starten den Deep-Link purpletv://home über die Android-TV-Remote-Integration nutzen."
+    "Couch ist nicht erreichbar (TV aus oder App geschlossen). "
+    "Zum Starten den Deep-Link couch://home über die Android-TV-Remote-Integration nutzen."
 )
 
 YOUTUBE_ID = re.compile(r"(?:v=|youtu\.be/|/shorts/|/live/|/embed/)([A-Za-z0-9_-]{11})")
@@ -270,7 +270,7 @@ class PurpleTVMediaPlayer(CoordinatorEntity[TVCoordinator], MediaPlayerEntity):
         if media_content_id in (None, "", "root"):
             children = []
             if "twitch" in apps:
-                children.append(_folder("twitch_live", f"Twitch – Live ({len(s.get('followed_live') or [])})", None))
+                children.append(_folder("twitch_live", f"PurpleTV – Live auf Twitch ({len(s.get('followed_live') or [])})", None))
             if "youtube" in apps:
                 children.append(_folder("youtube_feed", "YouTube – Neu von deinen Abos", None))
             children.append(_folder("apps", "Apps", None))
@@ -278,7 +278,7 @@ class PurpleTVMediaPlayer(CoordinatorEntity[TVCoordinator], MediaPlayerEntity):
                 media_class=MediaClass.DIRECTORY,
                 media_content_id="root",
                 media_content_type="purpletv",
-                title="PurpleTV",
+                title="Couch",
                 can_play=False,
                 can_expand=True,
                 children=children,
