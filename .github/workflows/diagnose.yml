@@ -57,17 +57,4 @@ jobs:
         if: always()
         env:
           REPO_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@users.noreply.github.com"
-          if ! git clone -q --depth 1 --branch diagnostics "$REPO_URL" /tmp/d; then
-            git init -q /tmp/d && git -C /tmp/d checkout -q --orphan diagnostics
-            git -C /tmp/d remote add origin "$REPO_URL"
-          fi
-          dir="/tmp/d/runs/${GITHUB_SHA::7}"
-          rm -rf "$dir" && mkdir -p "$dir"
-          cp -r diag/. "$dir/" || true
-          cd /tmp/d
-          git add -A
-          git commit -q -m "Diagnose ${GITHUB_SHA::7}" || exit 0
-          git push -q origin diagnostics
+        run: bash .github/scripts/save-diag.sh
