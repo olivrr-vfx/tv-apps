@@ -37,10 +37,27 @@ class Settings(context: Context) {
 
     var accessToken: String?
         get() = string("access_token")
-        set(value) = put("access_token", value)
+        private set(value) = put("access_token", value)
     var refreshToken: String?
         get() = string("refresh_token")
-        set(value) = put("refresh_token", value)
+        private set(value) = put("refresh_token", value)
+
+    /**
+     * Refresh tokens are single-use, so both tokens must reach the disk together and right away.
+     * With apply() a TV that is switched off at the wrong moment would keep the already-used
+     * refresh token and the login would be lost.
+     */
+    fun saveTokens(access: String, refresh: String?) {
+        prefs.edit()
+            .putString("access_token", access)
+            .apply { if (refresh != null) putString("refresh_token", refresh) }
+            .commit()
+    }
+
+    /** Last login/refresh problem, shown in the settings to make login issues debuggable. */
+    var lastAuthError: String?
+        get() = string("last_auth_error")
+        set(value) = put("last_auth_error", value)
     var userId: String?
         get() = string("user_id")
         set(value) = put("user_id", value)
@@ -66,6 +83,9 @@ class Settings(context: Context) {
     var autoUpdate: Boolean
         get() = prefs.getBoolean("auto_update", true)
         set(value) = putBool("auto_update", value)
+    var livePreview: Boolean
+        get() = prefs.getBoolean("live_preview", true)
+        set(value) = putBool("live_preview", value)
     var showStats: Boolean
         get() = prefs.getBoolean("show_stats", false)
         set(value) = putBool("show_stats", value)
@@ -87,6 +107,6 @@ class Settings(context: Context) {
         prefs.edit()
             .remove("access_token").remove("refresh_token")
             .remove("user_id").remove("user_login").remove("user_name")
-            .apply()
+            .commit()
     }
 }

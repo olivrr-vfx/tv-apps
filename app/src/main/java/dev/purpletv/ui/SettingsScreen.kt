@@ -60,6 +60,9 @@ fun SettingsScreen(vm: HomeViewModel, onLogin: () -> Unit) {
             } else {
                 SettingRow("Twitch-Konto", "Nicht angemeldet", action = "Anmelden") { onLogin() }
             }
+            s.lastAuthError?.let {
+                Text("Letztes Login-Problem: $it", color = Colors.TextDim, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+            }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = clientId,
@@ -85,6 +88,7 @@ fun SettingsScreen(vm: HomeViewModel, onLogin: () -> Unit) {
             SettingRow("Niedrige Latenz", onOff(s.lowLatency)) { s.lowLatency = !s.lowLatency; changed() }
             SettingRow("Standard-Qualität", s.defaultQuality.label) { s.defaultQuality = s.defaultQuality.next(); changed() }
             SettingRow("Statistiken im Player", onOff(s.showStats)) { s.showStats = !s.showStats; changed() }
+            SettingRow("Live-Vorschau auf der Startseite", onOff(s.livePreview)) { s.livePreview = !s.livePreview; changed() }
 
             Section("Chat")
             SettingRow("Chat-Modus", s.chatMode.label) { s.chatMode = s.chatMode.next(); changed() }
@@ -103,7 +107,7 @@ fun SettingsScreen(vm: HomeViewModel, onLogin: () -> Unit) {
             Spacer(Modifier.height(16.dp))
             Text("PurpleTV ${BuildConfig.VERSION_NAME}", color = Colors.TextDim, fontSize = 12.sp)
             Text(
-                "Fernbedienung im Player: ▲▼ Kanal wechseln · ▶ Chat umschalten · ◀ Statistiken · OK Menü",
+                "Live: ▲▼ Kanal · ▶ Chat · ◀ Statistiken · OK Steuerung · Menü-Taste Einstellungen  —  VOD: ◀▶ spulen (halten = schneller)",
                 color = Colors.TextDim,
                 fontSize = 12.sp,
             )

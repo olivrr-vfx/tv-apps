@@ -22,12 +22,15 @@ import dev.purpletv.update.Updater
 import kotlinx.coroutines.launch
 import dev.purpletv.twitch.Game
 import dev.purpletv.twitch.StreamInfo
+import dev.purpletv.twitch.VideoInfo
 
 sealed interface Route {
     data object Home : Route
     data object Login : Route
     data class GameStreams(val game: Game) : Route
+    data class Channel(val login: String) : Route
     data class Player(val channels: List<StreamInfo>, val index: Int) : Route
+    data class Vod(val video: VideoInfo) : Route
 }
 
 class MainActivity : ComponentActivity() {
@@ -66,30 +69,44 @@ private fun App() {
     fun pop() {
         if (stack.size > 1) stack = stack.dropLast(1)
     }
+    fun openChannel(login: String) {
+        // Coming from the channel page into a player and back to the same channel: just go back.
+        val previous = stack.getOrNull(stack.size - 2)
+        if (previous is Route.Channel && previous.login == login) pop() else push(Route.Channel(login))
+    }
+
+    val actions = HomeActions(
+        play = { list, index -> push(Route.Player(list, index)) },
+        vod = { video -> push(Route.Vod(video)) },
+        channel = { login -> openChannel(login) },
+        game = { game ->
+            vm.openGame(game)
+            push(Route.GameStreams(game))
+        },
+        login = { push(Route.Login) },
+    )
 
     BackHandler(enabled = stack.size > 1) { pop() }
 
     Box(Modifier.fillMaxSize().background(Colors.Background)) {
         when (val route = stack.last()) {
-            Route.Home -> saveable.SaveableStateProvider("home") {
-                HomeScreen(
-                    vm = vm,
-                    onPlay = { list, index -> push(Route.Player(list, index)) },
-                    onGame = { game ->
-                        vm.openGame(game)
-                        push(Route.GameStreams(game))
-                    },
-                    onLogin = { push(Route.Login) },
-                )
-            }
+            Route.Home -> saveable.SaveableStateProvider("home") { HomeScreen(vm, actions) }
             is Route.GameStreams -> saveable.SaveableStateProvider("game-${route.game.id}") {
-                GameStreamsScreen(vm, route.game, onPlay = { list, index -> push(Route.Player(list, index)) })
+                GameStreamsScreen(vm, route.game, actions)
+            }
+            is Route.Channel -> saveable.SaveableStateProvider("channel-${route.login}") {
+                ChannelScreen(
+                    vm, route.login,
+                    onPlayLive = { stream -> push(Route.Player(listOf(stream), 0)) },
+                    onVod = { video -> push(Route.Vod(video)) },
+                    onLogin = actions.login,
+                )
             }
             Route.Login -> LoginScreen(
                 app = vm.app,
                 onDone = {
                     vm.onLoginChanged()
-                    vm.tab.value = Tab.FOLLOWED
+                    vm.tab.value = Tab.START
                     pop()
                 },
             )
@@ -98,6 +115,16 @@ private fun App() {
                 channels = route.channels,
                 startIndex = route.index,
                 onExit = { pop() },
+                onChannel = { login -> openChannel(login) },
+            )
+            is Route.Vod -> VodPlayerScreen(
+                app = vm.app,
+                video = route.video,
+                onExit = {
+                    pop()
+                    vm.refreshHistory()
+                },
+                onChannel = { login -> openChannel(login) },
             )
         }
         UpdateOverlay()

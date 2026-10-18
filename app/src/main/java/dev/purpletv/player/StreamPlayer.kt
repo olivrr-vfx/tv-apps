@@ -35,6 +35,7 @@ sealed interface PlaybackState {
     data object Playing : PlaybackState
     data object Buffering : PlaybackState
     data object Offline : PlaybackState
+    data object Ended : PlaybackState
     data class Error(val message: String) : PlaybackState
 }
 
@@ -49,12 +50,19 @@ data class PlayerStats(
     val bandwidthMbps: Double = 0.0,
 )
 
-class StreamPlayer(context: Context, private val settings: Settings, private val gql: TwitchGql) {
+enum class PlayerMode { LIVE, VOD, PREVIEW }
+
+class StreamPlayer(
+    context: Context,
+    private val settings: Settings,
+    private val gql: TwitchGql,
+    val mode: PlayerMode = PlayerMode.LIVE,
+) {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    private val lowLatency = settings.lowLatency
+    private val lowLatency = settings.lowLatency && mode != PlayerMode.VOD
 
-    val adEngine = AdBlockEngine(gql, { settings.adBlock }, { lowLatency })
+    val adEngine = AdBlockEngine(gql, { settings.adBlock }, { lowLatency }).apply { active = mode != PlayerMode.VOD }
 
     private val _state = MutableStateFlow<PlaybackState>(PlaybackState.Loading)
     val state: StateFlow<PlaybackState> = _state
@@ -69,6 +77,8 @@ class StreamPlayer(context: Context, private val settings: Settings, private val
     private var droppedFrames = 0
     private var bandwidthBps = 0L
     private var login: String? = null
+    private var vodId: String? = null
+    private var vodStartMs = 0L
     private var retries = 0
     private var loadJob: Job? = null
 
@@ -76,7 +86,12 @@ class StreamPlayer(context: Context, private val settings: Settings, private val
 
     init {
         val dataSourceFactory = AdBlockDataSource.Factory(OkHttpDataSource.Factory(Http.client), adEngine)
-        val loadControl = if (lowLatency) {
+        val loadControl = if (mode == PlayerMode.VOD) {
+            DefaultLoadControl.Builder()
+                .setBufferDurationsMs(10_000, 60_000, 1_000, 2_500)
+                .setPrioritizeTimeOverSizeThresholds(true)
+                .build()
+        } else if (lowLatency) {
             DefaultLoadControl.Builder()
                 .setBufferDurationsMs(1_500, 20_000, 500, 1_000)
                 .setPrioritizeTimeOverSizeThresholds(true)
@@ -92,7 +107,12 @@ class StreamPlayer(context: Context, private val settings: Settings, private val
             .setLoadControl(loadControl)
             .build()
 
-        applyDefaultQuality(settings.defaultQuality)
+        if (mode == PlayerMode.PREVIEW) {
+            player.trackSelectionParameters = player.trackSelectionParameters.buildUpon().setMaxVideoSize(Int.MAX_VALUE, 480).build()
+            player.volume = 0f
+        } else {
+            applyDefaultQuality(settings.defaultQuality)
+        }
 
         player.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -102,6 +122,7 @@ class StreamPlayer(context: Context, private val settings: Settings, private val
                         _state.value = PlaybackState.Playing
                     }
                     Player.STATE_BUFFERING -> if (_state.value == PlaybackState.Playing) _state.value = PlaybackState.Buffering
+                    Player.STATE_ENDED -> if (mode == PlayerMode.VOD) _state.value = PlaybackState.Ended
                     else -> Unit
                 }
             }
@@ -129,13 +150,14 @@ class StreamPlayer(context: Context, private val settings: Settings, private val
 
         scope.launch {
             adEngine.status.collect { status ->
-                player.volume = if (status == AdStatus.SHOWING && settings.muteAds) 0f else 1f
+                player.volume = if (mode == PlayerMode.PREVIEW || (status == AdStatus.SHOWING && settings.muteAds)) 0f else 1f
             }
         }
     }
 
     fun play(login: String) {
         this.login = login
+        this.vodId = null
         retries = 0
         droppedFrames = 0
         adEngine.reset(login)
@@ -145,11 +167,54 @@ class StreamPlayer(context: Context, private val settings: Settings, private val
         load()
     }
 
+    fun playVod(id: String, startMs: Long) {
+        vodId = id
+        vodStartMs = startMs
+        login = null
+        retries = 0
+        droppedFrames = 0
+        _qualities.value = emptyList()
+        _state.value = PlaybackState.Loading
+        player.stop()
+        loadVod()
+    }
+
     fun reload() {
-        login?.let { play(it) }
+        val vod = vodId
+        if (vod != null) {
+            vodStartMs = player.currentPosition.takeIf { it > 0 } ?: vodStartMs
+            playVod(vod, vodStartMs)
+        } else {
+            login?.let { play(it) }
+        }
+    }
+
+    private fun loadVod() {
+        val id = vodId ?: return
+        loadJob?.cancel()
+        loadJob = scope.launch {
+            val url = withContext(Dispatchers.IO) { runCatching { gql.vodToken(id)?.let { gql.vodUsherUrl(id, it) } } }
+            val usher = url.getOrElse {
+                retryLater("Keine Verbindung zu Twitch")
+                return@launch
+            }
+            if (usher == null) {
+                _state.value = PlaybackState.Error("Dieses Video gibt es nicht mehr")
+                return@launch
+            }
+            val item = MediaItem.Builder().setUri(usher).setMimeType(MimeTypes.APPLICATION_M3U8).build()
+            player.setMediaItem(item, vodStartMs)
+            player.prepare()
+            player.playWhenReady = true
+        }
     }
 
     private fun load() {
+        if (vodId != null) {
+            vodStartMs = player.currentPosition.takeIf { it > 0 } ?: vodStartMs
+            loadVod()
+            return
+        }
         val login = login ?: return
         loadJob?.cancel()
         loadJob = scope.launch {
@@ -184,9 +249,15 @@ class StreamPlayer(context: Context, private val settings: Settings, private val
     private fun handleError(error: PlaybackException) {
         var cause: Throwable? = error
         while (cause != null) {
-            if (cause is HttpStatusException && cause.url.contains("usher") && cause.code == 404) {
-                _state.value = PlaybackState.Offline
-                return
+            if (cause is HttpStatusException && cause.url.contains("usher")) {
+                if (vodId != null && cause.code == 403) {
+                    _state.value = PlaybackState.Error("Dieses Video ist nur für Abonnenten verfügbar")
+                    return
+                }
+                if (cause.code == 404) {
+                    _state.value = if (vodId != null) PlaybackState.Error("Video nicht gefunden") else PlaybackState.Offline
+                    return
+                }
             }
             cause = cause.cause
         }
@@ -272,8 +343,26 @@ class StreamPlayer(context: Context, private val settings: Settings, private val
         )
     }
 
+    val positionMs get() = player.currentPosition.coerceAtLeast(0)
+    val durationMs get() = player.duration.takeIf { it != C.TIME_UNSET && it > 0 } ?: 0L
+
+    fun seekTo(ms: Long) {
+        val d = durationMs
+        player.seekTo(if (d > 0) ms.coerceIn(0, d - 1000) else ms.coerceAtLeast(0))
+    }
+
+    fun stop() {
+        loadJob?.cancel()
+        player.stop()
+        _state.value = PlaybackState.Loading
+    }
+
     fun pause() = player.pause()
     fun resume() {
+        if (mode == PlayerMode.VOD) {
+            if (player.playbackState == Player.STATE_IDLE) reload() else player.play()
+            return
+        }
         if (player.playbackState == Player.STATE_IDLE) reload() else {
             // Jump back to live after a pause instead of playing old content.
             player.seekToDefaultPosition()

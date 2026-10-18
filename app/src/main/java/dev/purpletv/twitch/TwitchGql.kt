@@ -42,22 +42,44 @@ class TwitchGql(private val deviceId: String) {
     )
 
     /** Blocking. Returns null when the channel does not exist. */
-    fun playbackToken(login: String, kind: PlayerKind = MAIN): Token? {
+    fun playbackToken(login: String, kind: PlayerKind = MAIN): Token? =
+        token(login = login, vodId = null, kind = kind)
+
+    /** Blocking. Returns null when the video does not exist. */
+    fun vodToken(vodId: String): Token? = token(login = "", vodId = vodId, kind = MAIN)
+
+    private fun token(login: String, vodId: String?, kind: PlayerKind): Token? {
         val body = JSONObject()
             .put("operationName", "PlaybackAccessToken_Template")
             .put("query", TOKEN_QUERY)
             .put(
                 "variables", JSONObject()
-                    .put("isLive", true)
+                    .put("isLive", vodId == null)
                     .put("login", login)
-                    .put("isVod", false)
-                    .put("vodID", "")
+                    .put("isVod", vodId != null)
+                    .put("vodID", vodId ?: "")
                     .put("playerType", kind.playerType)
                     .put("platform", kind.platform)
             )
         val json = JSONObject(Http.postJson(URL, body, headers))
-        val token = json.optJSONObject("data")?.optJSONObject("streamPlaybackAccessToken") ?: return null
+        val field = if (vodId == null) "streamPlaybackAccessToken" else "videoPlaybackAccessToken"
+        val token = json.optJSONObject("data")?.optJSONObject(field) ?: return null
         return Token(token.getString("value"), token.getString("signature"))
+    }
+
+    fun vodUsherUrl(vodId: String, token: Token): String {
+        fun enc(s: String) = URLEncoder.encode(s, "UTF-8")
+        val params = linkedMapOf(
+            "allow_source" to "true",
+            "allow_audio_only" to "true",
+            "p" to Random.nextInt(1_000_000, 9_999_999).toString(),
+            "player_backend" to "mediaplayer",
+            "playlist_include_framerate" to "true",
+            "supported_codecs" to "avc1",
+            "nauthsig" to token.signature,
+            "nauth" to token.value,
+        )
+        return "https://usher.ttvnw.net/vod/$vodId.m3u8?" + params.entries.joinToString("&") { "${it.key}=${enc(it.value)}" }
     }
 
     fun usherUrl(login: String, token: Token, lowLatency: Boolean): String {

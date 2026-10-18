@@ -8,6 +8,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import dev.purpletv.data.Http
 import dev.purpletv.data.Settings
+import dev.purpletv.data.WatchHistory
 import dev.purpletv.twitch.Helix
 import dev.purpletv.twitch.TwitchAuth
 import dev.purpletv.twitch.TwitchGql
@@ -21,6 +22,8 @@ class PurpleApp : Application(), ImageLoaderFactory {
         private set
     lateinit var helix: Helix
         private set
+    lateinit var history: WatchHistory
+        private set
 
     override fun onCreate() {
         super.onCreate()
@@ -28,6 +31,7 @@ class PurpleApp : Application(), ImageLoaderFactory {
         gql = TwitchGql(settings.deviceId)
         auth = TwitchAuth(settings)
         helix = Helix(settings, auth)
+        history = WatchHistory(this)
     }
 
     // Animated emotes (7TV/BTTV webp + gif) need the platform ImageDecoder on Android 9+.

@@ -6,11 +6,15 @@ import dev.purpletv.data.Settings
 import org.json.JSONArray
 import org.json.JSONObject
 import java.net.URLEncoder
+import java.util.concurrent.ConcurrentHashMap
 
 class NotLoggedInException : Exception("Nicht angemeldet")
 
 /** Official Twitch API. All calls are blocking and need a logged in user. */
 class Helix(private val settings: Settings, private val auth: TwitchAuth) {
+
+    /** userId -> profile image, filled lazily so cards can show avatars. */
+    private val avatars = ConcurrentHashMap<String, String>()
 
     private fun get(path: String, retry: Boolean = true): JSONObject {
         val token = settings.accessToken ?: throw NotLoggedInException()
@@ -20,9 +24,12 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth) {
                 mapOf("Client-Id" to settings.clientId, "Authorization" to "Bearer $token")
             )
         } catch (e: HttpStatusException) {
-            if (e.code == 401 && retry && auth.refresh()) get(path, retry = false)
-            else if (e.code == 401) throw NotLoggedInException()
-            else throw e
+            if (e.code != 401) throw e
+            when {
+                retry && auth.refresh(token) -> get(path, retry = false)
+                !auth.isLoggedIn -> throw NotLoggedInException()
+                else -> throw Exception("Twitch-Anmeldung konnte gerade nicht erneuert werden, versuch es gleich nochmal")
+            }
         }
     }
 
@@ -44,6 +51,28 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth) {
         )
     }
 
+    private fun withAvatars(streams: List<StreamInfo>): List<StreamInfo> {
+        runCatching { loadAvatars(streams.mapNotNull { it.userId }) }
+        return streams.map { s -> s.userId?.let { avatars[it] }?.let { s.copy(avatarUrl = it) } ?: s }
+    }
+
+    private fun loadAvatars(ids: List<String>) {
+        ids.filterNot { avatars.containsKey(it) }.distinct().chunked(100).forEach { chunk ->
+            users(chunk.joinToString("&") { "id=$it" }).forEach { avatars[it.id] = it.avatarUrl }
+        }
+    }
+
+    private fun users(query: String): List<ChannelInfo> = get("users?$query").getJSONArray("data").mapObjects {
+        ChannelInfo(
+            id = it.getString("id"),
+            login = it.getString("login"),
+            displayName = it.optString("display_name").ifBlank { it.getString("login") },
+            avatarUrl = it.optString("profile_image_url"),
+            description = it.optString("description"),
+            offlineImageUrl = it.optString("offline_image_url"),
+        )
+    }
+
     fun followedStreams(): List<StreamInfo> {
         val userId = settings.userId ?: throw NotLoggedInException()
         val out = mutableListOf<StreamInfo>()
@@ -53,14 +82,30 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth) {
             out += parseStreams(json)
             cursor = json.optJSONObject("pagination")?.optString("cursor")?.ifBlank { null }
         } while (cursor != null && out.size < 300)
-        return out.sortedByDescending { it.viewers }
+        return withAvatars(out.sortedByDescending { it.viewers })
+    }
+
+    /** All followed channels (live or not), most recently followed first. */
+    fun followedChannels(): List<ChannelInfo> {
+        val userId = settings.userId ?: throw NotLoggedInException()
+        val ids = mutableListOf<String>()
+        var cursor: String? = null
+        do {
+            val json = get("channels/followed?user_id=$userId&first=100" + (cursor?.let { "&after=${enc(it)}" } ?: ""))
+            json.getJSONArray("data").mapObjects { it.getString("broadcaster_id") }.let { ids += it }
+            cursor = json.optJSONObject("pagination")?.optString("cursor")?.ifBlank { null }
+        } while (cursor != null && ids.size < 500)
+        val byId = ids.chunked(100).flatMap { chunk -> users(chunk.joinToString("&") { "id=$it" }) }
+            .onEach { avatars[it.id] = it.avatarUrl }
+            .associateBy { it.id }
+        return ids.mapNotNull { byId[it] }
     }
 
     fun topStreams(gameId: String? = null, language: String? = null): List<StreamInfo> {
         var path = "streams?first=60"
         if (gameId != null) path += "&game_id=$gameId"
         if (language != null) path += "&language=$language"
-        return parseStreams(get(path))
+        return withAvatars(parseStreams(get(path)))
     }
 
     fun topGames(): List<Game> = get("games/top?first=60").getJSONArray("data").mapObjects {
@@ -81,10 +126,31 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth) {
             )
         }.sortedByDescending { it.isLive }
 
-    fun stream(login: String): StreamInfo? = parseStreams(get("streams?user_login=${enc(login)}")).firstOrNull()
+    fun stream(login: String): StreamInfo? =
+        withAvatars(parseStreams(get("streams?user_login=${enc(login)}"))).firstOrNull()
+
+    fun channel(login: String): ChannelInfo? = users("login=${enc(login)}").firstOrNull()
+
+    /** Past broadcasts (type archive) or highlights of a channel. */
+    fun videos(userId: String, type: String): List<VideoInfo> =
+        get("videos?user_id=$userId&type=$type&first=60").getJSONArray("data").mapObjects {
+            VideoInfo(
+                id = it.getString("id"),
+                userId = it.optString("user_id"),
+                login = it.optString("user_login"),
+                userName = it.optString("user_name"),
+                title = it.optString("title"),
+                duration = it.optString("duration"),
+                createdAt = it.optString("created_at"),
+                thumbnailUrl = it.optString("thumbnail_url"),
+                viewCount = it.optInt("view_count"),
+                type = it.optString("type"),
+            )
+        }
 
     fun loadSelf() {
-        val user = get("users").getJSONArray("data").optJSONObject(0) ?: return
-        settings.userName = user.optString("display_name").ifBlank { null }
+        val user = users("").firstOrNull() ?: return
+        settings.userName = user.displayName
+        avatars[user.id] = user.avatarUrl
     }
 }

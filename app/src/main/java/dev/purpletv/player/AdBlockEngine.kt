@@ -52,8 +52,12 @@ class AdBlockEngine(
         _status.value = AdStatus.NONE
     }
 
+    /** Off for VODs, which have no stitched ads. */
+    @Volatile var active = true
+
     /** Returns replacement bytes for [uri], or null to let the request pass through untouched. */
     fun intercept(uri: Uri): ByteArray? {
+        if (!active) return null
         val host = uri.host ?: return null
         if (!host.endsWith("ttvnw.net") || uri.path?.endsWith(".m3u8") != true) return null
         val url = uri.toString()

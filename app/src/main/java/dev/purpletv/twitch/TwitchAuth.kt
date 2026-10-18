@@ -4,10 +4,18 @@ import dev.purpletv.data.Http
 import dev.purpletv.data.HttpStatusException
 import dev.purpletv.data.Settings
 import org.json.JSONObject
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * OAuth "Device Code Grant" flow: the TV shows a code, the user confirms it on their phone.
  * Works with a public client registered on dev.twitch.tv, no client secret needed.
+ *
+ * Access tokens live about 4 hours, the refresh token rotates on every refresh and can only be
+ * used once. Two refreshes racing with the same refresh token make Twitch reject the second
+ * one, so refreshing is single-flight: whoever comes second just picks up the new token.
  */
 class TwitchAuth(private val settings: Settings) {
 
@@ -27,6 +35,7 @@ class TwitchAuth(private val settings: Settings) {
     }
 
     private val scopes = "user:read:follows"
+    private val lock = Any()
 
     val isLoggedIn get() = settings.accessToken != null
     val hasClientId get() = settings.clientId.isNotBlank()
@@ -59,12 +68,11 @@ class TwitchAuth(private val settings: Settings) {
                 )
             )
         )
-        settings.accessToken = json.getString("access_token")
-        settings.refreshToken = json.optString("refresh_token").ifBlank { null }
+        settings.saveTokens(json.getString("access_token"), json.optString("refresh_token").ifBlank { null })
+        settings.lastAuthError = null
         if (validate()) PollResult.Success else PollResult.Failed("Token ungültig")
     } catch (e: HttpStatusException) {
-        val message = runCatching { JSONObject(e.body).optString("message") }.getOrDefault("")
-        when (message) {
+        when (val message = errorMessage(e)) {
             "authorization_pending" -> PollResult.Pending
             "slow_down" -> PollResult.SlowDown
             "expired_token", "invalid device code" -> PollResult.Failed("Code abgelaufen")
@@ -73,7 +81,10 @@ class TwitchAuth(private val settings: Settings) {
         }
     }
 
-    /** Checks the stored token and fills in user id / login. */
+    /**
+     * Checks the stored token, fills in user id / login and refreshes ahead of time when the
+     * token is about to expire. Network problems keep the login (the TV may just be offline).
+     */
     fun validate(): Boolean {
         val token = settings.accessToken ?: return false
         return try {
@@ -81,17 +92,27 @@ class TwitchAuth(private val settings: Settings) {
             settings.userId = json.getString("user_id")
             settings.userLogin = json.getString("login")
             if (settings.userName == null) settings.userName = json.getString("login")
+            if (json.optInt("expires_in", Int.MAX_VALUE) < 30 * 60) refresh(token)
             true
         } catch (e: HttpStatusException) {
-            if (e.code == 401) refresh() else false
+            if (e.code == 401) refresh(token) else true
+        } catch (e: IOException) {
+            true
         }
     }
 
-    /** Public clients get one-time-use refresh tokens; a new one comes with each refresh. */
-    @Synchronized
-    fun refresh(): Boolean {
-        val refresh = settings.refreshToken ?: run { settings.clearAuth(); return false }
-        return try {
+    /**
+     * @param failedToken the access token that was rejected. If another caller already replaced
+     *   it, nothing is refreshed and the caller simply retries with the new token.
+     */
+    fun refresh(failedToken: String?): Boolean = synchronized(lock) {
+        val current = settings.accessToken
+        if (failedToken != null && current != null && current != failedToken) return true
+        val refresh = settings.refreshToken ?: run {
+            fail("Kein Refresh-Token gespeichert", logout = true)
+            return false
+        }
+        try {
             val json = JSONObject(
                 Http.postForm(
                     "https://id.twitch.tv/oauth2/token",
@@ -102,14 +123,29 @@ class TwitchAuth(private val settings: Settings) {
                     )
                 )
             )
-            settings.accessToken = json.getString("access_token")
-            settings.refreshToken = json.optString("refresh_token").ifBlank { refresh }
+            settings.saveTokens(json.getString("access_token"), json.optString("refresh_token").ifBlank { refresh })
             true
         } catch (e: HttpStatusException) {
-            if (e.code in 400..401) settings.clearAuth()
+            val message = errorMessage(e)
+            // Only a definitive "this refresh token is dead" ends the session; anything else
+            // (rate limits, Twitch hiccups) is retried next time.
+            val dead = e.code == 400 && message.contains("invalid", ignoreCase = true)
+            fail("Token-Erneuerung fehlgeschlagen (${e.code}): ${message.ifBlank { "unbekannt" }}", logout = dead)
+            false
+        } catch (e: IOException) {
+            fail("Token-Erneuerung: keine Verbindung (${e.message})", logout = false)
             false
         }
     }
+
+    private fun fail(message: String, logout: Boolean) {
+        val time = SimpleDateFormat("dd.MM. HH:mm", Locale.GERMANY).format(Date())
+        settings.lastAuthError = "$time – $message" + if (logout) " → abgemeldet" else ""
+        if (logout) settings.clearAuth()
+    }
+
+    private fun errorMessage(e: HttpStatusException) =
+        runCatching { JSONObject(e.body).optString("message") }.getOrDefault("")
 
     fun logout() = settings.clearAuth()
 }
