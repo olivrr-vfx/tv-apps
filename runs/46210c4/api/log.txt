@@ -1,0 +1,14 @@
+Couch 2.0.5 · Android 13 · Google sdk_gphone64_x86_64
+
+20:46:46 E Twitch: GQL fehlgeschlagen | UnknownHostException: Unable to resolve host "gql.twitch.tv": No address associated with hostname <- GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+20:46:46 E Twitch: Laden fehlgeschlagen | UnknownHostException: Unable to resolve host "gql.twitch.tv": No address associated with hostname <- GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+20:46:46 E Twitch: GQL fehlgeschlagen | UnknownHostException: Unable to resolve host "gql.twitch.tv": No address associated with hostname <- GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+20:46:46 E Twitch: Laden fehlgeschlagen | UnknownHostException: Unable to resolve host "gql.twitch.tv": No address associated with hostname <- GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+20:46:47 E YouTube: Regal trending_gaming | c: Unable to resolve host "www.youtube.com": No address associated with hostname <- UnknownHostException: Unable to resolve host "www.youtube.com": No address associated with hostname
+20:46:47 E YouTube: Regal live | c: Unable to resolve host "www.youtube.com": No address associated with hostname <- UnknownHostException: Unable to resolve host "www.youtube.com": No address associated with hostname
+20:46:47 E YouTube: Regal trending_movies_and_shows | c: Unable to resolve host "charts.youtube.com": No address associated with hostname <- UnknownHostException: Unable to resolve host "charts.youtube.com": No address associated with hostname <- GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+20:46:47 E YouTube: Regal trending_podcasts_episodes | c: Unable to resolve host "www.youtube.com": No address associated with hostname <- UnknownHostException: Unable to resolve host "www.youtube.com": No address associated with hostname
+20:46:47 E YouTube: Regal trending_music | c: Unable to resolve host "charts.youtube.com": No address associated with hostname <- UnknownHostException: Unable to resolve host "charts.youtube.com": No address associated with hostname <- GaiException: android_getaddrinfo failed: EAI_NODATA (No address associated with hostname)
+20:49:54 E YouTube: Video igtiPYWnnw8 | c: YouTube möchte bestätigen, dass du kein Bot bist. Bitte später nochmal versuchen. <- l: YouTube probably temporarily blocked anonymous watch access with this IP , got error LOGIN_REQUIRED: "Sign in to confirm that you're not a bot"
+20:49:54 I YouTube: Spiele igtiPYWnnw8 über den YouTube-Player
+200 0.006188s
