@@ -1,0 +1,54 @@
+10-18 21:12:26.560 I/Couch/Netz( 2698): verbunden
+10-18 21:13:00.576 I/AndroidRuntime( 4317): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:00.735 I/AndroidRuntime( 4961): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:18.365 I/AndroidRuntime( 5246): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:21.240 I/AndroidRuntime( 5455): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:23.336 I/AndroidRuntime( 5491): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:24.960 I/AndroidRuntime( 5520): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:26.031 I/AndroidRuntime( 5550): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:26.954 I/AndroidRuntime( 5568): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:27.603 I/AndroidRuntime( 5603): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:28.137 I/AndroidRuntime( 5621): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:28.487 I/AndroidRuntime( 5638): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:28.755 I/AndroidRuntime( 5656): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:28.937 I/AndroidRuntime( 5673): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:29.093 I/AndroidRuntime( 5690): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:29.261 I/AndroidRuntime( 5710): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:29.339 I/AndroidRuntime( 5731): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:29.497 I/AndroidRuntime( 5749): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:29.588 I/AndroidRuntime( 5767): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:29.689 I/AndroidRuntime( 5784): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:29.745 I/AndroidRuntime( 5801): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:29.831 I/AndroidRuntime( 5818): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:29.900 I/AndroidRuntime( 5835): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:30.105 I/AndroidRuntime( 5858): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:30.186 I/AndroidRuntime( 5881): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:30.295 I/AndroidRuntime( 5900): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:30.436 I/AndroidRuntime( 5921): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:30.524 I/AndroidRuntime( 5938): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:30.685 I/AndroidRuntime( 5958): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:30.845 I/AndroidRuntime( 5984): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:30.933 I/AndroidRuntime( 6002): VM exiting with result code 0, cleanup skipped.
+10-18 21:13:31.000 I/AndroidRuntime( 6020): VM exiting with result code 0, cleanup skipped.
+10-18 21:14:00.389 I/AndroidRuntime( 6684): VM exiting with result code 0, cleanup skipped.
+10-18 21:14:00.514 I/AndroidRuntime( 6703): VM exiting with result code 0, cleanup skipped.
+10-18 21:14:00.607 I/AndroidRuntime( 6720): VM exiting with result code 0, cleanup skipped.
+10-18 21:14:00.679 I/AndroidRuntime( 6738): VM exiting with result code 0, cleanup skipped.
+10-18 21:15:39.027 W/Couch/YouTube( 2698): Video ZfRT-wNiNqE
+10-18 21:15:39.027 W/Couch/YouTube( 2698): F3.c: YouTube möchte bestätigen, dass du kein Bot bist. Bitte später nochmal versuchen.
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at F3.b.e(SourceFile:278)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at H3.i.l(SourceFile:29)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at P3.a.q(SourceFile:9)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at g4.H.run(SourceFile:107)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at h4.c.run(SourceFile:9)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at n4.j.run(SourceFile:3)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at n4.a.run(SourceFile:93)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): Caused by: Q4.l: YouTube probably temporarily blocked anonymous watch access with this IP , got error LOGIN_REQUIRED: "Sign in to confirm that you're not a bot"
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at c5.M.i(SourceFile:295)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at M4.a.b(SourceFile:25)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at h5.e.f(SourceFile:53)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	at F3.b.e(SourceFile:18)
+10-18 21:15:39.027 W/Couch/YouTube( 2698): 	... 6 more
+10-18 21:15:39.027 I/Couch/YouTube( 2698): Spiele ZfRT-wNiNqE über den YouTube-Player
+10-18 21:15:42.867 W/Couch/YouTube( 2698): Eingebetteter Player: Fehler 150 für ZfRT-wNiNqE
+10-18 21:16:29.225 I/AndroidRuntime( 7190): VM exiting with result code 0, cleanup skipped.

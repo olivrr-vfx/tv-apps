@@ -1,0 +1,7 @@
+Couch 2.0.8 · Android 13 · Google sdk_gphone64_x86_64
+
+21:12:26 I Netz: verbunden
+21:15:39 E YouTube: Video ZfRT-wNiNqE | c: YouTube möchte bestätigen, dass du kein Bot bist. Bitte später nochmal versuchen. <- l: YouTube probably temporarily blocked anonymous watch access with this IP , got error LOGIN_REQUIRED: "Sign in to confirm that you're not a bot"
+21:15:39 I YouTube: Spiele ZfRT-wNiNqE über den YouTube-Player
+21:15:42 E YouTube: Eingebetteter Player: Fehler 150 für ZfRT-wNiNqE
+200 0.004358s
