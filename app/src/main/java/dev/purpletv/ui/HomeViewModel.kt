@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dev.purpletv.PurpleApp
 import dev.purpletv.data.WatchHistory
+import dev.purpletv.remote.RemoteControl
 import dev.purpletv.twitch.ChannelInfo
 import dev.purpletv.twitch.Game
 import dev.purpletv.twitch.NotLoggedInException
@@ -114,7 +115,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         _continueWatching.value = app.history.continueWatching()
     }
 
-    fun refreshFollowed(silent: Boolean = false) = load(_followed, showLoading = !silent) { app.helix.followedStreams() }
+    fun refreshFollowed(silent: Boolean = false) = load(_followed, showLoading = !silent) { app.helix.followedStreams().also { RemoteControl.followedLive = it } }
     fun refreshTop(silent: Boolean = false) = load(_top, showLoading = !silent) { app.helix.topStreams() }
 
     fun openGame(game: Game) = load(_gameStreams) { app.helix.topStreams(gameId = game.id) }

@@ -9,6 +9,7 @@ import coil.decode.ImageDecoderDecoder
 import dev.purpletv.data.Http
 import dev.purpletv.data.Settings
 import dev.purpletv.data.WatchHistory
+import dev.purpletv.remote.RemoteServer
 import dev.purpletv.twitch.Helix
 import dev.purpletv.twitch.TwitchAuth
 import dev.purpletv.twitch.TwitchGql
@@ -32,6 +33,19 @@ class PurpleApp : Application(), ImageLoaderFactory {
         auth = TwitchAuth(settings)
         helix = Helix(settings, auth)
         history = WatchHistory(this)
+        if (settings.remoteEnabled) startRemote()
+    }
+
+    private var remote: RemoteServer? = null
+
+    fun startRemote() {
+        if (remote != null) return
+        remote = RemoteServer(this, settings).also { it.startAll() }
+    }
+
+    fun stopRemote() {
+        remote?.stopAll()
+        remote = null
     }
 
     // Animated emotes (7TV/BTTV webp + gif) need the platform ImageDecoder on Android 9+.

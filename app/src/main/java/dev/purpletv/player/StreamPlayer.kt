@@ -150,7 +150,8 @@ class StreamPlayer(
 
         scope.launch {
             adEngine.status.collect { status ->
-                player.volume = if (mode == PlayerMode.PREVIEW || (status == AdStatus.SHOWING && settings.muteAds)) 0f else 1f
+                adMuted = status == AdStatus.SHOWING && settings.muteAds
+                applyVolume()
             }
         }
     }
@@ -349,6 +350,27 @@ class StreamPlayer(
     fun seekTo(ms: Long) {
         val d = durationMs
         player.seekTo(if (d > 0) ms.coerceIn(0, d - 1000) else ms.coerceAtLeast(0))
+    }
+
+    private var adMuted = false
+    var muted = false
+        private set
+    var volume = 1f
+        private set
+
+    fun setMuted(mute: Boolean) {
+        muted = mute
+        applyVolume()
+    }
+
+    fun setVolume(level: Float) {
+        volume = level.coerceIn(0f, 1f)
+        if (volume > 0f) muted = false
+        applyVolume()
+    }
+
+    private fun applyVolume() {
+        player.volume = if (mode == PlayerMode.PREVIEW || adMuted || muted) 0f else volume
     }
 
     fun stop() {

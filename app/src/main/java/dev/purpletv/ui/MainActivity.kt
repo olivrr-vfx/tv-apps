@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
@@ -20,6 +21,13 @@ import dev.purpletv.PurpleApp
 import dev.purpletv.update.UpdateState
 import dev.purpletv.update.Updater
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import android.content.Intent
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import dev.purpletv.remote.DeepLinks
+import dev.purpletv.remote.RemoteControl
 import dev.purpletv.twitch.Game
 import dev.purpletv.twitch.StreamInfo
 import dev.purpletv.twitch.VideoInfo
@@ -36,8 +44,23 @@ sealed interface Route {
 class MainActivity : ComponentActivity() {
     private var lastUpdateCheck = 0L
 
+    override fun onStop() {
+        super.onStop()
+        RemoteControl.foreground = false
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleLink(intent)
+    }
+
+    private fun handleLink(intent: Intent?) {
+        DeepLinks.parse(intent?.data)?.let { RemoteControl.pendingLink.value = it }
+    }
+
     override fun onStart() {
         super.onStart()
+        RemoteControl.foreground = true
         if (!(application as PurpleApp).settings.autoUpdate) return
         val now = System.currentTimeMillis()
         // Re-check right away when coming back from the permission screen.
@@ -49,6 +72,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) handleLink(intent)
         setContent {
             PurpleTheme {
                 App()
@@ -62,6 +86,7 @@ private fun App() {
     val vm: HomeViewModel = viewModel()
     var stack by remember { mutableStateOf(listOf<Route>(Route.Home)) }
     val saveable = rememberSaveableStateHolder()
+    val scope = rememberCoroutineScope()
 
     fun push(route: Route) {
         stack = stack + route
@@ -88,8 +113,36 @@ private fun App() {
 
     BackHandler(enabled = stack.size > 1) { pop() }
 
+    // Deep links and Home Assistant commands that change the screen.
+    fun open(command: RemoteControl.Command) {
+        when (command) {
+            is RemoteControl.Command.OpenLive -> {
+                val known = vm.followed.value.items().firstOrNull { it.login == command.login }
+                stack = listOf(Route.Home, Route.Player(listOf(known ?: StreamInfo(null, command.login, command.login)), 0))
+            }
+            is RemoteControl.Command.OpenChannel -> stack = listOf(Route.Home, Route.Channel(command.login))
+            is RemoteControl.Command.OpenVod -> scope.launch {
+                val video = withContext(Dispatchers.IO) { runCatching { vm.app.helix.video(command.id) }.getOrNull() }
+                if (video != null) stack = listOf(Route.Home, Route.Vod(video))
+            }
+            RemoteControl.Command.Home -> stack = listOf(Route.Home)
+            else -> Unit
+        }
+    }
+    LaunchedEffect(Unit) {
+        RemoteControl.pendingLink.collect { link ->
+            if (link != null) {
+                RemoteControl.pendingLink.value = null
+                open(link)
+            }
+        }
+    }
+    LaunchedEffect(Unit) { RemoteControl.commands.collect { open(it) } }
+
     Box(Modifier.fillMaxSize().background(Colors.Background)) {
-        when (val route = stack.last()) {
+        val route = stack.last()
+        // A new route instance (e.g. another channel opened from Home Assistant) gets fresh state.
+        key(route) { when (route) {
             Route.Home -> saveable.SaveableStateProvider("home") { HomeScreen(vm, actions) }
             is Route.GameStreams -> saveable.SaveableStateProvider("game-${route.game.id}") {
                 GameStreamsScreen(vm, route.game, actions)
@@ -126,7 +179,7 @@ private fun App() {
                 },
                 onChannel = { login -> openChannel(login) },
             )
-        }
+        } }
         UpdateOverlay()
     }
 }

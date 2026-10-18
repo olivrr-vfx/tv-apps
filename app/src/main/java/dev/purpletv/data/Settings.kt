@@ -100,6 +100,18 @@ class Settings(context: Context) {
         get() = runCatching { DefaultQuality.valueOf(string("quality")!!) }.getOrDefault(DefaultQuality.AUTO)
         set(value) = put("quality", value.name)
 
+    /** Local control API for Home Assistant. */
+    var remoteEnabled: Boolean
+        get() = prefs.getBoolean("remote_enabled", true)
+        set(value) = putBool("remote_enabled", value)
+
+    /** Pairing code Home Assistant has to send with every request. */
+    val remoteCode: String
+        get() = string("remote_code") ?: newRemoteCode()
+
+    fun newRemoteCode(): String =
+        (100000 + java.security.SecureRandom().nextInt(900000)).toString().also { put("remote_code", it) }
+
     val deviceId: String
         get() = string("device_id") ?: UUID.randomUUID().toString().replace("-", "").also { put("device_id", it) }
 

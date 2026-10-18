@@ -51,6 +51,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import dev.purpletv.PurpleApp
 import dev.purpletv.player.PlaybackState
+import dev.purpletv.remote.RemoteControl
 import dev.purpletv.player.PlayerMode
 import dev.purpletv.player.StreamPlayer
 import dev.purpletv.twitch.VideoInfo
@@ -166,6 +167,34 @@ fun VodPlayerScreen(app: PurpleApp, video: VideoInfo, onExit: () -> Unit, onChan
         showStats = !showStats
         app.settings.showStats = showStats
     }
+
+    // Home Assistant: commands in, current state out.
+    LaunchedEffect(Unit) {
+        RemoteControl.commands.collect { c ->
+            when (c) {
+                RemoteControl.Command.Play -> if (paused) togglePause()
+                RemoteControl.Command.Pause -> if (!paused) togglePause()
+                RemoteControl.Command.Toggle -> togglePause()
+                is RemoteControl.Command.Mute -> player.setMuted(c.mute)
+                is RemoteControl.Command.Volume -> player.setVolume(c.level)
+                RemoteControl.Command.Next -> player.seekTo(player.positionMs + 30_000)
+                RemoteControl.Command.Previous -> player.seekTo(player.positionMs - 30_000)
+                else -> Unit
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
+        while (true) {
+            RemoteControl.live = null
+            RemoteControl.vod = video
+            RemoteControl.vodPositionMs = player.positionMs
+            RemoteControl.paused = paused
+            RemoteControl.muted = player.muted
+            RemoteControl.volume = player.volume
+            delay(1_000)
+        }
+    }
+    DisposableEffect(Unit) { onDispose { RemoteControl.clearPlayer() } }
 
     Box(
         Modifier

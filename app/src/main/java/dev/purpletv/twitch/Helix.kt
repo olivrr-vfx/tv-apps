@@ -148,6 +148,22 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth) {
             )
         }
 
+    fun video(id: String): VideoInfo? =
+        get("videos?id=${enc(id)}").getJSONArray("data").mapObjects {
+            VideoInfo(
+                id = it.getString("id"),
+                userId = it.optString("user_id"),
+                login = it.optString("user_login"),
+                userName = it.optString("user_name"),
+                title = it.optString("title"),
+                duration = it.optString("duration"),
+                createdAt = it.optString("created_at"),
+                thumbnailUrl = it.optString("thumbnail_url"),
+                viewCount = it.optInt("view_count"),
+                type = it.optString("type"),
+            )
+        }.firstOrNull()
+
     fun loadSelf() {
         val user = users("").firstOrNull() ?: return
         settings.userName = user.displayName

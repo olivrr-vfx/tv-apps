@@ -35,6 +35,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.purpletv.BuildConfig
+import dev.purpletv.remote.RemoteServer
 
 @Composable
 fun SettingsScreen(vm: HomeViewModel, onLogin: () -> Unit) {
@@ -97,6 +98,24 @@ fun SettingsScreen(vm: HomeViewModel, onLogin: () -> Unit) {
                 changed()
             }
             SettingRow("7TV- & BTTV-Emotes", onOff(s.thirdPartyEmotes)) { s.thirdPartyEmotes = !s.thirdPartyEmotes; changed() }
+
+            Section("Home Assistant")
+            SettingRow("Steuerung im Heimnetz", onOff(s.remoteEnabled)) {
+                s.remoteEnabled = !s.remoteEnabled
+                if (s.remoteEnabled) vm.app.startRemote() else vm.app.stopRemote()
+                changed()
+            }
+            if (s.remoteEnabled) {
+                val ip = remember { RemoteServer.localAddresses().firstOrNull() ?: "?" }
+                SettingRow("Adresse", "$ip:${RemoteServer.PORT}") {}
+                SettingRow("Code", s.remoteCode, action = "Neu erzeugen") { s.newRemoteCode(); changed() }
+                Text(
+                    "Home Assistant findet den TV automatisch (Integration „PurpleTV“). Den Code gibst du beim Einrichten ein.",
+                    color = Colors.TextDim,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 4.dp),
+                )
+            }
 
             Section("App")
             SettingRow("Automatische Updates", onOff(s.autoUpdate)) { s.autoUpdate = !s.autoUpdate; changed() }

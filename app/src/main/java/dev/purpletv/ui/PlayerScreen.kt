@@ -61,6 +61,7 @@ import dev.purpletv.PurpleApp
 import dev.purpletv.chat.ChatClient
 import dev.purpletv.data.ChatMode
 import dev.purpletv.player.PlaybackState
+import dev.purpletv.remote.RemoteControl
 import dev.purpletv.player.StreamPlayer
 import dev.purpletv.twitch.StreamInfo
 import dev.purpletv.twitch.formatUptime
@@ -139,7 +140,11 @@ fun PlayerScreen(
         paused = false
         zapBanner = System.currentTimeMillis()
         player.play(current.login)
-        val id = current.userId ?: withContext(Dispatchers.IO) { runCatching { app.gql.user(current.login)?.first }.getOrNull() }
+        // Opened by name (deep link / Home Assistant): fetch title, game and avatar right away.
+        if (current.title.isBlank() && app.auth.isLoggedIn) {
+            withContext(Dispatchers.IO) { runCatching { app.helix.stream(current.login) }.getOrNull() }?.let { info = it }
+        }
+        val id = (info?.userId ?: current.userId) ?: withContext(Dispatchers.IO) { runCatching { app.gql.user(current.login)?.first }.getOrNull() }
         chat.connect(current.login, id)
     }
 
@@ -198,6 +203,33 @@ fun PlayerScreen(
         controls = false
         panel = Panel.MAIN
     }
+
+    // Home Assistant: commands in, current state out.
+    LaunchedEffect(Unit) {
+        RemoteControl.commands.collect { c ->
+            when (c) {
+                RemoteControl.Command.Play -> if (paused) togglePause()
+                RemoteControl.Command.Pause -> if (!paused) togglePause()
+                RemoteControl.Command.Toggle -> togglePause()
+                is RemoteControl.Command.Mute -> player.setMuted(c.mute)
+                is RemoteControl.Command.Volume -> player.setVolume(c.level)
+                RemoteControl.Command.Next -> zap(1)
+                RemoteControl.Command.Previous -> zap(-1)
+                else -> Unit
+            }
+        }
+    }
+    LaunchedEffect(Unit) {
+        while (true) {
+            RemoteControl.live = info
+            RemoteControl.vod = null
+            RemoteControl.paused = paused
+            RemoteControl.muted = player.muted
+            RemoteControl.volume = player.volume
+            delay(1_000)
+        }
+    }
+    DisposableEffect(Unit) { onDispose { RemoteControl.clearPlayer() } }
 
     Box(
         Modifier
