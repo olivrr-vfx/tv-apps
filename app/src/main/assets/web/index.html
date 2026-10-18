@@ -82,7 +82,7 @@
           </div>
         </section>
         <div class="shelf" data-app="twitch"><h3><span id="start-live-title">Live auf Twitch</span> <span class="count" id="start-live-count"></span></h3><div class="cards" id="start-live"></div></div>
-        <div class="shelf" data-app="youtube"><h3>Neu auf YouTube</h3><div class="cards" id="start-yt"></div></div>
+        <div class="shelf" data-app="youtube"><h3 id="start-yt-title">Neu auf YouTube</h3><div class="cards" id="start-yt"></div></div>
         <div class="shelf"><h3>Weiter schauen</h3><div class="cards" id="start-history"></div></div>
       </section>
 
@@ -197,6 +197,12 @@
             <h3>Couch auf weiteren Geräten</h3>
             <p class="muted">Diesen Link öffnen und auf dem iPhone „Zum Home-Bildschirm“ wählen. Er enthält deinen Code – nur im Haushalt teilen.</p>
             <div class="copy-row"><code id="pair-url"></code><button class="btn small" data-copy="pair-url">Kopieren</button></div>
+          </article>
+
+          <article class="tile">
+            <h3>Etwas klappt nicht?</h3>
+            <p class="muted">Das Fehlerprotokoll des TV zeigt, was zuletzt schiefging – zum Beispiel, ob Twitch oder YouTube nicht erreichbar waren.</p>
+            <a class="btn small" id="log-link" target="_blank" rel="noopener">Fehlerprotokoll öffnen</a>
           </article>
         </div>
       </section>

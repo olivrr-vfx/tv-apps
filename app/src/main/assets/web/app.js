@@ -428,7 +428,11 @@
     $("#start-live-title").textContent = showTop ? "Beliebt auf Twitch" : "Live auf Twitch";
     renderCards("#start-live", showTop ? top.slice(0, 20) : live, "Keiner deiner Kanäle ist live.");
     renderCards("#tw-live", live, "Keiner deiner Kanäle ist gerade live.");
-    renderCards("#start-yt", (s.youtube_feed || []).slice(0, 20).map(ytItem), "Noch keine YouTube-Abos. Unter YouTube → Kanäle verwalten hinzufügen.");
+    // No subscriptions yet: trending videos instead of an empty row.
+    var feed = (s.youtube_feed || []).slice(0, 20).map(ytItem);
+    var trends = !feed.length && (ytTrends || []).length > 0;
+    $("#start-yt-title").textContent = trends ? "Trends auf YouTube" : "Neu auf YouTube";
+    renderCards("#start-yt", trends ? ytTrends.slice(0, 20) : feed, "Noch keine YouTube-Abos. Unter YouTube → Kanäle verwalten hinzufügen.");
   }
 
   $("#hero-watch").addEventListener("click", function () { var i = mediaItem(state && state.media); if (i) watchHere(i); });
@@ -531,7 +535,7 @@
   });
 
   function loadView(view) {
-    if (view === "start") { loadHistory(); loadTwitchTop(); }
+    if (view === "start") { loadHistory(); loadTwitchTop(); loadYtTrendsForStart(); }
     if (view === "twitch") loadTwitchTop();
     if (view === "youtube") ytView(currentYt);
   }
@@ -567,8 +571,20 @@
 
   // --- YouTube ---------------------------------------------------------------------------
 
-  var currentYt = "feed";
+  var currentYt = null;
+  var ytTrends = [];
+  function loadYtTrendsForStart() {
+    api("GET", "youtube/shelves").then(function (r) {
+      var shelves = (r.shelves || []).filter(function (sh) { return sh.videos && sh.videos.length; });
+      // Prefer a real trend list over random live streams.
+      shelves.sort(function (a, b) { return (a.id === "live") - (b.id === "live"); });
+      ytTrends = shelves.length ? shelves[0].videos.map(ytItem) : [];
+      if (state) render(state);
+    }).catch(function () {});
+  }
   function ytView(view) {
+    // Without subscriptions the feed is empty: open the trends first.
+    if (!view) view = state && (state.youtube_feed || []).length ? "feed" : "trends";
     currentYt = view;
     $$("[data-yt]").forEach(function (c) { c.classList.toggle("active", c.getAttribute("data-yt") === view); });
     $$("[data-yt-view]").forEach(function (v) { v.hidden = v.getAttribute("data-yt-view") !== view; });
@@ -678,6 +694,7 @@
     $("#bookmarklet").addEventListener("click", function (e) { e.preventDefault(); toast("In die Lesezeichenleiste ziehen"); });
     $("#shortcut-url").textContent = origin + "/api/open?token=" + code + "&url=";
     $("#pair-url").textContent = origin + "/?code=" + code;
+    $("#log-link").href = "/api/log?token=" + encodeURIComponent(code);
     $("#secure-link").href = DEMO ? "#" : secureUrl();
     var canScreen = !!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) || !window.isSecureContext && !/iPhone|iPad|Android/.test(navigator.userAgent);
     $("#screen-start").hidden = !canScreen;
