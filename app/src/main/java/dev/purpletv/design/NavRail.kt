@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
+
 package dev.purpletv.design
 
 import androidx.compose.foundation.focusGroup
