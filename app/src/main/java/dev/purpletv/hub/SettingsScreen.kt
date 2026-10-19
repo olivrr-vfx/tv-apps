@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -134,6 +135,7 @@ private fun TwitchSettings(app: PurpleApp, nav: Navigator) {
     @Suppress("UNUSED_VARIABLE") val observed = version
     val name by app.twitch.loggedInName.collectAsState()
     var clientId by remember { mutableStateOf(s.clientId) }
+    var clientSecret by remember { mutableStateOf(s.clientSecret) }
 
     SettingsSection("Konto")
     if (name != null) {
@@ -142,10 +144,18 @@ private fun TwitchSettings(app: PurpleApp, nav: Navigator) {
         SettingRow("Twitch-Konto", value = "Anmelden", description = "Nötig für gefolgte Kanäle", onClick = { nav.push(Route.TwitchLogin) })
     }
     s.lastAuthError?.let { Text("Letztes Login-Problem: $it", color = Palette.textFaint, style = Type.bodySmall) }
+
+    SettingsSection("Eigene Twitch-App (optional)", description = "Normalerweise nicht nötig: die Anmeldung läuft über twitch.tv/activate. Nur für eine eigene App von dev.twitch.tv; danach neu anmelden.")
     Row(verticalAlignment = Alignment.CenterVertically) {
-        TvTextField(clientId, { clientId = it }, label = "Twitch Client-ID (dev.twitch.tv)", onSubmit = { s.clientId = clientId; changed() }, modifier = Modifier.weight(1f))
+        TvTextField(clientId, { clientId = it }, label = "Client-ID (leer = ohne eigene App)", onSubmit = { s.clientId = clientId; changed() }, modifier = Modifier.weight(1f))
         Spacer(Modifier.width(Tokens.Space.lg))
         TvButton("Speichern", onClick = { s.clientId = clientId; changed() })
+    }
+    Spacer(Modifier.height(Tokens.Space.sm))
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        TvTextField(clientSecret, { clientSecret = it }, label = "Client-Secret (nur bei „Vertraulich“)", onSubmit = { s.clientSecret = clientSecret; changed() }, modifier = Modifier.weight(1f))
+        Spacer(Modifier.width(Tokens.Space.lg))
+        TvButton("Speichern", onClick = { s.clientSecret = clientSecret; changed() })
     }
 
     SettingsSection("Wiedergabe")

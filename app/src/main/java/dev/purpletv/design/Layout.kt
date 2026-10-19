@@ -1,6 +1,8 @@
 package dev.purpletv.design
 
 import androidx.compose.foundation.background
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
@@ -214,9 +216,15 @@ fun <T> TopTabs(
         delay(280)
         onSelect(target)
     }
+    val selectedFocus = remember { FocusRequester() }
     // Scrolls instead of squeezing the last tabs when the header is narrow (960 dp on a 1080p TV).
+    // Coming up from the page always lands on the active tab; landing on the tab that happens
+    // to be above would switch the page.
     Row(
-        modifier.horizontalScroll(rememberScrollState()),
+        modifier
+            .focusProperties { enter = { selectedFocus } }
+            .focusGroup()
+            .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(Tokens.Space.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -228,7 +236,8 @@ fun <T> TopTabs(
                 icon = icon?.invoke(tab),
                 onFocus = { if (tab != selected) pending = tab },
                 // Opening an app (e.g. from its home screen tile) puts the focus on its tabs.
-                modifier = Modifier.initialFocus(enabled = tab == selected, key = Unit),
+                modifier = Modifier.initialFocus(enabled = tab == selected, key = Unit)
+                    .then(if (tab == selected) Modifier.focusRequester(selectedFocus) else Modifier),
             )
         }
     }

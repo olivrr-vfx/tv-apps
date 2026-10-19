@@ -31,6 +31,7 @@ jobs:
       - name: Build release APK
         env:
           TWITCH_CLIENT_ID: ${{ vars.TWITCH_CLIENT_ID }}
+          COUCH_NO_UPDATES: "1"
         run: |
           chmod +x gradlew
           ./gradlew --no-daemon assembleRelease

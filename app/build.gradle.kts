@@ -16,6 +16,8 @@ android {
         targetSdk = 35
         versionCode = runNumber
         versionName = "2.0.$runNumber"
+        // Test builds on the emulator must not replace themselves with the latest release.
+        buildConfigField("boolean", "UPDATES", (System.getenv("COUCH_NO_UPDATES") == null).toString())
         buildConfigField("String", "TWITCH_CLIENT_ID", "\"${System.getenv("TWITCH_CLIENT_ID").orEmpty()}\"")
     }
 

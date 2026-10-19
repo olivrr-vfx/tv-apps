@@ -21,10 +21,32 @@ for it in items:
 PY
 }
 
+focused() {
+  # Which element has the focus after a key press (for navigation bugs).
+  adb shell uiautomator dump /sdcard/ui.xml > /dev/null 2>&1
+  adb exec-out cat /sdcard/ui.xml > /tmp/ui.xml 2>/dev/null
+  python3 - "$1" >> $OUT/navigation.txt <<'PY'
+import re, sys
+xml = open("/tmp/ui.xml", encoding="utf-8", errors="ignore").read()
+nodes = re.findall(r'<node [^>]*focused="true"[^>]*>', xml)
+def attr(n, a):
+    m = re.search(a + r'="([^"]*)"', n); return m.group(1) if m else ""
+desc = "; ".join(f"{attr(n,'text') or attr(n,'content-desc') or attr(n,'class')} {attr(n,'bounds')}" for n in nodes) or "(nichts fokussiert)"
+print(f"{sys.argv[1]}: {desc}")
+PY
+}
+nav() { local label=$1; shift; for k in "$@"; do adb shell input keyevent "$k"; sleep 1.2; focused "$label $k"; done; }
+
 adb install -r Couch.apk > $OUT/install.txt 2>&1
 adb logcat -c
 adb shell am start -W -n $PKG/.hub.MainActivity
 shot 01-dashboard 30
+
+# Navigation: Up/Down must stay in the page, Left opens the rail, Right returns.
+focused "dashboard start"
+nav dashboard KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP
+nav dashboard KEYCODE_DPAD_LEFT KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_RIGHT
+shot 01b-dashboard-after-nav 1
 
 # Local API (pairing code comes from the app manifest the phone uses).
 adb forward tcp:8765 tcp:8765
@@ -40,6 +62,11 @@ for p in state twitch/live twitch/top "twitch/search?q=papaplatte" youtube/feed 
 
 open couch://app/twitch
 shot 02-twitch-start 20
+focused "twitch start"
+nav twitch KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_RIGHT KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP
+shot 02b-twitch-after-nav 1
+open couch://app/twitch
+sleep 3
 key KEYCODE_DPAD_RIGHT
 shot 03-twitch-live 6
 key KEYCODE_DPAD_RIGHT
@@ -63,6 +90,9 @@ fi
 
 open couch://app/youtube
 shot 10-youtube 25
+focused "youtube start"
+nav youtube KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP KEYCODE_DPAD_UP
+shot 10b-youtube-after-nav 1
 key KEYCODE_DPAD_DOWN KEYCODE_DPAD_DOWN
 shot 11-youtube-scrolled 4
 
