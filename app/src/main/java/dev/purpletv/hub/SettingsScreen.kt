@@ -94,7 +94,7 @@ fun SettingsScreen(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
                 when (category) {
                     Category.GENERAL -> GeneralSettings(app)
                     Category.TWITCH -> AccentScope(Accent.Twitch) { TwitchSettings(app, nav) }
-                    Category.YOUTUBE -> AccentScope(Accent.YouTube) { YouTubeSettings(app) }
+                    Category.YOUTUBE -> AccentScope(Accent.YouTube) { YouTubeSettings(app, nav) }
                     Category.REMOTE -> RemoteSettings(app, onPhoneRemote)
                     Category.ABOUT -> AboutSettings(app)
                 }
@@ -179,11 +179,26 @@ private fun TwitchSettings(app: PurpleApp, nav: Navigator) {
 }
 
 @Composable
-private fun YouTubeSettings(app: PurpleApp) {
+private fun YouTubeSettings(app: PurpleApp, nav: Navigator) {
     val s = app.settings
     val (version, changed) = rememberRefresh()
     @Suppress("UNUSED_VARIABLE") val observed = version
     val subs by app.youtube.subscriptions.collectAsState()
+    val google by app.youtube.accountName.collectAsState()
+    var syncing by remember { mutableStateOf<String?>(null) }
+
+    SettingsSection("Google-Konto", description = "Übernimmt deine YouTube-Abos. Videos laufen weiter ohne Konto.")
+    if (app.youtube.account.isLoggedIn) {
+        SettingRow("Angemeldet" + (google?.let { " als $it" } ?: ""), value = "Abmelden", onClick = { app.youtube.logoutAccount(); changed() })
+        SettingRow("Abos jetzt abgleichen", value = syncing ?: "", onClick = {
+            syncing = "läuft…"
+            app.youtube.syncAccount { r -> syncing = r.fold({ "$it neu" }, { "Fehler" }) }
+        })
+    } else {
+        SettingRow("Mit Google anmelden", value = "Anmelden",
+            description = if (app.youtube.account.isConfigured) "Code am Handy bestätigen" else "Einmalige Einrichtung nötig",
+            onClick = { nav.push(Route.YouTubeLogin) })
+    }
 
     SettingsSection("Wiedergabe")
     SettingRow("Maximale Qualität", value = s.youtubeQuality.label, onClick = {

@@ -18,6 +18,9 @@ android {
         versionName = "2.0.$runNumber"
         // Test builds on the emulator must not replace themselves with the latest release.
         buildConfigField("boolean", "UPDATES", (System.getenv("COUCH_NO_UPDATES") == null).toString())
+        // Optional Google client ("TVs and Limited Input devices") for the YouTube login.
+        buildConfigField("String", "YOUTUBE_CLIENT_ID", "\"${System.getenv("YOUTUBE_CLIENT_ID").orEmpty()}\"")
+        buildConfigField("String", "YOUTUBE_CLIENT_SECRET", "\"${System.getenv("YOUTUBE_CLIENT_SECRET").orEmpty()}\"")
         buildConfigField("String", "TWITCH_CLIENT_ID", "\"${System.getenv("TWITCH_CLIENT_ID").orEmpty()}\"")
     }
 

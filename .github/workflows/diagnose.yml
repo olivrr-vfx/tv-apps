@@ -31,10 +31,16 @@ jobs:
       - name: Build release APK
         env:
           TWITCH_CLIENT_ID: ${{ vars.TWITCH_CLIENT_ID }}
+          YOUTUBE_CLIENT_ID: ${{ vars.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           COUCH_NO_UPDATES: "1"
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon assembleRelease
+          set -o pipefail
+          ./gradlew --no-daemon assembleRelease 2>&1 | tee build.log || {
+            grep -E "^e: |error:|FAILED" build.log | head -30 | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          }
           cp app/build/outputs/apk/release/app-release.apk Couch.apk
 
       - name: Enable KVM

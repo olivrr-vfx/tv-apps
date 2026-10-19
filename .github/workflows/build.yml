@@ -47,12 +47,19 @@ jobs:
       - name: Test and build
         env:
           TWITCH_CLIENT_ID: ${{ vars.TWITCH_CLIENT_ID }}
+          YOUTUBE_CLIENT_ID: ${{ vars.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon testReleaseUnitTest assembleRelease
+          # Compiler errors as annotations, so they can be read without the log.
+          set -o pipefail
+          ./gradlew --no-daemon testReleaseUnitTest assembleRelease 2>&1 | tee build.log || {
+            grep -E "^e: |error:|FAILED" build.log | head -30 | while IFS= read -r line; do echo "::error::$line"; done
+            exit 1
+          }
           cp app/build/outputs/apk/release/app-release.apk Couch.apk
           # Old download links and installed versions before the rename look for PurpleTV.apk.
           cp Couch.apk PurpleTV.apk

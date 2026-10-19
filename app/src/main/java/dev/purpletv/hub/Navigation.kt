@@ -29,6 +29,7 @@ sealed interface Route {
     data class TwitchVod(val video: VideoInfo) : Route
 
     // YouTube
+    data object YouTubeLogin : Route
     data class YouTubeChannel(val url: String, val name: String = "") : Route
     data class YouTubeWatch(val video: YtVideo, val queue: List<YtVideo> = emptyList()) : Route
 

@@ -39,6 +39,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import dev.purpletv.BuildConfig
+import dev.purpletv.youtube.ui.YouTubeLoginScreen
 import dev.purpletv.PurpleApp
 import dev.purpletv.core.AppId
 import dev.purpletv.core.items
@@ -190,7 +191,7 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
                 Route.Settings -> "settings"
                 is Route.App -> route.app.key
                 Route.TwitchLogin, is Route.TwitchGame, is Route.TwitchChannel, is Route.TwitchLive, is Route.TwitchVod -> "twitch"
-                is Route.YouTubeChannel, is Route.YouTubeWatch -> "youtube"
+                Route.YouTubeLogin, is Route.YouTubeChannel, is Route.YouTubeWatch -> "youtube"
                 is Route.ScreenShare -> "screen"
                 is Route.Media -> "media"
             }
@@ -229,6 +230,7 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
             is RemoteControl.Command.CloseScreenShare -> if ((nav.current as? Route.ScreenShare)?.id == command.id) nav.pop()
             // An open viewer picks up new photos itself.
             is RemoteControl.Command.ShowMedia -> if (nav.current !is Route.Media) nav.open(Route.Media(command.id))
+            RemoteControl.Command.OpenYouTubeLogin -> if (nav.current != Route.YouTubeLogin) nav.open(Route.YouTubeLogin)
             else -> Unit
         }
     }
@@ -306,6 +308,9 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
                         },
                         onChannel = { login -> nav.openTwitchChannel(login) },
                     )
+                }
+                Route.YouTubeLogin -> AccentScope(Accent.YouTube) {
+                    YouTubeLoginScreen(app, onDone = { nav.pop() })
                 }
                 is Route.YouTubeChannel -> AccentScope(Accent.YouTube) {
                     saveable.SaveableStateProvider("yt-channel-${route.url}") { YtChannelScreen(viewModel(), route.url, nav) }
