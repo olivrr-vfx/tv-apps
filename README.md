@@ -44,27 +44,50 @@ bekommt Couch als normales Update – Login, Einstellungen und Home-Assistant-Co
   Live-Kanal (OK = bleiben).
 - **Tasten im Player**: ▲▼ Kanal wechseln · ▶ Chat · ◀ Statistiken · OK Steuerung · Menü Einstellungen.
 
+**Anmelden** (für deine gefolgten Kanäle): in PurpleTV auf *Mit Twitch anmelden*, QR-Code scannen
+oder twitch.tv/activate öffnen und den Code bestätigen. Nichts einzurichten. Alles andere (beliebte
+Streams, Kategorien, Suche, Kanäle, VODs) geht auch ohne Login.
+
 <details>
-<summary><b>Twitch-Login einrichten</b> (einmalig, ca. 2 Minuten)</summary>
+<summary>Eigene Twitch-App verwenden (optional)</summary>
 
-Für Login und gefolgte Kanäle braucht Couch eine eigene, kostenlose Twitch Client-ID:
-
-1. Auf https://dev.twitch.tv/console → **Register Your Application**.
-2. Name beliebig, OAuth Redirect URL `http://localhost`, Category *Application Integration*, **Client Type: Public**.
-3. Die **Client-ID** entweder im Repo als Actions-Variable `TWITCH_CLIENT_ID` anlegen und neu bauen,
-   oder in Couch unter *Einstellungen → PurpleTV (Twitch) → Twitch Client-ID* eintragen.
-4. In PurpleTV auf **Anmelden**, QR-Code scannen, Code bestätigen.
-
-Ohne Login lassen sich Kanäle über die Suche per Namen öffnen.
+Unter *Einstellungen → PurpleTV (Twitch) → Eigene Twitch-App* lässt sich die Client-ID einer App von
+https://dev.twitch.tv/console eintragen. Ist die App als **Vertraulich (Confidential)** angelegt, braucht
+Couch zusätzlich das Client-Secret – sonst läuft die Anmeldung nach ein paar Stunden ab. Danach neu anmelden.
 </details>
 
 ## YouTube
 
 Läuft ohne Google-Konto über [NewPipeExtractor](https://github.com/TeamNewPipe/NewPipeExtractor).
-Abos speichert Couch auf dem TV, der Feed kommt aus den öffentlichen Kanal-Feeds. Abos fügst du auf der
-Kanalseite hinzu – oder schneller am Handy/Mac unter *YouTube → Kanäle verwalten* (Links oder `@Namen`, eine Zeile pro Kanal).
+Blockiert YouTube das einmal (z. B. „Bestätige, dass du kein Bot bist“), spielt Couch das Video
+automatisch über den offiziellen YouTube-Player ab.
 
-YouTube ändert seine Schnittstellen öfter. Lädt ein Video nicht, hilft meist das nächste Couch-Update.
+**Abos** speichert Couch auf dem TV, der Feed kommt aus den öffentlichen Kanal-Feeds. Drei Wege:
+
+- **Abos aus Google übernehmen, ohne Einrichtung:** auf [takeout.google.com](https://takeout.google.com)
+  nur *YouTube und YouTube Music → Abos* exportieren und `Abos.csv` in Couch auf Handy/Mac unter
+  *YouTube → Kanäle verwalten* hochladen.
+- **Mit Google anmelden** (gleicht die Abos automatisch ab) – braucht einmalig eine eigene Google-Client-ID,
+  siehe unten.
+- Einzelne Kanäle auf der Kanalseite oder am Handy/Mac per Link oder `@Name` abonnieren.
+
+<details>
+<summary><b>Google-Login einrichten</b> (einmalig, ca. 5 Minuten)</summary>
+
+Google erlaubt die Anmeldung auf Fernsehern nur mit einer eigenen Client-ID:
+
+1. https://console.cloud.google.com → neues Projekt anlegen.
+2. *APIs & Dienste → Bibliothek* → **YouTube Data API v3** aktivieren.
+3. *OAuth-Zustimmungsbildschirm*: Typ *Extern*, App-Name z. B. „Couch“, deine E-Mail eintragen.
+   Danach **App veröffentlichen** (im Testmodus läuft die Anmeldung nach 7 Tagen ab; die Warnung
+   „Google hat diese App nicht überprüft“ beim Anmelden einfach mit *Weiter* bestätigen).
+4. *Anmeldedaten → Anmeldedaten erstellen → OAuth-Client-ID*, Typ **Fernseher und Geräte mit begrenzter Eingabe**.
+5. Client-ID und Client-Secret in Couch auf Handy/Mac unter *YouTube → Kanäle verwalten* eintragen
+   und *Speichern und auf dem TV anmelden* drücken – oder im Repo als Variable `YOUTUBE_CLIENT_ID`
+   und Secret `YOUTUBE_CLIENT_SECRET` hinterlegen, dann ist es in jedem Update eingebaut.
+6. Auf dem TV den Code unter google.com/device bestätigen. Couch übernimmt deine Abos und gleicht sie
+   alle 6 Stunden ab.
+</details>
 
 ## Couch auf Handy & Mac
 
