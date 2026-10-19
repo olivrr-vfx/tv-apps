@@ -34,7 +34,7 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth, privat
         return try {
             Http.getJson(
                 "https://api.twitch.tv/helix/$path",
-                mapOf("Client-Id" to settings.clientId, "Authorization" to "Bearer $token")
+                mapOf("Client-Id" to auth.apiClientId, "Authorization" to "Bearer $token")
             )
         } catch (e: HttpStatusException) {
             if (e.code != 401) throw e
@@ -86,7 +86,26 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth, privat
         )
     }
 
+    /** Token of a login through Twitch's TV client, for GQL; null for Helix logins. */
+    private fun tvAuth(): Pair<String, String>? {
+        if (!auth.usesTvClient) return null
+        return auth.apiClientId to (settings.accessToken ?: throw NotLoggedInException())
+    }
+
+    /** GQL with the user's token. A rejected token is checked once and ends the login if dead. */
+    private fun <T> withTvToken(block: (Pair<String, String>) -> T): T {
+        val a = tvAuth() ?: throw NotLoggedInException()
+        return try {
+            block(a)
+        } catch (e: HttpStatusException) {
+            if (e.code != 401) throw e
+            if (!auth.validate() || !auth.isLoggedIn) throw NotLoggedInException()
+            block(tvAuth() ?: throw NotLoggedInException())
+        }
+    }
+
     fun followedStreams(): List<StreamInfo> {
+        if (auth.usesTvClient) return withTvToken { gql.followedLive(it) }
         val userId = settings.userId ?: throw NotLoggedInException()
         val out = mutableListOf<StreamInfo>()
         var cursor: String? = null
@@ -100,6 +119,7 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth, privat
 
     /** All followed channels (live or not), most recently followed first. */
     fun followedChannels(): List<ChannelInfo> {
+        if (auth.usesTvClient) return withTvToken { gql.followedChannels(it) }
         val userId = settings.userId ?: throw NotLoggedInException()
         val ids = mutableListOf<String>()
         var cursor: String? = null
@@ -191,6 +211,13 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth, privat
         }.firstOrNull()
 
     fun loadSelf() {
+        if (auth.usesTvClient) {
+            val me = withTvToken { gql.self(it) } ?: return
+            settings.userId = me.id
+            settings.userLogin = me.login
+            settings.userName = me.displayName
+            return
+        }
         val user = users("").firstOrNull() ?: return
         settings.userName = user.displayName
         avatars[user.id] = user.avatarUrl

@@ -53,10 +53,6 @@ fun LoginScreen(app: PurpleApp, onDone: () -> Unit) {
     LaunchedEffect(attempt) {
         error = null
         code = null
-        if (!app.auth.hasClientId) {
-            error = "Keine Twitch Client-ID hinterlegt. Trag sie unter Einstellungen → Twitch ein (Anleitung in der README)."
-            return@LaunchedEffect
-        }
         val device = withContext(Dispatchers.IO) { runCatching { app.auth.startDeviceFlow() } }
             .getOrElse {
                 error = "Login konnte nicht gestartet werden: ${it.message}"

@@ -41,10 +41,23 @@ class Settings(context: Context) {
     private fun put(key: String, value: String?) = prefs.edit().putString(key, value).apply()
     private fun putBool(key: String, value: Boolean) = prefs.edit().putBoolean(key, value).apply()
 
-    /** Client-ID of the user's own app registered on dev.twitch.tv (used for login + Helix). */
+    /**
+     * Optional: Client-ID of the user's own app on dev.twitch.tv. Empty means the login uses
+     * Twitch's TV client, which needs no setup.
+     */
     var clientId: String
-        get() = string("client_id") ?: BuildConfig.TWITCH_CLIENT_ID
+        get() = string("client_id").orEmpty()
         set(value) = put("client_id", value.trim())
+
+    /** Secret of the user's own app; only needed when it is registered as "Confidential". */
+    var clientSecret: String
+        get() = string("client_secret").orEmpty()
+        set(value) = put("client_secret", value.trim())
+
+    /** The client the stored tokens belong to (tokens only work with the client that issued them). */
+    var authClientId: String?
+        get() = string("auth_client_id") ?: string("client_id") ?: BuildConfig.TWITCH_CLIENT_ID.ifBlank { null }
+        set(value) = put("auth_client_id", value)
 
     var accessToken: String?
         get() = string("access_token")
