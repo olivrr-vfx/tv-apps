@@ -1,5 +1,6 @@
 package dev.purpletv.youtube
 
+import dev.purpletv.core.AppLog
 import android.content.Context
 import dev.purpletv.core.Load
 import dev.purpletv.data.Settings
@@ -34,6 +35,7 @@ class YouTubeRepository(context: Context, private val settings: Settings) {
     companion object {
         const val FEED_INTERVAL_MS = 15 * 60_000L
         private const val CHANNEL_CACHE_MS = 10 * 60_000L
+        private val RETRY_DELAYS_MS = longArrayOf(2_000, 5_000, 10_000, 20_000, 40_000)
     }
 
     private val prefs = context.getSharedPreferences("youtube", Context.MODE_PRIVATE)
@@ -136,7 +138,10 @@ class YouTubeRepository(context: Context, private val settings: Settings) {
                     subs.map { ch ->
                         async {
                             channelCache[ch.id]?.takeIf { now - it.first < CHANNEL_CACHE_MS }?.second
-                                ?: limit.withPermit { runCatching { YouTubeClient.latestUploads(ch) }.getOrNull() }
+                                ?: limit.withPermit {
+                                    runCatching { YouTubeClient.latestUploads(ch) }
+                                        .onFailure { AppLog.e("YouTube", "Feed ${ch.name}", it) }.getOrNull()
+                                }
                                     ?.also { channelCache[ch.id] = now to it }
                         }
                     }.awaitAll()
@@ -150,23 +155,45 @@ class YouTubeRepository(context: Context, private val settings: Settings) {
                 .take(120)
             if (failedAll && silent && _feed.value is Load.Ok) return@launch
             _feed.value = if (failedAll) Load.Error("YouTube ist gerade nicht erreichbar.") else Load.Ok(videos)
+            if (failedAll && !silent) {
+                delay(RETRY_DELAYS_MS[1])
+                if (_feed.value is Load.Error) refreshFeed(silent = true)
+            }
             if (!failedAll) RemoteControl.youtubeFeed = videos
         }
     }
 
     fun refreshShelves() {
-        shelves.forEach { (id, flow) ->
-            if (flow.value !is Load.Ok) flow.value = Load.Loading
-            scope.launch {
-                val r = withContext(Dispatchers.IO) {
-                    runCatching {
-                        YouTubeClient.init(settings.youtubeRegion)
-                        YouTubeClient.shelf(id).filter { !(settings.youtubeHideShorts && it.isShort) }
-                    }
+        shelves.keys.forEach { refreshShelf(it) }
+    }
+
+    private fun refreshShelf(id: String, attempt: Int = 0) {
+        val flow = shelves[id] ?: return
+        if (flow.value !is Load.Ok) flow.value = Load.Loading
+        scope.launch {
+            val r = withContext(Dispatchers.IO) {
+                runCatching {
+                    YouTubeClient.init(settings.youtubeRegion)
+                    YouTubeClient.shelf(id).filter { !(settings.youtubeHideShorts && it.isShort) }
                 }
-                flow.value = r.fold({ Load.Ok(it) }, { Load.Error(it.message ?: "Fehler") })
+            }
+            flow.value = r.fold({ Load.Ok(it) }, {
+                AppLog.e("YouTube", "Regal $id", it)
+                Load.Error(it.message ?: "Fehler")
+            })
+            // E.g. the TV woke up before its Wi-Fi: try again a few times.
+            if (r.isFailure && attempt < RETRY_DELAYS_MS.size) {
+                delay(RETRY_DELAYS_MS[attempt])
+                if (flow.value is Load.Error) refreshShelf(id, attempt + 1)
             }
         }
+    }
+
+    /** The network came back: load again whatever failed. */
+    fun retryFailed() {
+        if (!started) return
+        shelves.forEach { (id, flow) -> if (flow.value is Load.Error) refreshShelf(id) }
+        if (_feed.value is Load.Error) refreshFeed()
     }
 }
 

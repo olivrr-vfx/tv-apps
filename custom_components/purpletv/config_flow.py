@@ -129,7 +129,7 @@ class PurpleTVConfigFlow(ConfigFlow, domain=DOMAIN):
 
     def _create(self, host: str, port: int, user_input: dict[str, Any]) -> ConfigFlowResult:
         return self.async_create_entry(
-            title=f"PurpleTV ({host})",
+            title=f"Couch ({host})",
             data={CONF_HOST: host, CONF_PORT: port, CONF_CODE: user_input[CONF_CODE].strip()},
             options={CONF_CHANNELS: parse_channels(user_input.get(CONF_CHANNELS, ""))},
         )

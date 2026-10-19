@@ -39,10 +39,16 @@ object RemoteControl {
         data class OpenYouTube(val videoId: String) : Command
         data class OpenYouTubeChannel(val url: String) : Command
         data class YouTubeSearch(val query: String) : Command
+        /** Someone wants to share their screen or camera; [id] is the signaling session. */
+        data class ShowScreenShare(val id: String) : Command
+        data class CloseScreenShare(val id: String) : Command
+        /** A photo or video was sent from a phone; [id] is the item in [dev.purpletv.remote.MediaInbox]. */
+        data class ShowMedia(val id: String) : Command
 
         val opensScreen: Boolean
             get() = this is Home || this is OpenApp || this is OpenLive || this is OpenChannel || this is OpenVod ||
-                this is OpenYouTube || this is OpenYouTubeChannel || this is YouTubeSearch
+                this is OpenYouTube || this is OpenYouTubeChannel || this is YouTubeSearch ||
+                this is ShowScreenShare || this is CloseScreenShare || this is ShowMedia
     }
 
     /** Remote keys accepted by /api/key, mapped to Android key codes in MainActivity. */
@@ -84,7 +90,7 @@ object RemoteControl {
     /** True while MainActivity is visible. */
     @Volatile var foreground = false
 
-    /** Current screen: "dashboard", "twitch", "youtube", "settings", "player". */
+    /** Current screen: "dashboard", "twitch", "youtube", "settings", "screen", "media". */
     @Volatile var screen = "dashboard"
     @Volatile var nowPlaying: NowPlaying? = null
     @Volatile var paused = false

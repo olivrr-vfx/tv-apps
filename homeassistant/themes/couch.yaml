@@ -1,7 +1,7 @@
 # Generated from design/tokens.json by design/generate.py. Do not edit.
 # Copy to <config>/themes/ and add `frontend: themes: !include_dir_merge_named themes`
-# to configuration.yaml, then pick "PurpleTV" in your profile.
-PurpleTV:
+# to configuration.yaml, then pick "Couch" in your profile.
+Couch:
   modes:
     dark:
       primary-color: "#7C6CFF"
@@ -36,6 +36,6 @@ PurpleTV:
       paper-item-icon-color: "#A9A9BC"
       code-editor-background-color: "#1A1A24"
       input-fill-color: "#242431"
-      purpletv-twitch-color: "#9147FF"
-      purpletv-youtube-color: "#FF2E4D"
-      purpletv-live-color: "#FF3040"
+      couch-twitch-color: "#9147FF"
+      couch-youtube-color: "#FF2E4D"
+      couch-live-color: "#FF3040"

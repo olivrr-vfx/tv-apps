@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -93,7 +94,7 @@ private fun ChannelContent(vm: YouTubeViewModel, page: YtChannelPage, nav: Navig
                     }
                     if (ch.description.isNotBlank()) {
                         Spacer(Modifier.height(Tokens.Space.lg))
-                        Text(ch.description, color = Palette.textDim, style = Type.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.width(900.dp))
+                        Text(ch.description, color = Palette.textDim, style = Type.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 620.dp))
                     }
                     Spacer(Modifier.height(Tokens.Space.xl))
                     SectionHeader("Videos", trailing = "${page.videos.size}")

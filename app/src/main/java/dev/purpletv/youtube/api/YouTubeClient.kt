@@ -62,6 +62,14 @@ object YouTubeClient {
     )
 
     @Volatile private var initialized = false
+
+    /**
+     * After YouTube blocked the extractor (bot check), further videos go straight to the embedded
+     * player for a while instead of waiting for the same error again.
+     */
+    @Volatile var preferEmbedUntil = 0L
+
+    fun preferEmbed() = System.currentTimeMillis() < preferEmbedUntil
     private val service get() = ServiceList.YouTube
 
     @Synchronized
@@ -282,4 +290,16 @@ object YouTubeClient {
     }
 }
 
-class YouTubeException(message: String, cause: Throwable? = null) : Exception(message, cause)
+class YouTubeException(message: String, cause: Throwable? = null) : Exception(message, cause) {
+    /**
+     * True when YouTube's own embedded player may still play the video: the extractor was blocked
+     * or broke, but the video itself is not private, paid or age restricted.
+     */
+    val embeddable: Boolean
+        get() = cause !is PrivateContentException && cause !is PaidContentException &&
+            cause !is AgeRestrictedContentException && cause !is GeographicRestrictionException
+
+    /** YouTube blocked this device for now (bot check, too many requests). */
+    val blocked: Boolean
+        get() = cause is SignInConfirmNotBotException || cause is ReCaptchaException
+}

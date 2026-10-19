@@ -1,5 +1,6 @@
 package dev.purpletv.twitch.api
 
+import dev.purpletv.core.AppLog
 import dev.purpletv.data.Http
 import dev.purpletv.data.HttpStatusException
 import dev.purpletv.data.Settings
@@ -10,8 +11,20 @@ import java.util.concurrent.ConcurrentHashMap
 
 class NotLoggedInException : Exception("Nicht angemeldet")
 
-/** Official Twitch API. All calls are blocking and need a logged in user. */
-class Helix(private val settings: Settings, private val auth: TwitchAuth) {
+/**
+ * Official Twitch API. All calls are blocking. Account data (followed channels) needs a login;
+ * public data (top streams, categories, search, channels, videos) comes from [gql] without one
+ * and only falls back to Helix when that fails.
+ */
+class Helix(private val settings: Settings, private val auth: TwitchAuth, private val gql: TwitchGql) {
+
+    private inline fun <T> public(fromGql: () -> T, fromHelix: () -> T): T = try {
+        fromGql()
+    } catch (e: Exception) {
+        AppLog.e("Twitch", "GQL fehlgeschlagen", e)
+        if (!auth.isLoggedIn) throw e
+        fromHelix()
+    }
 
     /** userId -> profile image, filled lazily so cards can show avatars. */
     private val avatars = ConcurrentHashMap<String, String>()
@@ -101,18 +114,26 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth) {
         return ids.mapNotNull { byId[it] }
     }
 
-    fun topStreams(gameId: String? = null, language: String? = null): List<StreamInfo> {
+    fun topStreams(gameId: String? = null, language: String? = null): List<StreamInfo> =
+        public({ gql.topStreams(gameId, language) }) { helixTopStreams(gameId, language) }
+
+    private fun helixTopStreams(gameId: String?, language: String?): List<StreamInfo> {
         var path = "streams?first=60"
         if (gameId != null) path += "&game_id=$gameId"
         if (language != null) path += "&language=$language"
         return withAvatars(parseStreams(get(path)))
     }
 
-    fun topGames(): List<Game> = get("games/top?first=60").getJSONArray("data").mapObjects {
+    fun topGames(): List<Game> = public({ gql.topGames() }) { helixTopGames() }
+
+    private fun helixTopGames(): List<Game> = get("games/top?first=60").getJSONArray("data").mapObjects {
         Game(it.getString("id"), it.getString("name"), it.optString("box_art_url"))
     }
 
     fun searchChannels(query: String): List<StreamInfo> =
+        public({ gql.searchChannels(query) }) { helixSearchChannels(query) }
+
+    private fun helixSearchChannels(query: String): List<StreamInfo> =
         get("search/channels?first=40&query=${enc(query)}").getJSONArray("data").mapObjects {
             StreamInfo(
                 userId = it.getString("id"),
@@ -127,12 +148,15 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth) {
         }.sortedByDescending { it.isLive }
 
     fun stream(login: String): StreamInfo? =
-        withAvatars(parseStreams(get("streams?user_login=${enc(login)}"))).firstOrNull()
+        public({ gql.stream(login) }) { withAvatars(parseStreams(get("streams?user_login=${enc(login)}"))).firstOrNull() }
 
-    fun channel(login: String): ChannelInfo? = users("login=${enc(login)}").firstOrNull()
+    fun channel(login: String): ChannelInfo? = public({ gql.channel(login) }) { users("login=${enc(login)}").firstOrNull() }
 
     /** Past broadcasts (type archive) or highlights of a channel. */
     fun videos(userId: String, type: String): List<VideoInfo> =
+        public({ gql.videos(userId, type) }) { helixVideos(userId, type) }
+
+    private fun helixVideos(userId: String, type: String): List<VideoInfo> =
         get("videos?user_id=$userId&type=$type&first=60").getJSONArray("data").mapObjects {
             VideoInfo(
                 id = it.getString("id"),
@@ -148,7 +172,9 @@ class Helix(private val settings: Settings, private val auth: TwitchAuth) {
             )
         }
 
-    fun video(id: String): VideoInfo? =
+    fun video(id: String): VideoInfo? = public({ gql.video(id) }) { helixVideo(id) }
+
+    private fun helixVideo(id: String): VideoInfo? =
         get("videos?id=${enc(id)}").getJSONArray("data").mapObjects {
             VideoInfo(
                 id = it.getString("id"),

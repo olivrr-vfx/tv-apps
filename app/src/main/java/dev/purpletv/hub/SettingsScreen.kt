@@ -56,10 +56,10 @@ import kotlinx.coroutines.launch
 
 private enum class Category(val label: String, val icon: ImageVector?, val app: AppId? = null) {
     GENERAL("Allgemein", Icons.Filled.Apps),
-    TWITCH("Twitch", null, AppId.TWITCH),
+    TWITCH("PurpleTV (Twitch)", null, AppId.TWITCH),
     YOUTUBE("YouTube", null, AppId.YOUTUBE),
     REMOTE("Fernbedienung & Home Assistant", Icons.Filled.Home),
-    ABOUT("Über PurpleTV", Icons.Filled.Info),
+    ABOUT("Über Couch", Icons.Filled.Info),
 }
 
 private val regions = listOf("DE", "AT", "CH", "US", "GB", "FR", "NL")
@@ -68,7 +68,7 @@ private val regions = listOf("DE", "AT", "CH", "US", "GB", "FR", "NL")
 fun SettingsScreen(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
     var category by rememberSaveable { mutableStateOf(Category.GENERAL) }
     Column(Modifier.fillMaxSize()) {
-        PageHeader("Einstellungen", overline = "PurpleTV")
+        PageHeader("Einstellungen", overline = "Couch")
         Row(Modifier.fillMaxSize()) {
             Column(
                 Modifier.width(300.dp).fillMaxHeight().padding(start = Tokens.Layout.safeHorizontal),
@@ -116,15 +116,15 @@ private fun GeneralSettings(app: PurpleApp) {
     val s = app.settings
     val (version, changed) = rememberRefresh()
     @Suppress("UNUSED_VARIABLE") val observed = version
-    SettingsSection("Apps", description = "Ausgeschaltete Apps verschwinden aus PurpleTV und vom TV-Startbildschirm.")
+    SettingsSection("Apps", description = "Ausgeschaltete Apps verschwinden aus Couch und vom TV-Startbildschirm.")
     AppId.entries.forEach { id ->
-        SettingRow(id.label, toggle = s.isEnabled(id), description = "Eigene Kachel auf dem TV-Startbildschirm", onClick = {
+        SettingRow(if (id.label == id.service) id.label else "${id.label} (${id.service})", toggle = s.isEnabled(id), description = "Eigene Kachel auf dem TV-Startbildschirm", onClick = {
             app.setAppEnabled(id, !s.isEnabled(id))
             changed()
         })
     }
     SettingsSection("Start")
-    SettingRow("Beim Öffnen von PurpleTV zeigen", value = s.startScreen.label, onClick = { s.startScreen = s.startScreen.next(); changed() })
+    SettingRow("Beim Öffnen von Couch zeigen", value = s.startScreen.label, onClick = { s.startScreen = s.startScreen.next(); changed() })
 }
 
 @Composable
@@ -143,7 +143,7 @@ private fun TwitchSettings(app: PurpleApp, nav: Navigator) {
     }
     s.lastAuthError?.let { Text("Letztes Login-Problem: $it", color = Palette.textFaint, style = Type.bodySmall) }
     Row(verticalAlignment = Alignment.CenterVertically) {
-        TvTextField(clientId, { clientId = it }, label = "Twitch Client-ID (dev.twitch.tv)", onSubmit = { s.clientId = clientId; changed() }, modifier = Modifier.width(460.dp))
+        TvTextField(clientId, { clientId = it }, label = "Twitch Client-ID (dev.twitch.tv)", onSubmit = { s.clientId = clientId; changed() }, modifier = Modifier.weight(1f))
         Spacer(Modifier.width(Tokens.Space.lg))
         TvButton("Speichern", onClick = { s.clientId = clientId; changed() })
     }
@@ -165,7 +165,7 @@ private fun TwitchSettings(app: PurpleApp, nav: Navigator) {
     SettingRow("7TV- & BTTV-Emotes", toggle = s.thirdPartyEmotes, onClick = { s.thirdPartyEmotes = !s.thirdPartyEmotes; changed() })
 
     SettingsSection("Daten")
-    SettingRow("Live-Liste jetzt aktualisieren", description = "Passiert sonst jede Minute, solange PurpleTV offen ist", onClick = { app.twitch.refreshAll() })
+    SettingRow("Live-Liste jetzt aktualisieren", description = "Passiert sonst jede Minute, solange Couch offen ist", onClick = { app.twitch.refreshAll() })
 }
 
 @Composable
@@ -217,11 +217,12 @@ private fun RemoteSettings(app: PurpleApp, onPhoneRemote: () -> Unit) {
     })
     if (s.remoteEnabled) {
         val ip = remember { RemoteServer.localAddresses().firstOrNull() ?: "?" }
-        InfoLine("Adresse", "$ip:${RemoteServer.PORT}")
+        InfoLine("Adresse", "http://$ip:${RemoteServer.PORT}")
+        InfoLine("Sicher (Bildschirm teilen)", "https://$ip:${RemoteServer.HTTPS_PORT}")
         SettingRow("Code", value = s.remoteCode, description = "Neu erzeugen meldet alle Geräte ab", onClick = { s.newRemoteCode(); changed() })
-        SettingRow("Handy-Fernbedienung einrichten", icon = Icons.Filled.PhoneIphone, chevron = true, onClick = onPhoneRemote)
+        SettingRow("Couch auf Handy und Mac einrichten", icon = Icons.Filled.PhoneIphone, chevron = true, onClick = onPhoneRemote)
         Text(
-            "Home Assistant findet den TV automatisch (Integration „PurpleTV“ über HACS). Den Code gibst du beim Einrichten ein.",
+            "Home Assistant findet den TV automatisch (Integration „Couch“ über HACS). Den Code gibst du beim Einrichten ein.",
             color = Palette.textFaint,
             style = Type.bodySmall,
         )

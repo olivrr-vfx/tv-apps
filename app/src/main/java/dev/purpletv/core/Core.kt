@@ -1,9 +1,15 @@
 package dev.purpletv.core
 
-/** The apps that live inside PurpleTV. New services get an entry here. */
-enum class AppId(val key: String, val label: String, val launcherAlias: String) {
-    TWITCH("twitch", "Twitch", "dev.purpletv.launcher.Twitch"),
-    YOUTUBE("youtube", "YouTube", "dev.purpletv.launcher.YouTube");
+/** The name of the hub app. */
+const val HUB_NAME = "Couch"
+
+/**
+ * The apps that live inside Couch. New services get an entry here.
+ * [label] is the app's name in Couch, [service] the platform its content comes from.
+ */
+enum class AppId(val key: String, val label: String, val service: String, val launcherAlias: String) {
+    TWITCH("twitch", "PurpleTV", "Twitch", "dev.purpletv.launcher.Twitch"),
+    YOUTUBE("youtube", "YouTube", "YouTube", "dev.purpletv.launcher.YouTube");
 
     companion object {
         fun fromKey(key: String?): AppId? = entries.firstOrNull { it.key == key?.lowercase() }

@@ -24,7 +24,7 @@ enum class DefaultQuality(val label: String, val maxHeight: Int?) {
     fun next() = entries[(ordinal + 1) % entries.size]
 }
 
-/** What PurpleTV shows when it is opened from its main launcher tile. */
+/** What Couch shows when it is opened from its main launcher tile. */
 enum class StartScreen(val label: String) {
     DASHBOARD("Dashboard"),
     LAST("Zuletzt genutzte App"),

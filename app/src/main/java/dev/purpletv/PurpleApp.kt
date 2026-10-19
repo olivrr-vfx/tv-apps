@@ -1,17 +1,23 @@
 package dev.purpletv
 
 import android.app.Application
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import dev.purpletv.core.AppId
+import dev.purpletv.core.AppLog
 import dev.purpletv.data.Http
 import dev.purpletv.data.Settings
 import dev.purpletv.data.WatchHistory
 import dev.purpletv.hub.AppLauncher
 import dev.purpletv.remote.RemoteServer
+import dev.purpletv.remote.WebPlayback
 import dev.purpletv.twitch.TwitchRepository
 import dev.purpletv.twitch.api.Helix
 import dev.purpletv.twitch.api.TwitchAuth
@@ -42,13 +48,37 @@ class PurpleApp : Application(), ImageLoaderFactory {
         settings = Settings(this)
         gql = TwitchGql(settings.deviceId)
         auth = TwitchAuth(settings)
-        helix = Helix(settings, auth)
+        helix = Helix(settings, auth, gql)
         history = WatchHistory(this)
         twitch = TwitchRepository(settings, auth, helix)
         youtube = YouTubeRepository(this, settings)
         _enabled.value = enabledApps()
         AppLauncher.sync(this, settings)
         if (settings.remoteEnabled) startRemote()
+        watchNetwork()
+    }
+
+    /**
+     * A TV often starts Couch before its Wi-Fi is up (waking from standby). When the network
+     * comes (back), everything that failed loads again instead of staying empty.
+     */
+    private fun watchNetwork() {
+        val cm = getSystemService(ConnectivityManager::class.java) ?: return
+        val main = Handler(Looper.getMainLooper())
+        runCatching {
+            cm.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
+                override fun onAvailable(network: Network) {
+                    AppLog.i("Netz", "verbunden")
+                    // Give DNS a moment after the link comes up.
+                    main.postDelayed({
+                        twitch.retryFailed()
+                        youtube.retryFailed()
+                    }, 1_500)
+                }
+
+                override fun onLost(network: Network) = AppLog.i("Netz", "getrennt")
+            })
+        }.onFailure { AppLog.e("Netz", "Netzwerk-Überwachung nicht möglich", it) }
     }
 
     fun enabledApps(): List<AppId> = AppId.entries.filter { settings.isEnabled(it) }
@@ -78,16 +108,20 @@ class PurpleApp : Application(), ImageLoaderFactory {
         youtube.onBackground()
     }
 
-    private var remote: RemoteServer? = null
+    /** Twitch streams relayed to browsers (Couch web app player). */
+    val webPlayback by lazy { WebPlayback(this) }
 
+    private var remote: List<RemoteServer> = emptyList()
+
+    /** Starts the web server for Home Assistant and the Couch web app (HTTP + HTTPS). */
     fun startRemote() {
-        if (remote != null) return
-        remote = RemoteServer(this).also { it.startAll() }
+        if (remote.isNotEmpty()) return
+        remote = listOf(RemoteServer(this), RemoteServer(this, secure = true)).onEach { it.startAll() }
     }
 
     fun stopRemote() {
-        remote?.stopAll()
-        remote = null
+        remote.forEach { it.stopAll() }
+        remote = emptyList()
     }
 
     // Animated emotes (7TV/BTTV webp + gif) need the platform ImageDecoder on Android 9+.

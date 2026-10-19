@@ -1,5 +1,6 @@
 package dev.purpletv.youtube.ui
 
+import dev.purpletv.core.AppLog
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -61,7 +62,7 @@ class YouTubeViewModel(application: Application) : AndroidViewModel(application)
                     YouTubeClient.search(text)
                 }.fold({ result ->
                     Load.Ok(result.copy(videos = result.videos.filter { !(app.settings.youtubeHideShorts && it.isShort) }))
-                }, { Load.Error(it.message ?: "Fehler") })
+                }, { AppLog.e("YouTube", "Laden fehlgeschlagen", it); Load.Error(it.message ?: "Fehler") })
             }
         }
     }
@@ -75,7 +76,7 @@ class YouTubeViewModel(application: Application) : AndroidViewModel(application)
                 runCatching {
                     YouTubeClient.init(app.settings.youtubeRegion)
                     YouTubeClient.channel(url)
-                }.fold({ Load.Ok(it) }, { Load.Error(it.message ?: "Fehler") })
+                }.fold({ Load.Ok(it) }, { AppLog.e("YouTube", "Laden fehlgeschlagen", it); Load.Error(it.message ?: "Fehler") })
             }
         }
     }

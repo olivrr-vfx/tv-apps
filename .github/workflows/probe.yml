@@ -1,0 +1,22 @@
+name: Probe
+
+# Fast network checks (Twitch GQL) without building; results go to the diagnostics branch.
+on:
+  push:
+    branches: ["claude/**"]
+    paths: [".github/scripts/probe.sh", ".github/workflows/probe.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash .github/scripts/probe.sh
+      - name: Save results to the diagnostics branch
+        env:
+          REPO_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git
+        run: bash .github/scripts/save-diag.sh

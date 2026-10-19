@@ -1,5 +1,6 @@
 package dev.purpletv.twitch
 
+import dev.purpletv.core.AppLog
 import dev.purpletv.core.Load
 import dev.purpletv.data.Settings
 import dev.purpletv.remote.RemoteControl
@@ -24,7 +25,7 @@ import kotlinx.coroutines.withContext
  * App-wide Twitch data: followed live channels, followed channels, top streams and categories.
  *
  * Lives as long as the app (not a screen), so every screen and the player see the same, fresh
- * list. While PurpleTV is visible the followed list refreshes every [FOLLOWED_INTERVAL_MS] and
+ * list. While Couch is visible the followed list refreshes every [FOLLOWED_INTERVAL_MS] and
  * immediately when the app comes back to the foreground; this is what removes channels that went
  * offline. Before, the list was only refreshed at start and while the home screen was open.
  */
@@ -38,6 +39,8 @@ class TwitchRepository(
         const val TOP_INTERVAL_MS = 5 * 60_000L
         /** Coming back after this long refreshes right away. */
         const val STALE_AFTER_MS = 30_000L
+        /** Waits before trying a failed request again (e.g. the TV woke up before its Wi-Fi). */
+        val RETRY_DELAYS_MS = longArrayOf(2_000, 5_000, 10_000, 20_000, 40_000)
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -79,7 +82,7 @@ class TwitchRepository(
         }
     }
 
-    /** PurpleTV became visible: refresh what is stale and keep refreshing until [onBackground]. */
+    /** Couch became visible: refresh what is stale and keep refreshing until [onBackground]. */
     fun onForeground() {
         if (!started) {
             start()
@@ -103,7 +106,13 @@ class TwitchRepository(
         loop = null
     }
 
-    private fun <T> load(target: MutableStateFlow<Load<T>>, showLoading: Boolean = true, onOk: (T) -> Unit = {}, block: () -> T) {
+    private fun <T> load(
+        target: MutableStateFlow<Load<T>>,
+        showLoading: Boolean = true,
+        onOk: (T) -> Unit = {},
+        attempt: Int = 0,
+        block: () -> T,
+    ) {
         if (showLoading || target.value !is Load.Ok) target.value = Load.Loading
         scope.launch {
             val result = withContext(Dispatchers.IO) {
@@ -112,13 +121,30 @@ class TwitchRepository(
                 } catch (e: NotLoggedInException) {
                     Load.NeedLogin
                 } catch (e: Exception) {
+                    AppLog.e("Twitch", "Laden fehlgeschlagen", e)
                     Load.Error(e.message ?: "Fehler")
                 }
             }
             if (result is Load.Ok) onOk(result.data)
             // Keep showing old data if a silent refresh fails.
             if (result is Load.Ok || showLoading || target.value !is Load.Ok) target.value = result
+            if (result is Load.Error && attempt < RETRY_DELAYS_MS.size) {
+                delay(RETRY_DELAYS_MS[attempt])
+                // Something else (a manual refresh, the network callback) may have fixed it already.
+                if (target.value is Load.Error || (target.value is Load.Ok && !showLoading)) {
+                    load(target, showLoading = false, onOk = onOk, attempt = attempt + 1, block = block)
+                }
+            }
         }
+    }
+
+    /** The network came back: load again whatever failed. */
+    fun retryFailed() {
+        if (!started) return
+        if (_followed.value is Load.Error) refreshFollowed()
+        if (_top.value is Load.Error) refreshTop()
+        if (_channels.value is Load.Error) load(_channels) { helix.followedChannels() }
+        if (_games.value is Load.Error) load(_games) { helix.topGames() }
     }
 
     fun refreshAll() {

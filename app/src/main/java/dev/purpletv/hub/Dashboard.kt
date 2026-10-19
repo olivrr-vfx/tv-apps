@@ -78,6 +78,9 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
     }
 
     val followed by app.twitch.followed.collectAsState()
+    val top by app.twitch.top.collectAsState()
+    // Fixed set of shelves, so collecting them in a loop keeps a stable call order.
+    val shelves = app.youtube.shelves.mapValues { it.value.collectAsState().value }
     val feed by app.youtube.feed.collectAsState()
     val subs by app.youtube.subscriptions.collectAsState()
     val twitchUser by app.twitch.loggedInName.collectAsState()
@@ -90,7 +93,8 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
         // Ambient glow in the hub colours behind the header.
         Box(
-            Modifier.fillMaxWidth().height(420.dp).background(
+            // Full height so the glow fades out instead of ending in a hard edge.
+            Modifier.fillMaxSize().background(
                 Brush.radialGradient(
                     listOf(Accent.Hub.deep.copy(alpha = 0.35f), Color.Transparent),
                     center = androidx.compose.ui.geometry.Offset(220f, 0f),
@@ -111,7 +115,7 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
                             when (appId) {
                                 AppId.TWITCH -> AccentScope(Accent.Twitch) {
                                     AppTile(
-                                        title = "Twitch",
+                                        title = AppId.TWITCH.label,
                                         status = when (val f = followed) {
                                             is Load.Ok -> if (f.data.isEmpty()) "Niemand live" else "${f.data.size} Kanäle live"
                                             Load.NeedLogin -> "Nicht angemeldet"
@@ -143,7 +147,7 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
                         }
                     }
                     item("phone") {
-                        UtilityTile("Handy-Fernbedienung", "iPhone als Fernbedienung", Icons.Filled.PhoneIphone, onClick = onPhoneRemote,
+                        UtilityTile("Handy & Mac", "Steuern, teilen, Bildschirm zeigen", Icons.Filled.PhoneIphone, onClick = onPhoneRemote,
                             modifier = Modifier.width(Tokens.Layout.appTile))
                     }
                     item("settings") {
@@ -178,7 +182,44 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
                 }
             }
 
+            // Nobody followed is live (or no login): popular streams instead of an empty page.
+            val popular = top.items().take(20)
+            if (twitchOn && live.isEmpty() && popular.isNotEmpty()) item("twitch-top") {
+                AccentScope(Accent.Twitch) {
+                    ContentRow("Beliebt auf Twitch") {
+                        itemsIndexed(popular, key = { _, s -> s.login }) { i, s ->
+                            RestorableFocus(memory, "top", i) { m ->
+                                StreamCard(s, onClick = {
+                                    memory.remember("top", i)
+                                    nav.push(Route.TwitchLive(popular, s.login))
+                                }, modifier = m.width(Tokens.Layout.cardWide), showApp = true)
+                            }
+                        }
+                    }
+                }
+            }
+
             val videos = feed.items()
+            if (youtubeOn && videos.isEmpty()) {
+                // No subscriptions yet: the first trending shelf that has loaded.
+                val shelf = shelves.entries.sortedBy { it.key == "live" }.firstOrNull { (it.value as? Load.Ok)?.data?.isNotEmpty() == true }
+                val trending = (shelf?.value as? Load.Ok)?.data.orEmpty().take(20)
+                if (trending.isNotEmpty()) item("youtube-trending") {
+                    AccentScope(Accent.YouTube) {
+                        val title = dev.purpletv.youtube.api.YouTubeClient.shelves.firstOrNull { it.id == shelf?.key }?.title ?: "Trends"
+                        ContentRow("YouTube: $title") {
+                            itemsIndexed(trending, key = { _, v -> v.id }) { i, v ->
+                                RestorableFocus(memory, "yt-trend", i) { m ->
+                                    VideoCard(v, onClick = {
+                                        memory.remember("yt-trend", i)
+                                        nav.push(Route.YouTubeWatch(v, trending))
+                                    }, modifier = m.width(Tokens.Layout.cardWide), showApp = true)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             if (youtubeOn && videos.isNotEmpty()) item("youtube-feed") {
                 AccentScope(Accent.YouTube) {
                     ContentRow("Neu auf YouTube") {
@@ -251,7 +292,7 @@ private fun Header() {
         }
         Spacer(Modifier.weight(1f))
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text("PurpleTV", color = Palette.textFaint, style = Type.label)
+            Text(dev.purpletv.core.HUB_NAME, color = Palette.textFaint, style = Type.label)
         }
     }
 }

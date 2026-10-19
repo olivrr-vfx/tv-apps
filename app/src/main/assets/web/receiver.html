@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Couch – Bildschirm</title>
+  <link rel="stylesheet" href="/tokens.css">
+  <style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; font-family: system-ui, sans-serif; color: var(--pt-color-text-primary); }
+    video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+    .card {
+      position: fixed; left: 48px; bottom: 28px; padding: 14px 20px; border-radius: 16px;
+      background: rgba(0,0,0,.72); transition: opacity .6s ease;
+    }
+    .card b { display: block; font-size: 20px; }
+    .card span { color: var(--pt-color-text-secondary); font-size: 14px; }
+    .center { position: fixed; inset: 0; display: grid; place-items: center; text-align: center; }
+    .center h1 { font-size: 30px; margin: 0 0 8px; }
+    .center p { color: var(--pt-color-text-secondary); margin: 0; font-size: 16px; }
+    .spinner { width: 48px; height: 48px; border-radius: 50%; border: 4px solid rgba(255,255,255,.15); border-top-color: var(--pt-color-hub); animation: spin 1s linear infinite; margin: 0 auto 20px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { opacity: 0; }
+  </style>
+</head>
+<body>
+  <video id="video" autoplay playsinline></video>
+  <div class="center" id="status"><div><div class="spinner"></div><h1 id="status-title">Verbinde…</h1><p id="status-text"></p></div></div>
+  <div class="card hidden" id="card"><b id="card-title"></b><span>Zurück-Taste beendet die Freigabe</span></div>
+<script>
+(function () {
+  "use strict";
+  var q = new URLSearchParams(location.search);
+  var id = q.get("id"), token = q.get("token");
+  var video = document.getElementById("video");
+  var pc = null, ended = false;
+
+  function api(method, path, body) {
+    var sep = path.indexOf("?") < 0 ? "?" : "&";
+    return fetch("/api/screen/" + path + sep + "token=" + encodeURIComponent(token), {
+      method: method,
+      headers: { "Content-Type": "text/plain" },
+      body: body ? JSON.stringify(body) : undefined,
+    }).then(function (r) { return r.json(); });
+  }
+  function status(title, text, spinner) {
+    var s = document.getElementById("status");
+    s.style.display = title ? "grid" : "none";
+    document.getElementById("status-title").textContent = title || "";
+    document.getElementById("status-text").textContent = text || "";
+    s.querySelector(".spinner").style.display = spinner ? "block" : "none";
+  }
+  function finish(text) {
+    if (ended) return;
+    ended = true;
+    if (pc) pc.close();
+    video.srcObject = null;
+    status("Freigabe beendet", text || "", false);
+    api("POST", "stop?id=" + id).catch(function () {});
+  }
+  function gathered(pc) {
+    return new Promise(function (resolve) {
+      if (pc.iceGatheringState === "complete") return resolve();
+      var done = function () { if (pc.iceGatheringState === "complete") resolve(); };
+      pc.addEventListener("icegatheringstatechange", done);
+      setTimeout(resolve, 2500);
+    });
+  }
+
+  api("GET", "session?id=" + id).then(function (s) {
+    if (!s.offer) throw new Error(s.error || "Keine Freigabe");
+    document.getElementById("card-title").textContent =
+      (s.kind === "camera" ? "Kamera von " : "Bildschirm von ") + (s.from || "einem Gerät");
+    status("Verbinde mit " + (s.from || "Gerät") + "…", "", true);
+    pc = new RTCPeerConnection({ iceServers: [] });
+    pc.ontrack = function (e) {
+      video.srcObject = e.streams[0] || new MediaStream([e.track]);
+      video.play().catch(function () { video.muted = true; video.play(); });
+    };
+    var lost = null;
+    pc.onconnectionstatechange = function () {
+      var st = pc.connectionState;
+      if (st === "connected") {
+        clearTimeout(lost);
+        status(null);
+        var card = document.getElementById("card");
+        card.classList.remove("hidden");
+        setTimeout(function () { card.classList.add("hidden"); }, 5000);
+      } else if (st === "failed" || st === "closed") {
+        finish(st === "failed" ? "Verbindung fehlgeschlagen. Sind beide Geräte im selben WLAN?" : "");
+      } else if (st === "disconnected") {
+        lost = setTimeout(function () { finish("Verbindung verloren."); }, 6000);
+      }
+    };
+    return pc.setRemoteDescription({ type: "offer", sdp: s.offer })
+      .then(function () { return pc.createAnswer(); })
+      .then(function (a) { return pc.setLocalDescription(a); })
+      .then(function () { return gathered(pc); })
+      .then(function () { return api("POST", "answer?id=" + id, { sdp: pc.localDescription.sdp }); });
+  }).catch(function (e) {
+    status("Freigabe nicht möglich", e.message || String(e), false);
+  });
+
+  // The sender stopped sharing.
+  setInterval(function () {
+    if (ended) return;
+    api("GET", "answer?id=" + id).then(function (r) { if (r.ended) finish(""); }).catch(function () {});
+  }, 3000);
+})();
+</script>
+</body>
+</html>

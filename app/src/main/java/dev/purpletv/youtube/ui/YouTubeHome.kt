@@ -80,10 +80,10 @@ fun YouTubeHome(vm: YouTubeViewModel, nav: Navigator) {
             Spacer(Modifier.width(Tokens.Space.md))
             Text("YouTube", color = Palette.text, style = Type.title)
             Spacer(Modifier.width(Tokens.Space.xl))
-            TopTabs(YouTubeTab.entries, tab, label = { it.label }, icon = { it.icon }, onSelect = { vm.tab.value = it }, modifier = Modifier.padding(0.dp))
-            Spacer(Modifier.weight(1f))
+            TopTabs(YouTubeTab.entries, tab, label = { it.label }, icon = { it.icon }, onSelect = { vm.tab.value = it }, modifier = Modifier.weight(1f))
+            Spacer(Modifier.width(Tokens.Space.md))
             val subs by vm.repo.subscriptions.collectAsState()
-            Text("${subs.size} Abos · ohne Konto", color = Palette.textFaint, style = Type.caption)
+            Text("${subs.size} Abos", color = Palette.textFaint, style = Type.caption, maxLines = 1)
         }
         when (tab) {
             YouTubeTab.START -> StartTab(vm, nav, play)
@@ -116,7 +116,7 @@ private fun StartTab(vm: YouTubeViewModel, nav: Navigator, play: (YtVideo, List<
             item("onboarding") {
                 EmptyState(
                     "Noch keine Abos",
-                    body = "PurpleTV braucht kein Google-Konto: Such Kanäle und abonniere sie hier auf dem TV – oder füge sie bequem mit der Handy-Fernbedienung hinzu.",
+                    body = "Couch braucht kein Google-Konto: Such Kanäle und abonniere sie hier auf dem TV – oder füge sie bequem mit der Handy-Fernbedienung hinzu.",
                     icon = Icons.Filled.Subscriptions,
                     action = "Kanäle suchen",
                     onAction = { vm.tab.value = YouTubeTab.SEARCH },
@@ -213,7 +213,7 @@ private fun SearchTab(vm: YouTubeViewModel, nav: Navigator, play: (YtVideo, List
         when (val r = result) {
             null -> EmptyState(
                 "YouTube durchsuchen",
-                body = "Tipp: Auf dem Handy tippst du schneller – öffne die PurpleTV-Fernbedienung und such dort.",
+                body = "Tipp: Auf dem Handy tippst du schneller – öffne Couch auf dem Handy oder Mac und such dort.",
                 icon = Icons.Filled.Search,
             )
             else -> LoadContent(r, onRetry = { vm.search() }) { data ->

@@ -4,7 +4,7 @@
 Outputs:
   app/src/main/java/dev/purpletv/design/Tokens.kt   Compose (TV app)
   app/src/main/assets/web/tokens.css                CSS custom properties (phone remote)
-  homeassistant/themes/purpletv.yaml                Home Assistant theme
+  homeassistant/themes/couch.yaml                   Home Assistant theme
 
 Run `python3 design/generate.py` after editing tokens.json.
 `--check` exits non-zero when a generated file is out of date (used in CI).
@@ -22,7 +22,7 @@ TOKENS = json.loads((ROOT / "design" / "tokens.json").read_text(encoding="utf-8"
 
 KOTLIN_OUT = ROOT / "app/src/main/java/dev/purpletv/design/Tokens.kt"
 CSS_OUT = ROOT / "app/src/main/assets/web/tokens.css"
-HA_OUT = ROOT / "homeassistant/themes/purpletv.yaml"
+HA_OUT = ROOT / "homeassistant/themes/couch.yaml"
 
 HEADER = "Generated from design/tokens.json by design/generate.py. Do not edit."
 
@@ -156,15 +156,15 @@ def ha_theme() -> str:
         "paper-item-icon-color": c["textSecondary"],
         "code-editor-background-color": c["surfaceRaised"],
         "input-fill-color": c["surfaceHigh"],
-        "purpletv-twitch-color": c["twitch"],
-        "purpletv-youtube-color": c["youtube"],
-        "purpletv-live-color": c["live"],
+        "couch-twitch-color": c["twitch"],
+        "couch-youtube-color": c["youtube"],
+        "couch-live-color": c["live"],
     }
     out = [
         f"# {HEADER}",
         "# Copy to <config>/themes/ and add `frontend: themes: !include_dir_merge_named themes`",
-        "# to configuration.yaml, then pick \"PurpleTV\" in your profile.",
-        "PurpleTV:",
+        "# to configuration.yaml, then pick \"Couch\" in your profile.",
+        "Couch:",
         "  modes:",
         "    dark:",
     ]

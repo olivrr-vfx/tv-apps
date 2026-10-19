@@ -6,7 +6,7 @@ import dev.purpletv.remote.RemoteControl.Command
 import dev.purpletv.youtube.api.parseVideoId
 
 /**
- * App links usable from Home Assistant, adb or any launcher:
+ * App links usable from Home Assistant, adb or any launcher. couch:// and purpletv:// are the same:
  *   purpletv://home                        dashboard
  *   purpletv://app/<twitch|youtube>        open an app
  *   purpletv://twitch, purpletv://youtube  same
@@ -25,7 +25,7 @@ object DeepLinks {
         val segments = uri.pathSegments.orEmpty()
         val arg = segments.firstOrNull()
         return when (uri.scheme) {
-            "purpletv" -> when (uri.host) {
+            "couch", "purpletv" -> when (uri.host) {
                 "watch", "live" -> arg?.let { Command.OpenLive(it.lowercase()) }
                 "channel" -> arg?.let { Command.OpenChannel(it.lowercase()) }
                 "vod", "video" -> arg?.let { Command.OpenVod(it) }
@@ -45,6 +45,8 @@ object DeepLinks {
                     "search" -> uri.getQueryParameter("q")?.takeIf { it.isNotBlank() }?.let { Command.YouTubeSearch(it) }
                     else -> parseVideoId(arg)?.let { Command.OpenYouTube(it) }
                 }
+                "screen" -> arg?.let { Command.ShowScreenShare(it) }
+                "media" -> arg?.let { Command.ShowMedia(it) }
                 else -> null
             }
             "http", "https" -> parseWeb(uri.toString(), uri.host.orEmpty(), segments)
@@ -56,7 +58,7 @@ object DeepLinks {
     fun parseText(text: String): Command? {
         val t = text.trim()
         if (t.startsWith("http")) return parse(Uri.parse(t))
-        if (t.startsWith("purpletv://")) return parse(Uri.parse(t))
+        if (t.startsWith("purpletv://") || t.startsWith("couch://")) return parse(Uri.parse(t))
         return null
     }
 
@@ -74,14 +76,16 @@ object DeepLinks {
         if (idOrHandle.startsWith("@")) "https://www.youtube.com/$idOrHandle" else "https://www.youtube.com/channel/$idOrHandle"
 
     fun uriFor(command: Command): Uri? = when (command) {
-        is Command.OpenLive -> Uri.parse("purpletv://watch/${command.login}")
-        is Command.OpenChannel -> Uri.parse("purpletv://channel/${command.login}")
-        is Command.OpenVod -> Uri.parse("purpletv://vod/${command.id}")
-        is Command.OpenApp -> Uri.parse("purpletv://app/${command.app.key}")
-        is Command.OpenYouTube -> Uri.parse("purpletv://youtube/watch/${command.videoId}")
-        is Command.OpenYouTubeChannel -> Uri.parse("purpletv://youtube/channel?url=${Uri.encode(command.url)}")
-        is Command.YouTubeSearch -> Uri.parse("purpletv://youtube/search?q=${Uri.encode(command.query)}")
-        Command.Home -> Uri.parse("purpletv://home")
+        is Command.OpenLive -> Uri.parse("couch://watch/${command.login}")
+        is Command.OpenChannel -> Uri.parse("couch://channel/${command.login}")
+        is Command.OpenVod -> Uri.parse("couch://vod/${command.id}")
+        is Command.OpenApp -> Uri.parse("couch://app/${command.app.key}")
+        is Command.OpenYouTube -> Uri.parse("couch://youtube/watch/${command.videoId}")
+        is Command.OpenYouTubeChannel -> Uri.parse("couch://youtube/channel?url=${Uri.encode(command.url)}")
+        is Command.YouTubeSearch -> Uri.parse("couch://youtube/search?q=${Uri.encode(command.query)}")
+        is Command.ShowScreenShare -> Uri.parse("couch://screen/${command.id}")
+        is Command.ShowMedia -> Uri.parse("couch://media/${command.id}")
+        Command.Home -> Uri.parse("couch://home")
         else -> null
     }
 }

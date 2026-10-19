@@ -71,8 +71,7 @@ fun NavRail(
                 HubMark(44.dp)
                 if (expanded) {
                     Spacer(Modifier.width(Tokens.Space.md))
-                    Text("Purple", color = Tokens.Colors.hubLight, style = Type.title)
-                    Text("TV", color = Color.White, style = Type.title)
+                    Text(dev.purpletv.core.HUB_NAME, color = Color.White, style = Type.title)
                 }
             }
             items.forEach { item ->

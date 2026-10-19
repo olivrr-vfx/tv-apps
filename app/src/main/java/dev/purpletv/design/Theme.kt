@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontFamily
 /**
  * Semantic layer on top of [Tokens]. UI code uses these names, never raw hex values.
  *
- * Every app inside PurpleTV (hub, Twitch, YouTube, ...) brings its own [Accent]; components pick
+ * Every app inside Couch (hub, PurpleTV/Twitch, YouTube, ...) brings its own [Accent]; components pick
  * it up from [LocalAccent], so the same button or card looks right in every app.
  */
 object Palette {

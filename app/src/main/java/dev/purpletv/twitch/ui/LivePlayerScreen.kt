@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
@@ -183,7 +184,7 @@ fun LivePlayerScreen(
         zapBanner = System.currentTimeMillis()
         player.play(login)
         // Opened by name (deep link / Home Assistant): fetch title, game and avatar right away.
-        if (info.title.isBlank() && app.auth.isLoggedIn) {
+        if (info.title.isBlank() || info.avatarUrl.isBlank()) {
             withContext(Dispatchers.IO) { runCatching { app.helix.stream(login) }.getOrNull() }?.let { info = it }
         }
         val id = info.userId ?: withContext(Dispatchers.IO) { runCatching { app.gql.user(login)?.id }.getOrNull() }
@@ -209,7 +210,7 @@ fun LivePlayerScreen(
     LaunchedEffect(login) {
         while (true) {
             delay(60_000)
-            if (!app.auth.isLoggedIn || repo.isFollowedLive(login) == true) continue
+            if (repo.isFollowedLive(login) == true) continue
             val result = withContext(Dispatchers.IO) { runCatching { app.helix.stream(login) } }
             result.onSuccess { fresh ->
                 if (fresh == null) wentOffline = true
@@ -484,7 +485,7 @@ private fun LiveHeader(info: StreamInfo, index: Int, total: Int) {
                 }
             }
             if (info.title.isNotBlank()) {
-                Text(info.title, color = Palette.text, style = Type.body, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.width(820.dp))
+                Text(info.title, color = Palette.text, style = Type.body, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.widthIn(max = 600.dp))
             }
             Text(details(info), color = LocalAccent.current.light, style = Type.label)
         }

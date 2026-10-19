@@ -12,9 +12,9 @@ from .const import DEFAULT_PORT, DOMAIN
 def tv_device(entry_id: str, host: str) -> DeviceInfo:
     return DeviceInfo(
         identifiers={(DOMAIN, entry_id)},
-        name="PurpleTV",
-        manufacturer="PurpleTV",
-        model="TV-Hub für Twitch und YouTube",
+        name="Couch",
+        manufacturer="Couch",
+        model="TV-Hub mit PurpleTV (Twitch) und YouTube",
         configuration_url=f"http://{host}:{DEFAULT_PORT}/",
     )
 

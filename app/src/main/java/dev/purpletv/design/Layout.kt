@@ -1,6 +1,8 @@
 package dev.purpletv.design
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -212,8 +214,9 @@ fun <T> TopTabs(
         delay(280)
         onSelect(target)
     }
+    // Scrolls instead of squeezing the last tabs when the header is narrow (960 dp on a 1080p TV).
     Row(
-        modifier.padding(horizontal = Tokens.Layout.safeHorizontal),
+        modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(Tokens.Space.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {

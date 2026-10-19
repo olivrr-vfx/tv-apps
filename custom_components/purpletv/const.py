@@ -11,10 +11,10 @@ TV_SCAN_SECONDS = 5
 LIVE_SCAN_SECONDS = 60
 
 APP_NAMES = {
-    "dashboard": "PurpleTV",
-    "twitch": "Twitch",
+    "dashboard": "Couch",
+    "twitch": "PurpleTV",
     "youtube": "YouTube",
-    "settings": "PurpleTV",
+    "settings": "Couch",
 }
 
 # Keys accepted by remote.send_command (PurpleTV /api/key), plus a few extras.

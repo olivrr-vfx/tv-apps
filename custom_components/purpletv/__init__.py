@@ -1,4 +1,4 @@
-"""PurpleTV: control the PurpleTV TV hub (Twitch, YouTube) on Android TV and watch Twitch live status."""
+"""Couch: control the Couch TV hub (PurpleTV for Twitch, YouTube) on Android TV and watch Twitch live status."""
 
 from __future__ import annotations
 

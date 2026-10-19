@@ -199,24 +199,24 @@ def _find(hass, domain, suffix):
 async def test_entities_live(hass: HomeAssistant, aioclient_mock):
     await _setup(hass, aioclient_mock, STATE_LIVE)
 
-    player = hass.states.get("media_player.purpletv")
+    player = hass.states.get("media_player.couch")
     assert player.state == "playing"
     assert player.attributes["media_title"] == "CRAFTATTACK TAG 9"
     assert player.attributes["media_artist"] == "Papaplatte"
     assert player.attributes["volume_level"] == 0.8
     assert player.attributes["source_list"] == ["Papaplatte", "zarbex"]
 
-    assert player.attributes["app_name"] == "Twitch"
+    assert player.attributes["app_name"] == "PurpleTV"
     assert player.attributes["media_content_id"] == "papaplatte"
 
-    assert hass.states.get("binary_sensor.purpletv_watching").state == "on"
-    assert hass.states.get("sensor.purpletv_current_channel").state == "Papaplatte"
-    assert hass.states.get("sensor.purpletv_followed_channels_live").state == "2"
-    assert hass.states.get("sensor.purpletv_new_youtube_videos").state == "1"
-    assert hass.states.get("select.purpletv_app").state == "Twitch"
-    remote = hass.states.get("remote.purpletv_remote")
+    assert hass.states.get("binary_sensor.couch_watching").state == "on"
+    assert hass.states.get("sensor.couch_current_channel").state == "Papaplatte"
+    assert hass.states.get("sensor.couch_followed_channels_live").state == "2"
+    assert hass.states.get("sensor.couch_new_youtube_videos").state == "1"
+    assert hass.states.get("select.couch_app").state == "PurpleTV"
+    remote = hass.states.get("remote.couch_remote")
     assert remote.state == "on"
-    assert remote.attributes["current_activity"] == "Twitch"
+    assert remote.attributes["current_activity"] == "PurpleTV"
 
     papa = _find(hass, "binary_sensor", "papaplatte_live")
     assert papa.state == "on"
@@ -231,10 +231,10 @@ async def test_tv_off(hass: HomeAssistant, aioclient_mock):
     entry.add_to_hass(hass)
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
-    assert hass.states.get("media_player.purpletv").state == "off"
-    assert hass.states.get("binary_sensor.purpletv_watching").state == "off"
-    assert hass.states.get("remote.purpletv_remote").state == "off"
-    assert hass.states.get("select.purpletv_app").state == "unavailable"
+    assert hass.states.get("media_player.couch").state == "off"
+    assert hass.states.get("binary_sensor.couch_watching").state == "off"
+    assert hass.states.get("remote.couch_remote").state == "off"
+    assert hass.states.get("select.couch_app").state == "unavailable"
     # Live sensors keep working with the TV off.
     assert _find(hass, "binary_sensor", "papaplatte_live").state == "on"
 
@@ -245,7 +245,7 @@ async def test_commands(hass: HomeAssistant, aioclient_mock):
         aioclient_mock.post(f"{BASE}/{path}", json={"ok": True})
 
     async def call(service, **data):
-        await hass.services.async_call("media_player", service, {"entity_id": "media_player.purpletv", **data}, blocking=True)
+        await hass.services.async_call("media_player", service, {"entity_id": "media_player.couch", **data}, blocking=True)
 
     await call("media_pause")
     await call("volume_mute", is_volume_muted=True)
@@ -270,22 +270,22 @@ async def test_commands(hass: HomeAssistant, aioclient_mock):
 async def test_legacy_app_state(hass: HomeAssistant, aioclient_mock):
     """A TV still running PurpleTV 1.x only sends channel/vod."""
     await _setup(hass, aioclient_mock, STATE_LEGACY)
-    player = hass.states.get("media_player.purpletv")
+    player = hass.states.get("media_player.couch")
     assert player.state == "playing"
     assert player.attributes["media_artist"] == "Papaplatte"
-    assert hass.states.get("binary_sensor.purpletv_watching").state == "on"
-    assert hass.states.get("sensor.purpletv_current_channel").state == "Papaplatte"
+    assert hass.states.get("binary_sensor.couch_watching").state == "on"
+    assert hass.states.get("sensor.couch_current_channel").state == "Papaplatte"
 
 
 async def test_youtube_state(hass: HomeAssistant, aioclient_mock):
     await _setup(hass, aioclient_mock, STATE_YOUTUBE)
-    player = hass.states.get("media_player.purpletv")
+    player = hass.states.get("media_player.couch")
     assert player.state == "playing"
     assert player.attributes["app_name"] == "YouTube"
     assert player.attributes["media_content_id"] == "youtube:dQw4w9WgXcQ"
     assert player.attributes["media_duration"] == 212
     assert player.attributes["media_position"] == 30
-    assert hass.states.get("select.purpletv_app").state == "YouTube"
+    assert hass.states.get("select.couch_app").state == "YouTube"
 
 
 def test_parse_media_id():
@@ -306,16 +306,16 @@ async def test_remote_select_and_youtube_commands(hass: HomeAssistant, aioclient
         aioclient_mock.post(f"{BASE}/{path}", json={"ok": True})
 
     await hass.services.async_call(
-        "remote", "send_command", {"entity_id": "remote.purpletv_remote", "command": ["up", "select", "back", "home"], "delay_secs": 0}, blocking=True
+        "remote", "send_command", {"entity_id": "remote.couch_remote", "command": ["up", "select", "back", "home"], "delay_secs": 0}, blocking=True
     )
-    await hass.services.async_call("remote", "turn_on", {"entity_id": "remote.purpletv_remote", "activity": "YouTube"}, blocking=True)
-    await hass.services.async_call("select", "select_option", {"entity_id": "select.purpletv_app", "option": "Twitch"}, blocking=True)
+    await hass.services.async_call("remote", "turn_on", {"entity_id": "remote.couch_remote", "activity": "YouTube"}, blocking=True)
+    await hass.services.async_call("select", "select_option", {"entity_id": "select.couch_app", "option": "PurpleTV"}, blocking=True)
     await hass.services.async_call(
         "media_player", "play_media",
-        {"entity_id": "media_player.purpletv", "media_content_type": "video", "media_content_id": "https://youtu.be/dQw4w9WgXcQ"},
+        {"entity_id": "media_player.couch", "media_content_type": "video", "media_content_id": "https://youtu.be/dQw4w9WgXcQ"},
         blocking=True,
     )
-    await hass.services.async_call("media_player", "media_seek", {"entity_id": "media_player.purpletv", "seek_position": 90}, blocking=True)
+    await hass.services.async_call("media_player", "media_seek", {"entity_id": "media_player.couch", "seek_position": 90}, blocking=True)
 
     posts = [(c[1].path.split("/api/")[1], dict(c[1].query)) for c in aioclient_mock.mock_calls if c[0] == "POST" and "/api/" in str(c[1])]
     assert posts == [
@@ -333,9 +333,9 @@ async def test_remote_select_and_youtube_commands(hass: HomeAssistant, aioclient
 async def test_browse_media(hass: HomeAssistant, aioclient_mock, hass_ws_client):
     await _setup(hass, aioclient_mock, STATE_LIVE)
     client = await hass_ws_client(hass)
-    await client.send_json({"id": 1, "type": "media_player/browse_media", "entity_id": "media_player.purpletv"})
+    await client.send_json({"id": 1, "type": "media_player/browse_media", "entity_id": "media_player.couch"})
     root = (await client.receive_json())["result"]
     assert [c["media_content_id"] for c in root["children"]] == ["twitch_live", "youtube_feed", "apps"]
-    await client.send_json({"id": 2, "type": "media_player/browse_media", "entity_id": "media_player.purpletv", "media_content_id": "youtube_feed", "media_content_type": "purpletv"})
+    await client.send_json({"id": 2, "type": "media_player/browse_media", "entity_id": "media_player.couch", "media_content_id": "youtube_feed", "media_content_type": "purpletv"})
     feed = (await client.receive_json())["result"]
     assert feed["children"][0]["media_content_id"] == "youtube:dQw4w9WgXcQ"

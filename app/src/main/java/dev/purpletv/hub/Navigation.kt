@@ -31,6 +31,10 @@ sealed interface Route {
     // YouTube
     data class YouTubeChannel(val url: String, val name: String = "") : Route
     data class YouTubeWatch(val video: YtVideo, val queue: List<YtVideo> = emptyList()) : Route
+
+    // Sharing from phones and computers
+    data class ScreenShare(val id: String) : Route
+    data class Media(val id: String) : Route
 }
 
 /** Back stack of the single activity. The first entry is always a [Route.Section]. */

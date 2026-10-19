@@ -117,4 +117,118 @@ class TwitchGql(private val deviceId: String) {
             isLive = user.optJSONObject("stream") != null,
         )
     }
+
+    // --- Public data without a login ------------------------------------------------------
+    // The same queries the website runs for logged out visitors. Used for everything that is
+    // not tied to the account, so browsing works without a login and when Helix has trouble.
+
+    private fun query(query: String, variables: JSONObject = JSONObject()): JSONObject {
+        val json = JSONObject(Http.postJson(URL, JSONObject().put("query", query).put("variables", variables), headers))
+        val data = json.optJSONObject("data")
+        val message = json.optJSONArray("errors")?.optJSONObject(0)?.optString("message")
+        // A failing field comes back as null next to an error; treat that as a failure, not as "nothing found".
+        if (data == null || (message != null && data.keys().asSequence().all { data.isNull(it) })) {
+            throw Exception("Twitch antwortet nicht richtig" + (message?.let { ": $it" } ?: ""))
+        }
+        return data
+    }
+
+    private fun JSONObject.edges(): List<JSONObject> {
+        val edges = optJSONArray("edges") ?: return emptyList()
+        return (0 until edges.length()).mapNotNull { edges.optJSONObject(it)?.let { e -> e.optJSONObject("node") ?: e.optJSONObject("item") } }
+    }
+
+    private fun JSONObject.str(name: String) = if (isNull(name)) "" else optString(name)
+
+    private fun JSONObject.toStream(owner: JSONObject? = null): StreamInfo? {
+        val user = owner ?: optJSONObject("broadcaster") ?: return null
+        return StreamInfo(
+            userId = user.str("id"),
+            login = user.str("login").ifEmpty { return null },
+            displayName = user.str("displayName").ifEmpty { user.str("login") },
+            title = str("title"),
+            gameName = optJSONObject("game")?.let { it.str("displayName").ifEmpty { it.str("name") } }.orEmpty(),
+            viewers = optInt("viewersCount"),
+            startedAt = str("createdAt"),
+            thumbnailUrl = str("previewImageURL"),
+            avatarUrl = user.str("profileImageURL"),
+        )
+    }
+
+    private fun JSONObject.toVideo() = VideoInfo(
+        id = str("id"),
+        userId = optJSONObject("owner")?.str("id").orEmpty(),
+        login = optJSONObject("owner")?.str("login").orEmpty(),
+        userName = optJSONObject("owner")?.let { it.str("displayName").ifEmpty { it.str("login") } }.orEmpty(),
+        title = str("title"),
+        duration = optLong("lengthSeconds").let { "${it / 3600}h${(it % 3600) / 60}m${it % 60}s" },
+        createdAt = str("createdAt"),
+        thumbnailUrl = str("previewThumbnailURL"),
+        viewCount = optInt("viewCount"),
+        type = str("broadcastType").lowercase().ifEmpty { "archive" },
+    )
+
+    private val streamFields =
+        "id title viewersCount createdAt previewImageURL(width: 440, height: 248) " +
+            "broadcaster { id login displayName profileImageURL(width: 150) } game { id name displayName }"
+    private val videoFields =
+        "id title lengthSeconds createdAt viewCount broadcastType previewThumbnailURL(width: 440, height: 248) " +
+            "owner { id login displayName }"
+    private val userFields = "id login displayName description profileImageURL(width: 300) offlineImageURL"
+
+    /** Most watched live streams, optionally of one category and in one language ("DE"). */
+    fun topStreams(gameId: String? = null, language: String? = null, first: Int = 30): List<StreamInfo> {
+        val lang = language?.uppercase()?.filter { it.isLetter() }?.takeIf { it.length == 2 }
+        val options = "{sort: VIEWER_COUNT" + (lang?.let { ", broadcasterLanguages: [$it]" } ?: "") + "}"
+        return if (gameId != null) {
+            query("query(\$id: ID!) { game(id: \$id) { streams(first: $first, options: $options) { edges { node { $streamFields } } } } }",
+                JSONObject().put("id", gameId))
+                .optJSONObject("game")?.optJSONObject("streams")?.edges().orEmpty().mapNotNull { it.toStream() }
+        } else {
+            query("query { streams(first: $first, options: $options) { edges { node { $streamFields } } } }")
+                .optJSONObject("streams")?.edges().orEmpty().mapNotNull { it.toStream() }
+        }
+    }
+
+    fun topGames(first: Int = 30): List<Game> =
+        query("query { games(first: $first) { edges { node { id name displayName boxArtURL(width: 285, height: 380) } } } }")
+            .optJSONObject("games")?.edges().orEmpty().map {
+                Game(it.str("id"), it.str("displayName").ifEmpty { it.str("name") }, it.str("boxArtURL"))
+            }
+
+    /** Channels matching [text], live ones first. */
+    fun searchChannels(text: String): List<StreamInfo> =
+        query("query(\$q: String!) { searchUsers(userQuery: \$q, first: 30) { edges { node { id login displayName profileImageURL(width: 150) stream { $streamFields } } } } }",
+            JSONObject().put("q", text))
+            .optJSONObject("searchUsers")?.edges().orEmpty().mapNotNull { user ->
+                user.optJSONObject("stream")?.toStream(user)?.copy(avatarUrl = user.str("profileImageURL"))
+                    ?: StreamInfo(user.str("id"), user.str("login").ifEmpty { return@mapNotNull null },
+                        user.str("displayName").ifEmpty { user.str("login") }, avatarUrl = user.str("profileImageURL"), isLive = false)
+            }.sortedByDescending { it.isLive }
+
+    /** The live stream of [login], or null when offline. */
+    fun stream(login: String): StreamInfo? {
+        val user = query("query(\$login: String!) { user(login: \$login) { id login displayName profileImageURL(width: 150) stream { $streamFields } } }",
+            JSONObject().put("login", login.lowercase())).optJSONObject("user") ?: return null
+        return user.optJSONObject("stream")?.toStream(user)
+    }
+
+    fun channel(login: String): ChannelInfo? {
+        val user = query("query(\$login: String!) { user(login: \$login) { $userFields } }",
+            JSONObject().put("login", login.lowercase())).optJSONObject("user") ?: return null
+        return ChannelInfo(user.str("id"), user.str("login"), user.str("displayName").ifEmpty { user.str("login") },
+            user.str("profileImageURL"), user.str("description"), user.str("offlineImageURL"))
+    }
+
+    /** Past broadcasts ("archive") or highlights of a channel, newest first. */
+    fun videos(userId: String, type: String): List<VideoInfo> {
+        val kind = if (type == "highlight") "HIGHLIGHT" else "ARCHIVE"
+        return query("query(\$id: ID!) { user(id: \$id) { videos(first: 30, type: $kind, sort: TIME) { edges { node { $videoFields } } } } }",
+            JSONObject().put("id", userId))
+            .optJSONObject("user")?.optJSONObject("videos")?.edges().orEmpty().map { it.toVideo() }
+    }
+
+    fun video(id: String): VideoInfo? =
+        query("query(\$id: ID!) { video(id: \$id) { $videoFields } }", JSONObject().put("id", id))
+            .optJSONObject("video")?.toVideo()
 }

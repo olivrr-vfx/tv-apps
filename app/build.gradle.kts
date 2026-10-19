@@ -15,7 +15,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = runNumber
-        versionName = "1.0.$runNumber"
+        versionName = "2.0.$runNumber"
         buildConfigField("String", "TWITCH_CLIENT_ID", "\"${System.getenv("TWITCH_CLIENT_ID").orEmpty()}\"")
     }
 
