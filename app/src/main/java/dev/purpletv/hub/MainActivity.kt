@@ -3,6 +3,9 @@
 package dev.purpletv.hub
 
 import androidx.compose.foundation.focusGroup
+import kotlinx.coroutines.delay
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
@@ -244,12 +247,14 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
     }
     LaunchedEffect(Unit) { RemoteControl.commands.collect { if (it.opensScreen) open(it) } }
 
-    Box(Modifier.fillMaxSize().background(Palette.canvas)) {
+    // Anything in the window focused (page, rail or a dialog)? See the focus guard in HubShell.
+    var anyFocus by remember { mutableStateOf(false) }
+    Box(Modifier.fillMaxSize().background(Palette.canvas).onFocusChanged { anyFocus = it.hasFocus }) {
         val route = nav.current
         // A new route instance (e.g. another channel opened from Home Assistant) gets fresh state.
         key(route) {
             when (route) {
-                is Route.Section -> HubShell(app, nav, route) {
+                is Route.Section -> HubShell(app, nav, route, hasFocus = { anyFocus }) {
                     saveable.SaveableStateProvider(route.key()) {
                         when (route) {
                             Route.Dashboard -> Dashboard(app, nav, onPhoneRemote = { phoneRemote = true })
@@ -342,7 +347,16 @@ private val pendingYouTubeSearch = kotlinx.coroutines.flow.MutableStateFlow<Stri
 
 /** Top-level sections get the navigation rail on the left. */
 @Composable
-private fun HubShell(app: PurpleApp, nav: Navigator, section: Route.Section, content: @Composable () -> Unit) {
+private fun HubShell(app: PurpleApp, nav: Navigator, section: Route.Section, hasFocus: () -> Boolean, content: @Composable () -> Unit) {
+    // Focus guard: when nothing has the focus (start, or the focused card vanished because a
+    // list refreshed), the first key press used to land in the rail. Put it back into the page.
+    val pageFocus = remember { FocusRequester() }
+    LaunchedEffect(section) {
+        while (true) {
+            delay(400)
+            if (!hasFocus()) runCatching { pageFocus.requestFocus() }
+        }
+    }
     val enabled by app.enabledAppsState.collectAsState()
     val items = buildList {
         add(RailItem("dashboard", "Start", icon = Icons.Filled.Home))
@@ -359,6 +373,7 @@ private fun HubShell(app: PurpleApp, nav: Navigator, section: Route.Section, con
                 .padding(start = Tokens.Layout.railCollapsed)
                 .focusProperties { exit = { if (it == FocusDirection.Left) FocusRequester.Default else FocusRequester.Cancel } }
                 .focusRestorer()
+                .focusRequester(pageFocus)
                 .focusGroup()
         ) { content() }
         NavRail(

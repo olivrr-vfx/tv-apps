@@ -103,17 +103,6 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
     val memory = dashboardMemory
 
     Box(Modifier.fillMaxSize()) {
-        // Ambient glow in the hub colours behind the header.
-        Box(
-            // Full height so the glow fades out instead of ending in a hard edge.
-            Modifier.fillMaxSize().background(
-                Brush.radialGradient(
-                    listOf(Accent.Hub.deep.copy(alpha = 0.35f), Color.Transparent),
-                    center = androidx.compose.ui.geometry.Offset(220f, 0f),
-                    radius = 1100f,
-                )
-            )
-        )
         LazyColumn(contentPadding = PaddingValues(bottom = 48.dp), modifier = Modifier.fillMaxSize()) {
             // The best thing to watch right now, big; the clock moved into its corner.
             val liveNow = followed.items()
