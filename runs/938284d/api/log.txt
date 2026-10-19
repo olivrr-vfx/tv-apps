@@ -1,0 +1,8 @@
+Couch 2.0.17 · Android 13 · Google sdk_gphone64_x86_64
+
+22:06:53 I Netz: verbunden
+22:12:08 E YouTube: Video NVKkZFVwiz0 | i: YouTube möchte bestätigen, dass du kein Bot bist. Bitte später nochmal versuchen. <- l: YouTube probably temporarily blocked anonymous watch access with this IP , got error LOGIN_REQUIRED: "Sign in to confirm that you're not a bot"
+22:12:08 I YouTube: Spiele NVKkZFVwiz0 über den YouTube-Player
+22:12:12 E YouTube: Eingebetteter Player: Fehler 150 für NVKkZFVwiz0
+22:13:42 E YouTube: Eingebetteter Player: Fehler 150 für Mg0W8q-MPug
+200 0.011901s
