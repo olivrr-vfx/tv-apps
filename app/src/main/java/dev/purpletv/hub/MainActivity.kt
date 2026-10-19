@@ -1,4 +1,15 @@
+@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
+
 package dev.purpletv.hub
+
+import androidx.compose.foundation.focusGroup
+import kotlinx.coroutines.delay
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRestorer
 
 import android.content.Intent
 import android.os.Bundle
@@ -30,6 +41,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import dev.purpletv.BuildConfig
+import dev.purpletv.youtube.ui.YouTubeLoginScreen
 import dev.purpletv.PurpleApp
 import dev.purpletv.core.AppId
 import dev.purpletv.core.items
@@ -127,7 +140,7 @@ class MainActivity : ComponentActivity() {
         while (true) {
             val now = System.currentTimeMillis()
             // Re-check right away when coming back from the permission screen.
-            if (app.settings.autoUpdate && (Updater.state.value == UpdateState.NeedsPermission || now - lastUpdateCheck > 30 * 60_000)) {
+            if (BuildConfig.UPDATES && app.settings.autoUpdate && (Updater.state.value == UpdateState.NeedsPermission || now - lastUpdateCheck > 30 * 60_000)) {
                 lastUpdateCheck = now
                 Updater.checkAndInstall(this)
             }
@@ -181,7 +194,7 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
                 Route.Settings -> "settings"
                 is Route.App -> route.app.key
                 Route.TwitchLogin, is Route.TwitchGame, is Route.TwitchChannel, is Route.TwitchLive, is Route.TwitchVod -> "twitch"
-                is Route.YouTubeChannel, is Route.YouTubeWatch -> "youtube"
+                Route.YouTubeLogin, is Route.YouTubeChannel, is Route.YouTubeWatch -> "youtube"
                 is Route.ScreenShare -> "screen"
                 is Route.Media -> "media"
             }
@@ -220,6 +233,7 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
             is RemoteControl.Command.CloseScreenShare -> if ((nav.current as? Route.ScreenShare)?.id == command.id) nav.pop()
             // An open viewer picks up new photos itself.
             is RemoteControl.Command.ShowMedia -> if (nav.current !is Route.Media) nav.open(Route.Media(command.id))
+            RemoteControl.Command.OpenYouTubeLogin -> if (nav.current != Route.YouTubeLogin) nav.open(Route.YouTubeLogin)
             else -> Unit
         }
     }
@@ -233,12 +247,14 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
     }
     LaunchedEffect(Unit) { RemoteControl.commands.collect { if (it.opensScreen) open(it) } }
 
-    Box(Modifier.fillMaxSize().background(Palette.canvas)) {
+    // Anything in the window focused (page, rail or a dialog)? See the focus guard in HubShell.
+    var anyFocus by remember { mutableStateOf(false) }
+    Box(Modifier.fillMaxSize().background(Palette.canvas).onFocusChanged { anyFocus = it.hasFocus }) {
         val route = nav.current
         // A new route instance (e.g. another channel opened from Home Assistant) gets fresh state.
         key(route) {
             when (route) {
-                is Route.Section -> HubShell(app, nav, route) {
+                is Route.Section -> HubShell(app, nav, route, hasFocus = { anyFocus }) {
                     saveable.SaveableStateProvider(route.key()) {
                         when (route) {
                             Route.Dashboard -> Dashboard(app, nav, onPhoneRemote = { phoneRemote = true })
@@ -298,6 +314,9 @@ private fun HubApp(app: PurpleApp, launchedFrom: AppId?) {
                         onChannel = { login -> nav.openTwitchChannel(login) },
                     )
                 }
+                Route.YouTubeLogin -> AccentScope(Accent.YouTube) {
+                    YouTubeLoginScreen(app, onDone = { nav.pop() })
+                }
                 is Route.YouTubeChannel -> AccentScope(Accent.YouTube) {
                     saveable.SaveableStateProvider("yt-channel-${route.url}") { YtChannelScreen(viewModel(), route.url, nav) }
                 }
@@ -328,7 +347,16 @@ private val pendingYouTubeSearch = kotlinx.coroutines.flow.MutableStateFlow<Stri
 
 /** Top-level sections get the navigation rail on the left. */
 @Composable
-private fun HubShell(app: PurpleApp, nav: Navigator, section: Route.Section, content: @Composable () -> Unit) {
+private fun HubShell(app: PurpleApp, nav: Navigator, section: Route.Section, hasFocus: () -> Boolean, content: @Composable () -> Unit) {
+    // Focus guard: when nothing has the focus (start, or the focused card vanished because a
+    // list refreshed), the first key press used to land in the rail. Put it back into the page.
+    val pageFocus = remember { FocusRequester() }
+    LaunchedEffect(section) {
+        while (true) {
+            delay(400)
+            if (!hasFocus()) runCatching { pageFocus.requestFocus() }
+        }
+    }
     val enabled by app.enabledAppsState.collectAsState()
     val items = buildList {
         add(RailItem("dashboard", "Start", icon = Icons.Filled.Home))
@@ -336,7 +364,18 @@ private fun HubShell(app: PurpleApp, nav: Navigator, section: Route.Section, con
         add(RailItem("settings", "Einstellungen", icon = Icons.Filled.Settings))
     }
     Box(Modifier.fillMaxSize()) {
-        Box(Modifier.fillMaxSize().padding(start = Tokens.Layout.railCollapsed)) { content() }
+        // The page is its own focus group: Up/Down never fall through into the rail (that happened
+        // whenever nothing focusable was below, e.g. a row not laid out yet). Only Left opens the
+        // rail, and coming back restores the element that had the focus.
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(start = Tokens.Layout.railCollapsed)
+                .focusProperties { exit = { if (it == FocusDirection.Left) FocusRequester.Default else FocusRequester.Cancel } }
+                .focusRestorer()
+                .focusRequester(pageFocus)
+                .focusGroup()
+        ) { content() }
         NavRail(
             items = items,
             selected = section.key(),

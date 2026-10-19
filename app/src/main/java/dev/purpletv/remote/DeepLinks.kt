@@ -47,6 +47,7 @@ object DeepLinks {
                 }
                 "screen" -> arg?.let { Command.ShowScreenShare(it) }
                 "media" -> arg?.let { Command.ShowMedia(it) }
+                "youtube-login" -> Command.OpenYouTubeLogin
                 else -> null
             }
             "http", "https" -> parseWeb(uri.toString(), uri.host.orEmpty(), segments)
@@ -85,6 +86,7 @@ object DeepLinks {
         is Command.YouTubeSearch -> Uri.parse("couch://youtube/search?q=${Uri.encode(command.query)}")
         is Command.ShowScreenShare -> Uri.parse("couch://screen/${command.id}")
         is Command.ShowMedia -> Uri.parse("couch://media/${command.id}")
+        Command.OpenYouTubeLogin -> Uri.parse("couch://youtube-login")
         Command.Home -> Uri.parse("couch://home")
         else -> null
     }

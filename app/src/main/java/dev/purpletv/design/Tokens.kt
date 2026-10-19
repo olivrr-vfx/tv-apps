@@ -36,13 +36,13 @@ object Tokens {
         /** Focus ring and focused button fill */
         val focus = Color(0xFFFFFFFF)
         /** Couch hub accent */
-        val hub = Color(0xFF7C6CFF)
+        val hub = Color(0xFF8B5CF6)
         /** Hub accent on dark text */
-        val hubLight = Color(0xFFB3A9FF)
+        val hubLight = Color(0xFFC4B5FD)
         /** Hub gradient start */
-        val hubDeep = Color(0xFF4B3BD6)
+        val hubDeep = Color(0xFF4338CA)
         /** Hub gradient end */
-        val hubGlow = Color(0xFF22D3EE)
+        val hubGlow = Color(0xFFEC4899)
         /** Twitch app accent */
         val twitch = Color(0xFF9147FF)
         /** Twitch accent on dark text */

@@ -18,6 +18,7 @@ import dev.purpletv.hub.MainActivity
 import dev.purpletv.remote.RemoteControl.Command
 import dev.purpletv.twitch.api.NotLoggedInException
 import dev.purpletv.twitch.api.StreamInfo
+import dev.purpletv.youtube.api.YouTubeAccount
 import dev.purpletv.youtube.api.YouTubeClient
 import dev.purpletv.youtube.api.parseVideoId
 import fi.iki.elonen.NanoHTTPD
@@ -235,6 +236,21 @@ class RemoteServer(private val app: PurpleApp, private val secure: Boolean = fal
                 }
                 return ok().put("channel", channel.toJson()).let { json(Response.Status.OK, it) }
             }
+            "/api/youtube/import" -> {
+                // Google Takeout subscriptions file (upload) or pasted text.
+                val text = body["file"]?.let { File(it).readText() } ?: param("text") ?: return badRequest("file")
+                val channels = YouTubeAccount.parseTakeout(text)
+                if (channels.isEmpty()) return json(Response.Status.BAD_REQUEST, JSONObject().put("error", "Keine Kanäle in der Datei gefunden"))
+                val added = app.youtube.importChannels(channels)
+                return json(Response.Status.OK, ok().put("found", channels.size).put("added", added))
+            }
+            "/api/youtube/account" -> {
+                // Google client for the YouTube login, typed comfortably on the phone or Mac.
+                param("client_id")?.let { app.youtube.account.clientId = it }
+                param("client_secret")?.let { app.youtube.account.clientSecret = it }
+                if (param("open") == "true") dispatch(Command.OpenYouTubeLogin)
+                return json(Response.Status.OK, ok().put("configured", app.youtube.account.isConfigured))
+            }
             "/api/youtube/unsubscribe" -> {
                 app.youtube.unsubscribe(param("id") ?: return badRequest("id"))
                 return json(Response.Status.OK, ok())
@@ -357,6 +373,11 @@ class RemoteServer(private val app: PurpleApp, private val secure: Boolean = fal
             val share = ScreenShare.get(param("id")) ?: return json(Response.Status.OK, JSONObject().put("ended", true))
             json(Response.Status.OK, JSONObject().put("answer", share.answer ?: JSONObject.NULL).put("ended", share.ended))
         }
+        "/api/youtube/account" -> json(Response.Status.OK, JSONObject()
+            .put("configured", app.youtube.account.isConfigured)
+            .put("logged_in", app.youtube.account.isLoggedIn)
+            .put("name", app.youtube.account.accountName ?: JSONObject.NULL)
+            .put("client_id", app.youtube.account.clientId))
         "/api/media" -> json(Response.Status.OK, JSONObject().put("items", JSONArray(MediaInbox.all().map {
             JSONObject().put("id", it.id).put("name", it.name).put("video", it.isVideo)
         })))

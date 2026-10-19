@@ -1,6 +1,18 @@
 package dev.purpletv.hub
 
 import androidx.compose.foundation.background
+import dev.purpletv.youtube.api.YtVideo
+import dev.purpletv.twitch.api.formatViewers
+import dev.purpletv.twitch.api.StreamInfo
+import dev.purpletv.design.TvButton
+import dev.purpletv.design.Thumbnail
+import dev.purpletv.design.LiveBadge
+import dev.purpletv.design.ButtonStyle
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -91,19 +103,31 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
     val memory = dashboardMemory
 
     Box(Modifier.fillMaxSize()) {
-        // Ambient glow in the hub colours behind the header.
-        Box(
-            // Full height so the glow fades out instead of ending in a hard edge.
-            Modifier.fillMaxSize().background(
-                Brush.radialGradient(
-                    listOf(Accent.Hub.deep.copy(alpha = 0.35f), Color.Transparent),
-                    center = androidx.compose.ui.geometry.Offset(220f, 0f),
-                    radius = 1100f,
-                )
-            )
-        )
         LazyColumn(contentPadding = PaddingValues(bottom = 48.dp), modifier = Modifier.fillMaxSize()) {
-            item("header") { Header() }
+            // The best thing to watch right now, big; the clock moved into its corner.
+            val liveNow = followed.items()
+            val popularNow = top.items()
+            val feedNow = feed.items()
+            val trendNow = shelves.entries.sortedBy { it.key == "live" }.firstNotNullOfOrNull { (it.value as? Load.Ok)?.data?.takeIf { d -> d.isNotEmpty() } }.orEmpty()
+            val featured: Featured? = when {
+                twitchOn && liveNow.isNotEmpty() -> Featured.Live(liveNow.first(), liveNow, followed = true)
+                youtubeOn && feedNow.isNotEmpty() -> Featured.Video(feedNow.first(), feedNow)
+                twitchOn && popularNow.isNotEmpty() -> Featured.Live(popularNow.first(), popularNow, followed = false)
+                youtubeOn && trendNow.isNotEmpty() -> Featured.Video(trendNow.first(), trendNow)
+                else -> null
+            }
+            item("header") {
+                if (featured != null) {
+                    DashboardHero(featured, focusFirst = memory.isEmpty, onPlay = {
+                        when (featured) {
+                            is Featured.Live -> nav.push(Route.TwitchLive(featured.list, featured.stream.login, featured.followed))
+                            is Featured.Video -> nav.push(Route.YouTubeWatch(featured.video, featured.list))
+                        }
+                    })
+                } else {
+                    Header()
+                }
+            }
 
             item("apps") {
                 ContentRow("Deine Apps") {
@@ -124,7 +148,7 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
                                         },
                                         accent = Accent.Twitch,
                                         onClick = { nav.showSection(Route.App(AppId.TWITCH)) },
-                                        modifier = Modifier.width(Tokens.Layout.appTile).initialFocus(isFirst && memory.isEmpty),
+                                        modifier = Modifier.width(Tokens.Layout.appTile).initialFocus(isFirst && memory.isEmpty && featured == null),
                                         mark = { AppMark(AppId.TWITCH, 44.dp) },
                                     )
                                 }
@@ -139,7 +163,7 @@ fun Dashboard(app: PurpleApp, nav: Navigator, onPhoneRemote: () -> Unit) {
                                         },
                                         accent = Accent.YouTube,
                                         onClick = { nav.showSection(Route.App(AppId.YOUTUBE)) },
-                                        modifier = Modifier.width(Tokens.Layout.appTile).initialFocus(isFirst && memory.isEmpty),
+                                        modifier = Modifier.width(Tokens.Layout.appTile).initialFocus(isFirst && memory.isEmpty && featured == null),
                                         mark = { AppMark(AppId.YOUTUBE, 44.dp) },
                                     )
                                 }
@@ -294,5 +318,75 @@ private fun Header() {
         Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(dev.purpletv.core.HUB_NAME, color = Palette.textFaint, style = Type.label)
         }
+    }
+}
+
+private sealed interface Featured {
+    data class Live(val stream: StreamInfo, val list: List<StreamInfo>, val followed: Boolean) : Featured
+    data class Video(val video: YtVideo, val list: List<YtVideo>) : Featured
+}
+
+/** Big picture of the featured stream or video, fading into the page, with one clear action. */
+@Composable
+private fun DashboardHero(featured: Featured, focusFirst: Boolean, onPlay: () -> Unit) {
+    val accent = if (featured is Featured.Live) Accent.Twitch else Accent.YouTube
+    val image: String
+    val kicker: String
+    val title: String
+    val subtitle: String
+    when (featured) {
+        is Featured.Live -> {
+            val st = featured.stream
+            // Previews come in 440x248; the hero needs the large one.
+            image = st.thumbnail(1280, 720).replace("-440x248", "-1280x720")
+            kicker = if (featured.followed) "Live · ${st.displayName}" else "Beliebt auf Twitch · ${st.displayName}"
+            title = st.title.ifBlank { st.displayName }
+            subtitle = listOfNotNull(st.gameName.ifBlank { null }, if (st.viewers > 0) "${formatViewers(st.viewers)} Zuschauer" else null).joinToString("  ·  ")
+        }
+        is Featured.Video -> {
+            val v = featured.video
+            image = v.thumbnail
+            kicker = "YouTube · ${v.channelName}"
+            title = v.title
+            subtitle = v.uploadedText
+        }
+    }
+    AccentScope(accent) {
+        Box(Modifier.fillMaxWidth().height(360.dp)) {
+            Thumbnail(image, Modifier.align(Alignment.TopEnd).fillMaxHeight().aspectRatio(16f / 9f))
+            Box(Modifier.matchParentSize().background(Brush.horizontalGradient(
+                0f to Palette.canvas, 0.38f to Palette.canvas.copy(alpha = 0.92f), 0.7f to Palette.canvas.copy(alpha = 0.25f), 1f to Color.Transparent)))
+            Box(Modifier.matchParentSize().background(Brush.verticalGradient(0.55f to Color.Transparent, 1f to Palette.canvas)))
+            HeroClock(Modifier.align(Alignment.TopEnd).padding(top = Tokens.Layout.safeVertical, end = Tokens.Layout.safeHorizontal))
+            Column(
+                Modifier.align(Alignment.BottomStart).padding(start = Tokens.Layout.safeHorizontal, bottom = Tokens.Space.lg).widthIn(max = 520.dp),
+                verticalArrangement = Arrangement.spacedBy(Tokens.Space.sm),
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Tokens.Space.sm)) {
+                    if (featured is Featured.Live || (featured as? Featured.Video)?.video?.isLive == true) LiveBadge()
+                    Text(kicker.uppercase(), color = accent.light, style = Type.overline, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                Text(title, color = Palette.text, style = Type.headline, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (subtitle.isNotBlank()) Text(subtitle, color = Palette.textDim, style = Type.body, maxLines = 1)
+                Spacer(Modifier.height(Tokens.Space.xs))
+                TvButton("Ansehen", onClick = onPlay, style = ButtonStyle.Primary, icon = Icons.Filled.PlayArrow,
+                    modifier = Modifier.initialFocus(focusFirst))
+            }
+        }
+    }
+}
+
+@Composable
+private fun HeroClock(modifier: Modifier) {
+    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            now = System.currentTimeMillis()
+            delay(15_000)
+        }
+    }
+    Column(modifier, horizontalAlignment = Alignment.End) {
+        Text(SimpleDateFormat("HH:mm", Locale.GERMANY).format(Date(now)), color = Palette.text, style = Type.title)
+        Text(SimpleDateFormat("EEE, d. MMM", Locale.GERMANY).format(Date(now)), color = Palette.textDim, style = Type.caption)
     }
 }

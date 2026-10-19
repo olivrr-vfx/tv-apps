@@ -1,4 +1,12 @@
+@file:OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
+
 package dev.purpletv.design
+
+import androidx.compose.foundation.focusGroup
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -57,6 +65,8 @@ fun NavRail(
     itemModifier: (RailItem) -> Modifier = { Modifier },
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val selectedFocus = remember { FocusRequester() }
+    val hasSelected = items.any { it.key == selected }
     Row(modifier.fillMaxHeight()) {
         Column(
             Modifier
@@ -64,6 +74,13 @@ fun NavRail(
                 .width(if (expanded) Tokens.Layout.railExpanded else Tokens.Layout.railCollapsed)
                 .background(RailBackground)
                 .onFocusChanged { expanded = it.hasFocus }
+                // Entering the rail lands on the current section; only Right leaves it again
+                // (Up/Down at its ends stay put instead of jumping into the page).
+                .focusProperties {
+                    enter = { if (hasSelected) selectedFocus else FocusRequester.Default }
+                    exit = { if (it == FocusDirection.Right) FocusRequester.Default else FocusRequester.Cancel }
+                }
+                .focusGroup()
                 .padding(vertical = Tokens.Layout.safeVertical, horizontal = 14.dp),
             verticalArrangement = Arrangement.spacedBy(Tokens.Space.sm),
         ) {
@@ -75,7 +92,9 @@ fun NavRail(
                 }
             }
             items.forEach { item ->
-                RailEntry(item, selected = item.key == selected, expanded = expanded, onSelect = { onSelect(item.key) }, modifier = itemModifier(item))
+                val isSelected = item.key == selected
+                RailEntry(item, selected = isSelected, expanded = expanded, onSelect = { onSelect(item.key) },
+                    modifier = itemModifier(item).then(if (isSelected) Modifier.focusRequester(selectedFocus) else Modifier))
             }
             Spacer(Modifier.weight(1f))
             if (expanded && footer != null) {

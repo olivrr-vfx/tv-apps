@@ -122,8 +122,10 @@ class TwitchGql(private val deviceId: String) {
     // The same queries the website runs for logged out visitors. Used for everything that is
     // not tied to the account, so browsing works without a login and when Helix has trouble.
 
-    private fun query(query: String, variables: JSONObject = JSONObject()): JSONObject {
-        val json = JSONObject(Http.postJson(URL, JSONObject().put("query", query).put("variables", variables), headers))
+    private fun query(query: String, variables: JSONObject = JSONObject(), auth: Pair<String, String>? = null): JSONObject {
+        // With a login: the user's token, sent with the client that issued it.
+        val h = auth?.let { (clientId, token) -> headers + mapOf("Client-ID" to clientId, "Authorization" to "OAuth $token") } ?: headers
+        val json = JSONObject(Http.postJson(URL, JSONObject().put("query", query).put("variables", variables), h))
         val data = json.optJSONObject("data")
         val message = json.optJSONArray("errors")?.optJSONObject(0)?.optString("message")
         // A failing field comes back as null next to an error; treat that as a failure, not as "nothing found".
@@ -226,6 +228,55 @@ class TwitchGql(private val deviceId: String) {
         return query("query(\$id: ID!) { user(id: \$id) { videos(first: 30, type: $kind, sort: TIME) { edges { node { $videoFields } } } } }",
             JSONObject().put("id", userId))
             .optJSONObject("user")?.optJSONObject("videos")?.edges().orEmpty().map { it.toVideo() }
+    }
+
+    // --- Account data (login through Twitch's TV client) -----------------------------------
+
+    /** Followed channels that are live, most viewers first. [auth] = client id to token. */
+    fun followedLive(auth: Pair<String, String>): List<StreamInfo> {
+        val out = mutableListOf<StreamInfo>()
+        var cursor: String? = null
+        do {
+            val user = query("query(\$after: Cursor) { currentUser { followedLiveUsers(first: 30, after: \$after) { edges { cursor node { id login displayName profileImageURL(width: 150) stream { $streamFields } } } pageInfo { hasNextPage } } } }",
+                JSONObject().put("after", cursor ?: JSONObject.NULL), auth).optJSONObject("currentUser") ?: throw NotLoggedInException()
+            val conn = user.optJSONObject("followedLiveUsers") ?: break
+            val edges = conn.optJSONArray("edges") ?: break
+            for (i in 0 until edges.length()) {
+                val edge = edges.optJSONObject(i) ?: continue
+                cursor = edge.str("cursor").ifEmpty { null }
+                val node = edge.optJSONObject("node") ?: continue
+                node.optJSONObject("stream")?.toStream(node)?.copy(avatarUrl = node.str("profileImageURL"))?.let { out += it }
+            }
+            val more = conn.optJSONObject("pageInfo")?.optBoolean("hasNextPage") == true
+        } while (more && cursor != null && out.size < 300)
+        return out.distinctBy { it.login }.sortedByDescending { it.viewers }
+    }
+
+    /** All followed channels, most recently followed first. */
+    fun followedChannels(auth: Pair<String, String>): List<ChannelInfo> {
+        val out = mutableListOf<ChannelInfo>()
+        var cursor: String? = null
+        do {
+            val user = query("query(\$after: Cursor) { currentUser { follows(first: 30, after: \$after) { edges { cursor node { id login displayName profileImageURL(width: 150) } } pageInfo { hasNextPage } } } }",
+                JSONObject().put("after", cursor ?: JSONObject.NULL), auth).optJSONObject("currentUser") ?: throw NotLoggedInException()
+            val conn = user.optJSONObject("follows") ?: break
+            val edges = conn.optJSONArray("edges") ?: break
+            for (i in 0 until edges.length()) {
+                val edge = edges.optJSONObject(i) ?: continue
+                cursor = edge.str("cursor").ifEmpty { null }
+                val n = edge.optJSONObject("node") ?: continue
+                out += ChannelInfo(n.str("id"), n.str("login"), n.str("displayName").ifEmpty { n.str("login") }, n.str("profileImageURL"))
+            }
+            val more = conn.optJSONObject("pageInfo")?.optBoolean("hasNextPage") == true
+        } while (more && cursor != null && out.size < 500)
+        return out.distinctBy { it.id }
+    }
+
+    /** id, login and display name of the logged in user. */
+    fun self(auth: Pair<String, String>): ChannelInfo? {
+        val u = query("query { currentUser { id login displayName profileImageURL(width: 150) } }", auth = auth)
+            .optJSONObject("currentUser") ?: return null
+        return ChannelInfo(u.str("id"), u.str("login"), u.str("displayName").ifEmpty { u.str("login") }, u.str("profileImageURL"))
     }
 
     fun video(id: String): VideoInfo? =

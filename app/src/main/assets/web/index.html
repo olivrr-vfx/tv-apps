@@ -127,6 +127,19 @@
           <textarea id="yt-add" rows="4" placeholder="@MrBeast&#10;https://www.youtube.com/@LinusTechTips"></textarea>
           <button class="btn youtube" id="yt-add-btn">Abonnieren</button>
           <p id="yt-add-status" class="muted"></p>
+          <article class="tile">
+            <h3>Abos aus Google übernehmen</h3>
+            <p class="muted">Am einfachsten: auf <a href="https://takeout.google.com" target="_blank" rel="noopener">takeout.google.com</a> nur „YouTube“ → „Abos“ exportieren und die Datei <code>Abos.csv</code> hier hochladen.</p>
+            <label class="btn youtube small file-btn">Abos.csv hochladen<input type="file" id="yt-takeout" accept=".csv,text/csv"></label>
+            <p id="yt-import-status" class="muted small"></p>
+          </article>
+          <article class="tile">
+            <h3>Google-Login auf dem TV <span class="muted small" id="yt-account-state"></span></h3>
+            <p class="muted">Gleicht die Abos automatisch ab. Google verlangt dafür einmalig eine eigene Client-ID vom Typ „Fernseher und Geräte mit begrenzter Eingabe“ (Anleitung in der README).</p>
+            <input id="yt-client-id" placeholder="Client-ID (…apps.googleusercontent.com)" autocomplete="off">
+            <input id="yt-client-secret" placeholder="Client-Secret" autocomplete="off">
+            <button class="btn youtube small" id="yt-account-save">Speichern und auf dem TV anmelden</button>
+          </article>
           <h3>Deine Abos <span class="count" id="yt-sub-count"></span></h3>
           <div id="yt-subs" class="list"></div>
         </div>

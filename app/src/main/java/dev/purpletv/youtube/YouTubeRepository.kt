@@ -5,6 +5,7 @@ import android.content.Context
 import dev.purpletv.core.Load
 import dev.purpletv.data.Settings
 import dev.purpletv.remote.RemoteControl
+import dev.purpletv.youtube.api.YouTubeAccount
 import dev.purpletv.youtube.api.YouTubeClient
 import dev.purpletv.youtube.api.YtChannel
 import dev.purpletv.youtube.api.YtVideo
@@ -43,6 +44,10 @@ class YouTubeRepository(context: Context, private val settings: Settings) {
 
     val history = YouTubeHistory(context)
 
+    /** Optional Google login; its subscriptions are merged into the local ones. */
+    val account = YouTubeAccount(context)
+    val accountName = MutableStateFlow(account.accountName)
+
     private val _subscriptions = MutableStateFlow(loadSubscriptions())
     val subscriptions: StateFlow<List<YtChannel>> = _subscriptions
 
@@ -63,6 +68,33 @@ class YouTubeRepository(context: Context, private val settings: Settings) {
         scope.launch(Dispatchers.IO) { YouTubeClient.init(settings.youtubeRegion) }
         refreshFeed()
         refreshShelves()
+        if (account.isLoggedIn && System.currentTimeMillis() - account.lastSync > 6 * 3600_000L) syncAccount()
+    }
+
+    /** Adds channels that are not subscribed yet (Google account, Takeout file). Returns how many. */
+    fun importChannels(channels: List<YtChannel>): Int {
+        val known = _subscriptions.value.map { it.id }.toSet()
+        val fresh = channels.filter { it.id !in known }
+        if (fresh.isEmpty()) return 0
+        saveSubscriptions(_subscriptions.value + fresh)
+        refreshFeed(silent = true)
+        return fresh.size
+    }
+
+    /** Takes over the subscriptions of the Google account. */
+    fun syncAccount(onDone: (Result<Int>) -> Unit = {}) {
+        scope.launch {
+            val result = withContext(Dispatchers.IO) { runCatching { account.subscriptions() } }
+                .onFailure { AppLog.e("YouTube", "Abos vom Google-Konto", it) }
+                .map { importChannels(it) }
+            accountName.value = account.accountName
+            onDone(result)
+        }
+    }
+
+    fun logoutAccount() {
+        account.logout()
+        accountName.value = null
     }
 
     fun onForeground() {
