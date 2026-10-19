@@ -1,0 +1,1 @@
+    topResumedActivity=ActivityRecord{91e3624 u0 dev.purpletv/.hub.MainActivity} t9}
