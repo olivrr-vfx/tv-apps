@@ -2,9 +2,8 @@ name: Diagnose on emulator
 
 # Installs the release APK on an Android emulator, opens every screen, calls the
 # local API and saves screenshots, API answers and logcat to the `diagnostics` branch.
+# Only on demand (Actions → Diagnose → Run workflow); it takes about 15 minutes.
 on:
-  push:
-    branches: ["claude/**"]
   workflow_dispatch:
 
 permissions:
