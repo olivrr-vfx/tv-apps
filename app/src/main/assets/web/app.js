@@ -651,7 +651,41 @@
     if (q) post("youtube/search", { q: q }).then(function () { toast("Suche auf dem TV geöffnet"); }).catch(function () {});
   });
 
+  function loadAccount() {
+    api("GET", "youtube/account").then(function (r) {
+      $("#yt-account-state").textContent = r.logged_in ? "· angemeldet" + (r.name ? " als " + r.name : "") : r.configured ? "· eingerichtet" : "";
+      if (r.client_id && !$("#yt-client-id").value) $("#yt-client-id").value = r.client_id;
+    }).catch(function () {});
+  }
+  $("#yt-account-save").addEventListener("click", function () {
+    var id = $("#yt-client-id").value.trim(), secret = $("#yt-client-secret").value.trim();
+    if (!id || !secret) return toast("Client-ID und Secret eintragen");
+    post("youtube/account", { client_id: id, client_secret: secret, open: "true" }).then(function () {
+      toast("Auf dem TV den Code bestätigen");
+      loadAccount();
+    }).catch(function () {});
+  });
+  $("#yt-takeout").addEventListener("change", function () {
+    var f = this.files && this.files[0], status = $("#yt-import-status");
+    if (!f) return;
+    if (DEMO) { status.textContent = "Im Demo-Modus nicht verfügbar."; return; }
+    status.textContent = "Lade " + f.name + "…";
+    var form = new FormData();
+    form.append("file", f, f.name);
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/api/youtube/import?token=" + encodeURIComponent(code));
+    xhr.onload = function () {
+      var r = safeJson(xhr.responseText) || {};
+      status.textContent = xhr.status >= 300 ? (r.error || "Fehler " + xhr.status) : r.found + " Kanäle gefunden, " + r.added + " neu abonniert.";
+      loadSubs();
+    };
+    xhr.onerror = function () { status.textContent = "TV nicht erreichbar."; };
+    xhr.send(form);
+    this.value = "";
+  });
+
   function loadSubs() {
+    loadAccount();
     api("GET", "youtube/subscriptions").then(function (r) {
       var list = r.channels || [], box = $("#yt-subs");
       $("#yt-sub-count").textContent = list.length ? String(list.length) : "";

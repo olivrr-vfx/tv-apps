@@ -3,6 +3,5 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android" xmlns:aapt="http://schemas.android.com/aapt"
     android:width="48dp" android:height="48dp" android:viewportWidth="48" android:viewportHeight="48">
     <path android:fillColor="#FF9147FF" android:pathData="M12,0h24a12,12 0,0 1,12 12v24a12,12 0,0 1,-12 12h-24a12,12 0,0 1,-12 -12v-24a12,12 0,0 1,12 -12z" />
-    <path android:fillColor="#FFFFFFFF" android:pathData="M11.5,13.3h25a2.7,2.7 0,0 1,2.7 2.7v14.2a2.7,2.7 0,0 1,-2.7 2.7h-13.3l-4.5,4.5v-4.5h-7.2a2.7,2.7 0,0 1,-2.7 -2.7v-14.2a2.7,2.7 0,0 1,2.7 -2.7z" />
-    <path android:fillColor="#FF9147FF" android:pathData="M20.9,18.2l8,4.9l-8,4.9z" />
+    <path android:fillColor="#FFFFFFFF" android:fillType="evenOdd" android:pathData="M11.5,13.3h25a2.7,2.7 0,0 1,2.7 2.7v14.2a2.7,2.7 0,0 1,-2.7 2.7h-13.3l-4.5,4.5v-4.5h-7.2a2.7,2.7 0,0 1,-2.7 -2.7v-14.2a2.7,2.7 0,0 1,2.7 -2.7z M20.9,18.2l8,4.9l-8,4.9z" />
 </vector>

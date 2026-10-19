@@ -113,15 +113,17 @@ private fun StartTab(vm: YouTubeViewModel, nav: Navigator, play: (YtVideo, List<
             }
         }
         if (subs.isEmpty()) {
+            // Compact, so the trends below stay on the first screen.
             item("onboarding") {
-                EmptyState(
-                    "Noch keine Abos",
-                    body = "Couch braucht kein Google-Konto: Such Kanäle und abonniere sie hier auf dem TV – oder füge sie bequem mit der Handy-Fernbedienung hinzu.",
-                    icon = Icons.Filled.Subscriptions,
-                    action = "Kanäle suchen",
-                    onAction = { vm.tab.value = YouTubeTab.SEARCH },
-                    modifier = Modifier.height(340.dp),
-                )
+                Row(
+                    Modifier.padding(horizontal = Tokens.Layout.safeHorizontal, vertical = Tokens.Space.md),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(Tokens.Space.md),
+                ) {
+                    TvButton("Abos von Google holen", onClick = { nav.push(Route.YouTubeLogin) }, icon = Icons.Filled.Subscriptions)
+                    TvButton("Kanäle suchen", onClick = { vm.tab.value = YouTubeTab.SEARCH })
+                    Text("oder Abos.csv in Couch auf Handy/Mac hochladen", color = Palette.textFaint, style = Type.bodySmall)
+                }
             }
         } else {
             item("feed") {

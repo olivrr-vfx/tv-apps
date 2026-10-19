@@ -322,3 +322,7 @@ input[type=range] { flex: 1; accent-color: var(--pt-color-hub); height: 32px; pa
   box-shadow: 0 8px 30px rgba(0,0,0,.4);
 }
 @media (min-width: 980px) { .toast { bottom: var(--pt-space-xxl); } }
+
+/* YouTube account tiles */
+.tile > input { width: 100%; margin-top: var(--pt-space-sm); }
+.tile > .btn { margin-top: var(--pt-space-md); }
